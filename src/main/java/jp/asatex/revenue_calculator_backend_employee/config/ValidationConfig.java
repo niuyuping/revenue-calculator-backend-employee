@@ -1,0 +1,27 @@
+package jp.asatex.revenue_calculator_backend_employee.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+import org.springframework.web.reactive.config.WebFluxConfigurer;
+
+/**
+ * 検証設定クラス
+ * WebFluxのパラメータ検証を設定
+ */
+@Configuration
+public class ValidationConfig implements WebFluxConfigurer {
+
+    @Bean
+    public LocalValidatorFactoryBean validator() {
+        return new LocalValidatorFactoryBean();
+    }
+
+    @Bean
+    public MethodValidationPostProcessor methodValidationPostProcessor() {
+        MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
+        processor.setValidator(validator());
+        return processor;
+    }
+}
