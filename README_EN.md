@@ -125,7 +125,7 @@ src/
 1. **Clone the project**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/niuyuping/revenue-calculator-backend-employee.git
    cd revenue-calculator-backend-employee
    ```
 
@@ -571,7 +571,7 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 ### Reactive Programming
 
 - Fully non-blocking I/O
-- Backpressure handling
+- Back pressure handling
 - Efficient resource utilization
 
 ### Database Optimization
@@ -610,8 +610,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-- Project Link: [https://github.com/username/revenue-calculator-backend-employee](https://github.com/username/revenue-calculator-backend-employee)
-- Issue Reports: [https://github.com/username/revenue-calculator-backend-employee/issues](https://github.com/username/revenue-calculator-backend-employee/issues)
+- Project Link: [https://github.com/niuyuping/revenue-calculator-backend-employee](https://github.com/niuyuping/revenue-calculator-backend-employee)
+- Issue Reports: [https://github.com/niuyuping/revenue-calculator-backend-employee/issues](https://github.com/niuyuping/revenue-calculator-backend-employee/issues)
 - Company Email: <niuyuping@asatex.jp>
 - LINE Contact: niuyuping
 

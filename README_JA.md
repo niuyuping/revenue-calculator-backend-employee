@@ -24,6 +24,7 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 ## 📋 機能
 
 ### コア機能
+
 - ✅ **従業員CRUD操作** - 従業員情報の作成、読み取り、更新、削除
 - ✅ **従業員検索** - 姓名とふりがなによる検索
 - ✅ **データ検証** - 完全な入力データ検証と制約
@@ -35,6 +36,7 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 - ✅ **多言語文書** - 英語、中国語、日本語のAPI文書
 
 ### データ検証
+
 - 従業員番号フォーマット検証（英数字、アンダースコア、ハイフン）
 - 姓名長さ検証（1-100文字）
 - ふりがなフォーマット検証（ひらがな、カタカナ、ラテン文字、スペース、括弧）
@@ -42,6 +44,7 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 - パスパラメータとクエリパラメータ検証
 
 ### 監視とヘルスチェック
+
 - Spring Boot Actuator統合
 - ヘルスチェックエンドポイント
 - Flywayマイグレーション状態監視
@@ -51,7 +54,7 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 
 ## 🏗️ プロジェクト構造
 
-```
+```text
 src/
 ├── main/
 │   ├── java/jp/asatex/revenue_calculator_backend_employee/
@@ -120,26 +123,30 @@ src/
 ### インストールと実行
 
 1. **プロジェクトのクローン**
+
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/niuyuping/revenue-calculator-backend-employee.git
    cd revenue-calculator-backend-employee
    ```
 
 2. **データベース設定**
+
    ```bash
    # PostgreSQLデータベースの作成
    createdb asatex-revenue
    ```
 
 3. **Redis設定**
+
    ```bash
    # Redisサービスの開始
    redis-server
    ```
 
 4. **アプリケーション設定**
-   
+
    `src/main/resources/application.properties`を編集:
+
    ```properties
    # データベース設定
    spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
@@ -157,11 +164,13 @@ src/
    ```
 
 5. **アプリケーションの実行**
+
    ```bash
    ./gradlew bootRun
    ```
 
 6. **動作確認**
+
    ```bash
    curl http://localhost:9001/api/v1/employee/health
    ```
@@ -169,17 +178,21 @@ src/
 ## 📚 API文書
 
 ### Swagger UIアクセス
+
 アプリケーション起動後、以下のリンクからSwagger UIにアクセスできます：
 
-- **Swagger UI**: http://localhost:9001/swagger-ui.html
-- **OpenAPI JSON**: http://localhost:9001/v3/api-docs
-- **Swagger設定**: http://localhost:9001/v3/api-docs/swagger-config
+- **Swagger UI**: <http://localhost:9001/swagger-ui.html>
+- **OpenAPI JSON**: <http://localhost:9001/v3/api-docs>
+- **Swagger設定**: <http://localhost:9001/v3/api-docs/swagger-config>
 
 ### 🌐 多言語サポート
+
 API文書は3つの言語をサポートし、以下の方法で切り替えできます：
 
 #### 言語切り替え方法
+
 1. **Accept-Languageヘッダーを使用**：
+
    ```bash
    # 英語
    curl -H "Accept-Language: en" http://localhost:9001/v3/api-docs
@@ -192,28 +205,32 @@ API文書は3つの言語をサポートし、以下の方法で切り替えで�
    ```
 
 2. **Swagger UIグループを使用**：
-   - **英語文書**: http://localhost:9001/swagger-ui.html?urls.primaryName=english
-   - **中国語文書**: http://localhost:9001/swagger-ui.html?urls.primaryName=chinese
-   - **日本語文書**: http://localhost:9001/swagger-ui.html?urls.primaryName=japanese
+   - **英語文書**: <http://localhost:9001/swagger-ui.html?urls.primaryName=english>
+   - **中国語文書**: <http://localhost:9001/swagger-ui.html?urls.primaryName=chinese>
+   - **日本語文書**: <http://localhost:9001/swagger-ui.html?urls.primaryName=japanese>
 
 #### サポート言語
+
 - 🇺🇸 **English** - デフォルト言語
 - 🇨🇳 **中国語（簡体字）** - 完全な中国語API文書
 - 🇯🇵 **日本語** - 完全な日本語API文書
 
 ### ベースURL
-```
+
+```text
 http://localhost:9001/api/v1/employee
 ```
 
 ### エンドポイント一覧
 
 #### 1. 全従業員取得
+
 ```http
 GET /api/v1/employee
 ```
 
 **レスポンス例:**
+
 ```json
 [
   {
@@ -227,44 +244,54 @@ GET /api/v1/employee
 ```
 
 #### 2. IDによる従業員取得
+
 ```http
 GET /api/v1/employee/{id}
 ```
 
 **パラメータ:**
+
 - `id` (パスパラメータ): 従業員ID（正数である必要がある）
 
 #### 3. 従業員番号による従業員取得
+
 ```http
 GET /api/v1/employee/number/{employeeNumber}
 ```
 
 **パラメータ:**
+
 - `employeeNumber` (パスパラメータ): 従業員番号（1-20文字、英数字アンダースコアハイフン）
 
 #### 4. 姓名による従業員検索
+
 ```http
 GET /api/v1/employee/search/name?name={name}
 ```
 
 **パラメータ:**
+
 - `name` (クエリパラメータ): 姓名キーワード（1-100文字）
 
 #### 5. ふりがなによる従業員検索
+
 ```http
 GET /api/v1/employee/search/furigana?furigana={furigana}
 ```
 
 **パラメータ:**
+
 - `furigana` (クエリパラメータ): ふりがなキーワード（1-200文字）
 
 #### 6. 従業員作成
+
 ```http
 POST /api/v1/employee
 Content-Type: application/json
 ```
 
 **リクエストボディ:**
+
 ```json
 {
   "employeeNumber": "EMP001",
@@ -275,22 +302,26 @@ Content-Type: application/json
 ```
 
 #### 7. 従業員更新
+
 ```http
 PUT /api/v1/employee/{id}
 Content-Type: application/json
 ```
 
 #### 8. IDによる従業員削除
+
 ```http
 DELETE /api/v1/employee/{id}
 ```
 
 #### 9. 従業員番号による従業員削除
+
 ```http
 DELETE /api/v1/employee/number/{employeeNumber}
 ```
 
 #### 10. ヘルスチェック
+
 ```http
 GET /api/v1/employee/health
 ```
@@ -320,11 +351,13 @@ GET /api/v1/employee/health
 ## 🧪 テスト
 
 ### 全テスト実行
+
 ```bash
 ./gradlew test
 ```
 
 ### 特定テストクラス実行
+
 ```bash
 ./gradlew test --tests "EmployeeServiceTest"
 ./gradlew test --tests "EmployeeRepositoryTest"
@@ -332,7 +365,9 @@ GET /api/v1/employee/health
 ```
 
 ### テストカバレッジ
+
 プロジェクトは包括的なテストカバレッジを持っています：
+
 - **サービス層テスト** - ビジネスロジックテスト
 - **リポジトリ層テスト** - データアクセステスト
 - **コントローラー層テスト** - APIエンドポイントテスト
@@ -438,6 +473,7 @@ logging.file.name=logs/revenue-calculator-employee.log
 ### テーブル構造
 
 #### employeesテーブル
+
 ```sql
 CREATE TABLE employees (
     employee_id BIGSERIAL PRIMARY KEY,
@@ -471,6 +507,7 @@ CREATE TABLE employees (
 ### Dockerデプロイ
 
 1. **Dockerfile作成**
+
    ```dockerfile
    FROM openjdk:21-jdk-slim
    COPY build/libs/*.jar app.jar
@@ -479,6 +516,7 @@ CREATE TABLE employees (
    ```
 
 2. **ビルドと実行**
+
    ```bash
    ./gradlew build
    docker build -t revenue-calculator-employee .
@@ -505,16 +543,19 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 ## 🔒 セキュリティ機能
 
 ### APIレート制限
+
 - **一般API**: 100リクエスト/分
 - **検索API**: 50リクエスト/分
 - **書き込み操作API**: 20リクエスト/分
 
-### データ検証
+### セキュリティ検証
+
 - 入力パラメータ検証
 - SQLインジェクション防止
 - XSS防止
 
 ### ログセキュリティ
+
 - 機密情報のログ記録なし
 - 分析のための構造化ログ
 - セキュリティイベントログ
@@ -522,16 +563,19 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 ## 📈 パフォーマンス最適化
 
 ### キャッシュ戦略
+
 - **従業員情報キャッシュ**: 15分TTL
 - **従業員リストキャッシュ**: 5分TTL
 - **自動キャッシュ無効化**: 書き込み操作時の関連キャッシュクリア
 
 ### リアクティブプログラミング
+
 - 完全非ブロッキングI/O
 - バックプレッシャー処理
 - 効率的なリソース利用
 
 ### データベース最適化
+
 - 接続プール設定
 - クエリ最適化
 - インデックス最適化
@@ -560,15 +604,15 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 
 - **会社名**: 株式会社アサテクス (Kabushiki-gaisha Asatex / Asatex Co., Ltd.)
 - **開発者**: 牛宇平 (Niuyuping)
-- **メール**: niuyuping@asatex.jp
+- **メール**: <niuyuping@asatex.jp>
 - **LINE ID**: niuyuping
 - **デモサイト**: [revenue.asatex.jp](https://revenue.asatex.jp)
 
 ## 📞 連絡先
 
-- プロジェクトリンク: [https://github.com/username/revenue-calculator-backend-employee](https://github.com/username/revenue-calculator-backend-employee)
-- 問題報告: [https://github.com/username/revenue-calculator-backend-employee/issues](https://github.com/username/revenue-calculator-backend-employee/issues)
-- 会社メール: niuyuping@asatex.jp
+- プロジェクトリンク: [https://github.com/niuyuping/revenue-calculator-backend-employee](https://github.com/niuyuping/revenue-calculator-backend-employee)
+- 問題報告: [https://github.com/niuyuping/revenue-calculator-backend-employee/issues](https://github.com/niuyuping/revenue-calculator-backend-employee/issues)
+- 会社メール: <niuyuping@asatex.jp>
 - LINE連絡: niuyuping
 
 ## 🙏 謝辞

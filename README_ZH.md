@@ -32,6 +32,7 @@
 ## 📋 功能特性
 
 ### 核心功能
+
 - ✅ **员工CRUD操作** - 员工信息的创建、读取、更新、删除
 - ✅ **员工搜索** - 支持按姓名和假名搜索
 - ✅ **数据验证** - 完整的输入数据验证和约束
@@ -43,6 +44,7 @@
 - ✅ **多语言文档** - 支持英、中、日三种语言的API文档
 
 ### 数据验证
+
 - 员工编号格式验证（字母、数字、下划线、连字符）
 - 姓名长度验证（1-100字符）
 - 假名格式验证（平假名、片假名、拉丁字母、空格、括号）
@@ -50,6 +52,7 @@
 - 路径参数和查询参数验证
 
 ### 监控和健康检查
+
 - Spring Boot Actuator集成
 - 健康检查端点
 - Flyway迁移状态监控
@@ -59,7 +62,7 @@
 
 ## 🏗️ 项目结构
 
-```
+```text
 src/
 ├── main/
 │   ├── java/jp/asatex/revenue_calculator_backend_employee/
@@ -114,7 +117,7 @@ src/
     │   └── validation/      # 验证测试
     └── resources/
         └── application-test.properties
-```
+```text
 
 ## 🚀 快速开始
 
@@ -128,26 +131,30 @@ src/
 ### 安装和运行
 
 1. **克隆项目**
+
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/niuyuping/revenue-calculator-backend-employee.git
    cd revenue-calculator-backend-employee
    ```
 
-2. **数据库设置**
+1. **数据库设置**
+
    ```bash
    # 创建PostgreSQL数据库
    createdb asatex-revenue
    ```
 
-3. **Redis设置**
+1. **Redis设置**
+
    ```bash
    # 启动Redis服务
    redis-server
    ```
 
-4. **应用配置**
-   
+1. **应用配置**
+
    编辑 `src/main/resources/application.properties`:
+
    ```properties
    # 数据库配置
    spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
@@ -164,12 +171,14 @@ src/
    spring.flyway.password=your_password
    ```
 
-5. **运行应用**
+1. **运行应用**
+
    ```bash
    ./gradlew bootRun
    ```
 
-6. **验证运行**
+1. **验证运行**
+
    ```bash
    curl http://localhost:9001/api/v1/employee/health
    ```
@@ -177,17 +186,21 @@ src/
 ## 📚 API文档
 
 ### Swagger UI访问
+
 启动应用后，可以通过以下链接访问Swagger UI：
 
-- **Swagger UI**: http://localhost:9001/swagger-ui.html
-- **OpenAPI JSON**: http://localhost:9001/v3/api-docs
-- **Swagger配置**: http://localhost:9001/v3/api-docs/swagger-config
+- **Swagger UI**: <http://localhost:9001/swagger-ui.html>
+- **OpenAPI JSON**: <http://localhost:9001/v3/api-docs>
+- **Swagger配置**: <http://localhost:9001/v3/api-docs/swagger-config>
 
 ### 🌐 多语言支持
+
 API文档支持三种语言，可以通过以下方式切换：
 
 #### 语言切换方式
+
 1. **通过Accept-Language头**：
+
    ```bash
    # 英文
    curl -H "Accept-Language: en" http://localhost:9001/v3/api-docs
@@ -199,38 +212,44 @@ API文档支持三种语言，可以通过以下方式切换：
    curl -H "Accept-Language: ja" http://localhost:9001/v3/api-docs
    ```
 
-2. **通过Swagger UI分组**：
-   - **英文文档**: http://localhost:9001/swagger-ui.html?urls.primaryName=english
-   - **中文文档**: http://localhost:9001/swagger-ui.html?urls.primaryName=chinese
-   - **日文文档**: http://localhost:9001/swagger-ui.html?urls.primaryName=japanese
+1. **通过Swagger UI分组**：
+   - **英文文档**: <http://localhost:9001/swagger-ui.html?urls.primaryName=english>
+   - **中文文档**: <http://localhost:9001/swagger-ui.html?urls.primaryName=chinese>
+   - **日文文档**: <http://localhost:9001/swagger-ui.html?urls.primaryName=japanese>
 
 #### 支持的语言
+
 - 🇺🇸 **English** - 默认语言
 - 🇨🇳 **中文 (简体)** - 完整的中文API文档
 - 🇯🇵 **日本語** - 完整的日文API文档
 
 #### 多语言测试
+
 通过以下方式测试多语言功能：
+
 ```bash
 # 测试不同语言的API文档
 curl -H "Accept-Language: en" http://localhost:9001/v3/api-docs
 curl -H "Accept-Language: zh-CN" http://localhost:9001/v3/api-docs
 curl -H "Accept-Language: ja" http://localhost:9001/v3/api-docs
-```
+```bash
 
 ### 基础URL
-```
+
+```text
 http://localhost:9001/api/v1/employee
-```
+```text
 
 ### 端点列表
 
 #### 1. 获取所有员工
+
 ```http
 GET /api/v1/employee
-```
+```http
 
 **响应示例:**
+
 ```json
 [
   {
@@ -241,47 +260,57 @@ GET /api/v1/employee
     "birthday": "1990-05-15"
   }
 ]
-```
+```json
 
 #### 2. 根据ID获取员工
+
 ```http
 GET /api/v1/employee/{id}
-```
+```http
 
 **参数:**
+
 - `id` (路径参数): 员工ID (必须是正数)
 
 #### 3. 根据员工编号获取员工
+
 ```http
 GET /api/v1/employee/number/{employeeNumber}
-```
+```http
 
 **参数:**
+
 - `employeeNumber` (路径参数): 员工编号 (1-20字符，英数字下划线连字符)
 
 #### 4. 根据姓名搜索员工
+
 ```http
 GET /api/v1/employee/search/name?name={name}
-```
+```http
 
 **参数:**
+
 - `name` (查询参数): 姓名关键词 (1-100字符)
 
 #### 5. 根据假名搜索员工
+
 ```http
 GET /api/v1/employee/search/furigana?furigana={furigana}
-```
+```http
 
 **参数:**
+
 - `furigana` (查询参数): 假名关键词 (1-200字符)
 
 #### 6. 创建员工
+
 ```http
 POST /api/v1/employee
 Content-Type: application/json
-```
+```http
 
 **请求体:**
+
 ```json
 {
   "employeeNumber": "EMP001",
@@ -289,28 +318,32 @@ Content-Type: application/json
   "furigana": "タナカタロウ",
   "birthday": "1990-05-15"
 }
-```
+```json
 
 #### 7. 更新员工
+
 ```http
 PUT /api/v1/employee/{id}
 Content-Type: application/json
-```
+```http
 
 #### 8. 根据ID删除员工
+
 ```http
 DELETE /api/v1/employee/{id}
-```
+```http
 
 #### 9. 根据员工编号删除员工
+
 ```http
 DELETE /api/v1/employee/number/{employeeNumber}
-```
+```http
 
 #### 10. 健康检查
+
 ```http
 GET /api/v1/employee/health
-```
+```http
 
 ### 错误响应格式
 
@@ -321,7 +354,7 @@ GET /api/v1/employee/health
   "details": "详细错误信息",
   "status": 400
 }
-```
+```json
 
 ### HTTP状态码
 
@@ -337,19 +370,23 @@ GET /api/v1/employee/health
 ## 🧪 测试
 
 ### 运行所有测试
+
 ```bash
 ./gradlew test
-```
+```bash
 
 ### 运行特定测试类
+
 ```bash
 ./gradlew test --tests "EmployeeServiceTest"
 ./gradlew test --tests "EmployeeRepositoryTest"
 ./gradlew test --tests "EmployeeIntegrationTest"
-```
+```bash
 
 ### 测试覆盖率
+
 项目具有全面的测试覆盖率：
+
 - **Service层测试** - 业务逻辑测试
 - **Repository层测试** - 数据访问测试
 - **Controller层测试** - API端点测试
@@ -398,7 +435,7 @@ management.endpoint.flyway.enabled=true
 # 日志配置
 logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 logging.file.name=logs/revenue-calculator-employee.log
-```
+```properties
 
 ### 环境变量
 
@@ -437,7 +474,7 @@ logging.file.name=logs/revenue-calculator-employee.log
     }
   }
 }
-```
+```json
 
 ### 自定义指标
 
@@ -455,6 +492,7 @@ logging.file.name=logs/revenue-calculator-employee.log
 ### 表结构
 
 #### employees表
+
 ```sql
 CREATE TABLE employees (
     employee_id BIGSERIAL PRIMARY KEY,
@@ -465,7 +503,7 @@ CREATE TABLE employees (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
+```sql
 
 ### 数据库约束
 
@@ -488,6 +526,7 @@ CREATE TABLE employees (
 ### Docker部署
 
 1. **创建Dockerfile**
+
    ```dockerfile
    FROM openjdk:21-jdk-slim
    COPY build/libs/*.jar app.jar
@@ -495,7 +534,8 @@ CREATE TABLE employees (
    ENTRYPOINT ["java", "-jar", "/app.jar"]
    ```
 
-2. **构建和运行**
+1. **构建和运行**
+
    ```bash
    ./gradlew build
    docker build -t revenue-calculator-employee .
@@ -517,21 +557,24 @@ spring.r2dbc.pool.max-idle-time=30m
 # 日志配置
 logging.level.root=WARN
 logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
-```
+```properties
 
 ## 🔒 安全特性
 
 ### API限流
+
 - **一般API**: 100请求/分钟
 - **搜索API**: 50请求/分钟
 - **写操作API**: 20请求/分钟
 
 ### 数据验证
+
 - 输入参数验证
 - SQL注入防护
 - XSS防护
 
 ### 日志安全
+
 - 不记录敏感信息
 - 结构化日志便于分析
 - 安全事件记录
@@ -539,16 +582,19 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 ## 📈 性能优化
 
 ### 缓存策略
+
 - **员工信息缓存**: 15分钟TTL
 - **员工列表缓存**: 5分钟TTL
 - **自动缓存失效**: 写操作时清除相关缓存
 
 ### 响应式编程
+
 - 完全非阻塞I/O
 - 背压处理
 - 资源高效利用
 
 ### 数据库优化
+
 - 连接池配置
 - 查询优化
 - 索引优化
@@ -556,10 +602,10 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 ## 🤝 贡献指南
 
 1. Fork项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建Pull Request
+1. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+1. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+1. 推送到分支 (`git push origin feature/AmazingFeature`)
+1. 创建Pull Request
 
 ### 编码规范
 
@@ -577,15 +623,15 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 
 - **公司名称**: 株式会社アサテクス (Kabushiki-gaisha Asatex / Asatex Co., Ltd.)
 - **开发者**: 牛宇平 (Niuyuping)
-- **邮箱**: niuyuping@asatex.jp
+- **邮箱**: <niuyuping@asatex.jp>
 - **LINE ID**: niuyuping
 - **演示网站**: [revenue.asatex.jp](https://revenue.asatex.jp)
 
 ## 📞 联系方式
 
-- 项目链接: [https://github.com/username/revenue-calculator-backend-employee](https://github.com/username/revenue-calculator-backend-employee)
-- 问题报告: [https://github.com/username/revenue-calculator-backend-employee/issues](https://github.com/username/revenue-calculator-backend-employee/issues)
-- 公司邮箱: niuyuping@asatex.jp
+- 项目链接: [https://github.com/niuyuping/revenue-calculator-backend-employee](https://github.com/niuyuping/revenue-calculator-backend-employee)
+- 问题报告: [https://github.com/niuyuping/revenue-calculator-backend-employee/issues](https://github.com/niuyuping/revenue-calculator-backend-employee/issues)
+- 公司邮箱: <niuyuping@asatex.jp>
 - LINE联系: niuyuping
 
 ## 🙏 致谢
