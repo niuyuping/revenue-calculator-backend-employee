@@ -10,6 +10,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 /**
  * TestContainers配置类
  * 为测试提供PostgreSQL容器
+ * Redis使用本地Docker服务
  */
 @TestConfiguration
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -30,4 +31,5 @@ public class TestContainersConfig {
         container.start();
         return container;
     }
+
 }

@@ -30,7 +30,7 @@ public class EmployeeDto {
     
     @Schema(description = "ふりがな", example = "たなかたろう")
     @Size(max = 200, message = "ふりがなの長さは200文字を超えることはできません")
-    @Pattern(regexp = "^[\\p{IsHiragana}\\p{IsKatakana}\\p{IsLatin}\\s（）]*$", message = "ふりがなはひらがな、カタカナ、ラテン文字、スペース、括弧のみを含むことができます")
+    @Pattern(regexp = "^[\\p{IsHiragana}\\p{IsKatakana}ー\\p{IsLatin}\\s（）]*$", message = "ふりがなはひらがな、カタカナ、ラテン文字、スペース、括弧のみを含むことができます")
     private String furigana;
     
     @Schema(description = "生年月日", example = "1990-01-01", type = "string", format = "date")

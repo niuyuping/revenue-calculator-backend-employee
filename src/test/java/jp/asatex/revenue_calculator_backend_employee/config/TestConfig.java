@@ -3,10 +3,12 @@ package jp.asatex.revenue_calculator_backend_employee.config;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import jp.asatex.revenue_calculator_backend_employee.service.AuditLogService;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * 测试配置类
@@ -83,5 +85,12 @@ public class TestConfig {
                 .description("Duration of database operations")
                 .tag("service", "revenue-calculator-employee")
                 .register(meterRegistry);
+    }
+
+    @Bean
+    @Primary
+    @Profile("test")
+    public AuditLogService auditLogService() {
+        return org.mockito.Mockito.mock(AuditLogService.class);
     }
 }

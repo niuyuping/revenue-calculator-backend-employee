@@ -1,6 +1,7 @@
 package jp.asatex.revenue_calculator_backend_employee.controller;
 
 import jp.asatex.revenue_calculator_backend_employee.service.EmployeeService;
+import jp.asatex.revenue_calculator_backend_employee.service.AuditLogService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -22,6 +23,9 @@ class EmployeeControllerParameterValidationTest {
 
     @MockitoBean
     private EmployeeService employeeService;
+
+    @MockitoBean
+    private AuditLogService auditLogService;
 
     @Test
     void testGetEmployeeById_WithInvalidId_ShouldReturnBadRequest() {

@@ -125,6 +125,19 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 事务异常的处理
+     */
+    @ExceptionHandler(TransactionException.class)
+    public Mono<ResponseEntity<Map<String, Object>>> handleTransactionException(TransactionException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", "事务处理失败");
+        response.put("message", ex.getMessage());
+        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        
+        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response));
+    }
+
+    /**
      * 汎用例外の処理
      */
     @ExceptionHandler(Exception.class)

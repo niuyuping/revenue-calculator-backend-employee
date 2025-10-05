@@ -13,7 +13,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * 多语言配置测试
  */
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
+                properties = {"spring.flyway.enabled=false"})
 @TestPropertySource(properties = {
     "spring.messages.basename=messages",
     "spring.messages.encoding=UTF-8"

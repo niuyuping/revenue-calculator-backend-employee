@@ -12,7 +12,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
  * 日志配置测试
  * 验证日志配置和请求日志功能
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+                properties = {"spring.flyway.enabled=false"})
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
 @Import(jp.asatex.revenue_calculator_backend_employee.config.TestConfig.class)
@@ -42,9 +43,9 @@ class LoggingConfigTest {
 
     @Test
     void testErrorLogging() {
-        // 测试错误日志记录
+        // 测试错误日志记录 - 使用一个不存在的员工ID
         webTestClient.get()
-                .uri("/api/v1/employee/999")
+                .uri("/api/v1/employee/999999")
                 .exchange()
                 .expectStatus().isNotFound();
     }

@@ -53,4 +53,161 @@ public interface EmployeeRepository extends ReactiveCrudRepository<Employee, Lon
      */
     @Query("DELETE FROM employees WHERE employee_number = :employeeNumber")
     Mono<Void> deleteByEmployeeNumber(String employeeNumber);
+    
+    /**
+     * 分页查询所有员工（排除已删除的）- 按员工ID升序
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE is_deleted = false ORDER BY employee_id ASC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findAllWithPaginationByIdAsc(int offset, int limit);
+    
+    /**
+     * 分页查询所有员工（排除已删除的）- 按员工ID降序
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE is_deleted = false ORDER BY employee_id DESC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findAllWithPaginationByIdDesc(int offset, int limit);
+    
+    /**
+     * 分页查询所有员工（排除已删除的）- 按姓名升序
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE is_deleted = false ORDER BY name ASC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findAllWithPaginationByNameAsc(int offset, int limit);
+    
+    /**
+     * 分页查询所有员工（排除已删除的）- 按姓名降序
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE is_deleted = false ORDER BY name DESC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findAllWithPaginationByNameDesc(int offset, int limit);
+    
+    /**
+     * 分页查询所有员工（排除已删除的）- 按员工编号升序
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE is_deleted = false ORDER BY employee_number ASC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findAllWithPaginationByNumberAsc(int offset, int limit);
+    
+    /**
+     * 分页查询所有员工（排除已删除的）- 按员工编号降序
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE is_deleted = false ORDER BY employee_number DESC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findAllWithPaginationByNumberDesc(int offset, int limit);
+    
+    /**
+     * 统计所有员工总数（排除已删除的）
+     * @return Mono<Long>
+     */
+    @Query("SELECT COUNT(*) FROM employees WHERE is_deleted = false")
+    Mono<Long> countAllActive();
+    
+    /**
+     * 分页查询按姓名搜索的员工 - 按员工ID升序
+     * @param name 姓名关键词
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE name LIKE :name AND is_deleted = false ORDER BY employee_id ASC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findByNameContainingWithPaginationByIdAsc(String name, int offset, int limit);
+    
+    /**
+     * 分页查询按姓名搜索的员工 - 按员工ID降序
+     * @param name 姓名关键词
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE name LIKE :name AND is_deleted = false ORDER BY employee_id DESC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findByNameContainingWithPaginationByIdDesc(String name, int offset, int limit);
+    
+    /**
+     * 分页查询按姓名搜索的员工 - 按姓名升序
+     * @param name 姓名关键词
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE name LIKE :name AND is_deleted = false ORDER BY name ASC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findByNameContainingWithPaginationByNameAsc(String name, int offset, int limit);
+    
+    /**
+     * 分页查询按姓名搜索的员工 - 按姓名降序
+     * @param name 姓名关键词
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE name LIKE :name AND is_deleted = false ORDER BY name DESC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findByNameContainingWithPaginationByNameDesc(String name, int offset, int limit);
+    
+    /**
+     * 统计按姓名搜索的员工总数
+     * @param name 姓名关键词
+     * @return Mono<Long>
+     */
+    @Query("SELECT COUNT(*) FROM employees WHERE name LIKE :name AND is_deleted = false")
+    Mono<Long> countByNameContaining(String name);
+    
+    /**
+     * 分页查询按ふりがな搜索的员工 - 按员工ID升序
+     * @param furigana ふりがな关键词
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE furigana LIKE :furigana AND is_deleted = false ORDER BY employee_id ASC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findByFuriganaContainingWithPaginationByIdAsc(String furigana, int offset, int limit);
+    
+    /**
+     * 分页查询按ふりがな搜索的员工 - 按员工ID降序
+     * @param furigana ふりがな关键词
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE furigana LIKE :furigana AND is_deleted = false ORDER BY employee_id DESC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findByFuriganaContainingWithPaginationByIdDesc(String furigana, int offset, int limit);
+    
+    /**
+     * 分页查询按ふりがな搜索的员工 - 按姓名升序
+     * @param furigana ふりがな关键词
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE furigana LIKE :furigana AND is_deleted = false ORDER BY name ASC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findByFuriganaContainingWithPaginationByNameAsc(String furigana, int offset, int limit);
+    
+    /**
+     * 分页查询按ふりがな搜索的员工 - 按姓名降序
+     * @param furigana ふりがな关键词
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return Flux<Employee>
+     */
+    @Query("SELECT * FROM employees WHERE furigana LIKE :furigana AND is_deleted = false ORDER BY name DESC LIMIT :limit OFFSET :offset")
+    Flux<Employee> findByFuriganaContainingWithPaginationByNameDesc(String furigana, int offset, int limit);
+    
+    /**
+     * 统计按ふりがな搜索的员工总数
+     * @param furigana ふりがな关键词
+     * @return Mono<Long>
+     */
+    @Query("SELECT COUNT(*) FROM employees WHERE furigana LIKE :furigana AND is_deleted = false")
+    Mono<Long> countByFuriganaContaining(String furigana);
 }

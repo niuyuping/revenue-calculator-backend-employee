@@ -6,6 +6,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Employeeエンティティクラス
@@ -37,6 +38,21 @@ public class Employee {
     @Past(message = "生年月日は過去の日付である必要があります")
     @Column("birthday")
     private LocalDate birthday;
+    
+    @Column("created_at")
+    private LocalDateTime createdAt;
+    
+    @Column("updated_at")
+    private LocalDateTime updatedAt;
+    
+    @Column("deleted_at")
+    private LocalDateTime deletedAt;
+    
+    @Column("deleted_by")
+    private String deletedBy;
+    
+    @Column("is_deleted")
+    private Boolean deleted = false;
     
     // デフォルトコンストラクタ
     public Employee() {}
@@ -91,6 +107,50 @@ public class Employee {
         this.birthday = birthday;
     }
     
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+    
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+    
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+    
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+    
+    public String getDeletedBy() {
+        return deletedBy;
+    }
+    
+    public void setDeletedBy(String deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+    
+    public Boolean getDeleted() {
+        return deleted;
+    }
+    
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+    
+    public boolean isDeleted() {
+        return deleted != null && deleted;
+    }
+    
     @Override
     public String toString() {
         return "Employee{" +
@@ -99,6 +159,11 @@ public class Employee {
                 ", name='" + name + '\'' +
                 ", furigana='" + furigana + '\'' +
                 ", birthday=" + birthday +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", deletedAt=" + deletedAt +
+                ", deletedBy='" + deletedBy + '\'' +
+                ", deleted=" + deleted +
                 '}';
     }
 }
