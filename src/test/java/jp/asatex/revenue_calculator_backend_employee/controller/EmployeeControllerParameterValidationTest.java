@@ -12,8 +12,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
- * EmployeeController参数验证测试
- * 测试路径参数和查询参数的验证
+ * EmployeeController parameter validation test
+ * Tests path parameter and query parameter validation
  */
 @WebFluxTest({EmployeeController.class, jp.asatex.revenue_calculator_backend_employee.exception.GlobalExceptionHandler.class, jp.asatex.revenue_calculator_backend_employee.config.ValidationConfig.class})
 class EmployeeControllerParameterValidationTest {
@@ -34,8 +34,8 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
@@ -45,8 +45,8 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
@@ -54,10 +54,10 @@ class EmployeeControllerParameterValidationTest {
         webTestClient.get()
                 .uri("/api/v1/employee/number/ ")
                 .exchange()
-                .expectStatus().isBadRequest() // 路径匹配但参数验证失败，返回400
+                .expectStatus().isBadRequest() // Path matches but parameter validation fails, returns 400
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
@@ -67,8 +67,8 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
@@ -78,8 +78,8 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
@@ -89,8 +89,8 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
@@ -100,8 +100,8 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
@@ -112,8 +112,8 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
@@ -123,8 +123,8 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("パラメータ検証失敗")
-                .jsonPath("$.message").isEqualTo("必須のクエリパラメータが不足しています");
+                .jsonPath("$.error").isEqualTo("Parameter validation failed")
+                .jsonPath("$.message").isEqualTo("Required query parameters are missing");
     }
 
     @Test
@@ -134,20 +134,20 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
     void testSearchEmployeesByFurigana_WithTooLongFurigana_ShouldReturnBadRequest() {
-        String longFurigana = "あ".repeat(201);
+        String longFurigana = "a".repeat(201);
         webTestClient.get()
                 .uri("/api/v1/employee/search/furigana?furigana=" + longFurigana)
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
@@ -157,13 +157,13 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("パラメータ検証失敗")
-                .jsonPath("$.message").isEqualTo("必須のクエリパラメータが不足しています");
+                .jsonPath("$.error").isEqualTo("Parameter validation failed")
+                .jsonPath("$.message").isEqualTo("Required query parameters are missing");
     }
 
     @Test
     void testUpdateEmployee_WithInvalidId_ShouldReturnBadRequest() {
-        String requestBody = "{\"employeeNumber\":\"EMP001\",\"name\":\"测试\",\"furigana\":\"テスト\"}";
+        String requestBody = "{\"employeeNumber\":\"EMP001\",\"name\":\"Test\",\"furigana\":\"test\"}";
         
         webTestClient.put()
                 .uri("/api/v1/employee/0")
@@ -172,8 +172,8 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
@@ -183,8 +183,8 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
@@ -194,8 +194,8 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
@@ -205,8 +205,8 @@ class EmployeeControllerParameterValidationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("検証失敗")
-                .jsonPath("$.message").isEqualTo("リクエストデータが検証ルールに適合しません");
+                .jsonPath("$.error").isEqualTo("Validation Failed")
+                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
     }
 
     @Test
@@ -217,23 +217,23 @@ class EmployeeControllerParameterValidationTest {
         webTestClient.get()
                 .uri("/api/v1/employee/number/EMP001")
                 .exchange()
-                .expectStatus().isNotFound(); // 员工不存在，但验证通过
+                .expectStatus().isNotFound(); // Employee does not exist, but validation passes
     }
 
     @Test
     void testValidSearchParameters_ShouldPassValidation() {
         webTestClient.get()
-                .uri("/api/v1/employee/search/name?name=田中")
+                .uri("/api/v1/employee/search/name?name=Tanaka")
                 .exchange()
-                .expectStatus().isOk(); // 验证通过，返回空结果
+                .expectStatus().isOk(); // Validation passes, returns empty result
     }
 
     @Test
     void testValidFuriganaSearch_ShouldPassValidation() {
         webTestClient.get()
-                .uri("/api/v1/employee/search/furigana?furigana=タナカ")
+                .uri("/api/v1/employee/search/furigana?furigana=tanaka")
                 .exchange()
-                .expectStatus().isOk(); // 验证通过，返回空结果
+                .expectStatus().isOk(); // Validation passes, returns empty result
     }
 
     @Test
@@ -244,6 +244,6 @@ class EmployeeControllerParameterValidationTest {
         webTestClient.get()
                 .uri("/api/v1/employee/1")
                 .exchange()
-                .expectStatus().isNotFound(); // 员工不存在，但验证通过
+                .expectStatus().isNotFound(); // Employee does not exist, but validation passes
     }
 }

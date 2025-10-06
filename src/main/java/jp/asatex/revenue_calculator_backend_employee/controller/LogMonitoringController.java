@@ -11,48 +11,48 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 /**
- * 日志监控控制器
- * 提供日志统计信息和健康状态的API端点
+ * Log monitoring controller
+ * Provides API endpoints for log statistics and health status
  */
 @RestController
 @RequestMapping("/api/v1/monitoring")
-@Tag(name = "日志监控", description = "日志监控和统计信息API")
+@Tag(name = "Log Monitoring", description = "Log monitoring and statistics API")
 public class LogMonitoringController {
 
     @Autowired
     private LogMonitoringService logMonitoringService;
 
     /**
-     * 获取日志统计信息
-     * @return 日志统计信息
+     * Get log statistics
+     * @return Log statistics information
      */
     @GetMapping(value = "/logs/stats", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "获取日志统计信息", description = "返回当前系统的日志统计信息，包括各种类型日志的数量和错误率")
+    @Operation(summary = "Get log statistics", description = "Returns current system log statistics including counts and error rates for various log types")
     public Mono<LogMonitoringService.LogStats> getLogStats() {
         return Mono.just(logMonitoringService.getLogStats());
     }
 
     /**
-     * 获取日志健康状态
-     * @return 日志健康状态
+     * Get log health status
+     * @return Log health status
      */
     @GetMapping(value = "/logs/health", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "获取日志健康状态", description = "返回当前系统的日志健康状态，包括错误率和状态评估")
+    @Operation(summary = "Get log health status", description = "Returns current system log health status including error rates and status assessment")
     public Mono<LogMonitoringService.LogHealthStatus> getLogHealthStatus() {
         return Mono.just(logMonitoringService.getLogHealthStatus());
     }
 
     /**
-     * 重置日志统计信息
-     * @return 操作结果
+     * Reset log statistics
+     * @return Operation result
      */
     @PostMapping(value = "/logs/reset", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "重置日志统计信息", description = "重置所有日志统计计数器")
+    @Operation(summary = "Reset log statistics", description = "Reset all log statistics counters")
     public Mono<ResponseEntity<String>> resetLogStats() {
         return Mono.fromRunnable(() -> logMonitoringService.resetLogStats())
-                .then(Mono.just(ResponseEntity.ok("日志统计信息已重置")));
+                .then(Mono.just(ResponseEntity.ok("Log statistics have been reset")));
     }
 }

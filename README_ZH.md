@@ -1,11 +1,11 @@
 # 员工管理微服务 (Revenue Calculator Backend Employee)
 
-基于 Spring Boot 3.x、R2DBC、WebFlux 的响应式员工管理系统后端服务。
+基于 Spring Boot 3.x、R2DBC、WebFlux 的响应式员工管理系统后端服务，提供全面的企业级功能。
 
-## 🌐 语言选择 / Language Selection / 言語選択
+## 🌐 语言选择
 
-- 🇨🇳 [中文版 (Chinese)](README_ZH.md) - 完整的中文文档
-- 🇺🇸 [English Version](README_EN.md) - Complete English documentation  
+- 🇨🇳 **中文版** - 完整的中文文档（本文件）
+- 🇺🇸 [English Version](README_EN.md) - Complete English documentation
 - 🇯🇵 [日本語版 (Japanese)](README_JA.md) - 完全な日本語文書
 
 ---
@@ -43,6 +43,40 @@
 - ✅ **监控指标** - 完整的业务和性能监控
 - ✅ **多语言文档** - 支持英、中、日三种语言的API文档
 
+### 企业级功能
+
+#### 🔄 缓存和限流
+
+- **Redis缓存管理器**: 多级缓存策略
+- **缓存策略**:
+  - 员工信息缓存: 1小时TTL
+  - 员工列表缓存: 30分钟TTL
+  - 搜索缓存: 15分钟TTL
+  - 分页缓存: 10分钟TTL
+- **限流保护**: 不同操作类型设置不同限制（20-100请求/分钟）
+
+#### 🗄️ 数据库审计
+
+- **全面审计跟踪**: INSERT、UPDATE、DELETE、SELECT操作
+- **上下文跟踪**: 用户ID、会话ID、请求ID、IP地址
+- **数据变更跟踪**: 旧值、新值、字段级变更
+- **性能监控**: 执行时间、影响行数
+- **错误跟踪**: 失败操作的详细错误信息
+
+#### 🔄 事务管理
+
+- **ACID合规**: 基于R2DBC的事务支持
+- **自动事务管理**: `@Transactional`注解支持
+- **事务监控**: 实时事务跟踪
+- **性能指标**: 事务执行时间监控
+
+#### 📊 全面日志
+
+- **日志分类**: 应用、审计、安全、性能、错误日志
+- **结构化日志**: JSON格式，包含上下文信息
+- **日志轮转**: 自动日志轮转和压缩
+- **保留策略**: 不同日志类型设置不同保留期
+
 ### 数据验证
 
 - 员工编号格式验证（字母、数字、下划线、连字符）
@@ -68,27 +102,37 @@ src/
 │   ├── java/jp/asatex/revenue_calculator_backend_employee/
 │   │   ├── config/           # 配置类
 │   │   │   ├── CacheConfig.java
+│   │   │   ├── DatabaseAuditConfig.java
 │   │   │   ├── InternationalizationConfig.java
 │   │   │   ├── LoggingConfig.java
 │   │   │   ├── MetricsConfig.java
 │   │   │   ├── MultiLanguageOpenApiConfig.java
 │   │   │   ├── RateLimitConfig.java
 │   │   │   ├── SwaggerConfig.java
+│   │   │   ├── TransactionConfig.java
 │   │   │   └── ValidationConfig.java
 │   │   ├── controller/       # REST控制器
 │   │   │   └── EmployeeController.java
 │   │   ├── dto/             # 数据传输对象
 │   │   │   └── EmployeeDto.java
 │   │   ├── entity/          # 实体类
-│   │   │   └── Employee.java
+│   │   │   ├── Employee.java
+│   │   │   └── DatabaseAuditLog.java
 │   │   ├── exception/       # 异常处理
 │   │   │   ├── GlobalExceptionHandler.java
 │   │   │   ├── EmployeeNotFoundException.java
-│   │   │   └── DuplicateEmployeeNumberException.java
+│   │   │   ├── DuplicateEmployeeNumberException.java
+│   │   │   └── TransactionException.java
 │   │   ├── repository/      # 数据访问层
-│   │   │   └── EmployeeRepository.java
+│   │   │   ├── EmployeeRepository.java
+│   │   │   └── DatabaseAuditLogRepository.java
 │   │   ├── service/         # 业务逻辑层
-│   │   │   └── EmployeeService.java
+│   │   │   ├── EmployeeService.java
+│   │   │   ├── AuditLogService.java
+│   │   │   ├── DatabaseAuditService.java
+│   │   │   ├── CacheMonitoringService.java
+│   │   │   ├── LogMonitoringService.java
+│   │   │   └── TransactionMonitoringService.java
 │   │   ├── util/            # 工具类
 │   │   │   └── LoggingUtil.java
 │   │   └── RevenueCalculatorBackendEmployeeApplication.java
@@ -104,7 +148,9 @@ src/
 │       └── db/migration/    # 数据库迁移脚本
 │           ├── V1__Create_employees_table.sql
 │           ├── V2__Insert_initial_employee_data.sql
-│           └── V3__Add_constraints_to_employees_table.sql
+│           ├── V3__Add_constraints_to_employees_table.sql
+│           ├── V4__Add_soft_delete_columns.sql
+│           └── V5__Create_database_audit_logs_table.sql
 └── test/                    # 测试代码
     ├── java/jp/asatex/revenue_calculator_backend_employee/
     │   ├── config/          # 配置测试
@@ -117,7 +163,7 @@ src/
     │   └── validation/      # 验证测试
     └── resources/
         └── application-test.properties
-```text
+```
 
 ## 🚀 快速开始
 
@@ -137,21 +183,21 @@ src/
    cd revenue-calculator-backend-employee
    ```
 
-1. **数据库设置**
+2. **数据库设置**
 
    ```bash
    # 创建PostgreSQL数据库
    createdb asatex-revenue
    ```
 
-1. **Redis设置**
+3. **Redis设置**
 
    ```bash
    # 启动Redis服务
    redis-server
    ```
 
-1. **应用配置**
+4. **应用配置**
 
    编辑 `src/main/resources/application.properties`:
 
@@ -171,13 +217,13 @@ src/
    spring.flyway.password=your_password
    ```
 
-1. **运行应用**
+5. **运行应用**
 
    ```bash
    ./gradlew bootRun
    ```
 
-1. **验证运行**
+6. **验证运行**
 
    ```bash
    curl http://localhost:9001/api/v1/employee/health
@@ -212,7 +258,7 @@ API文档支持三种语言，可以通过以下方式切换：
    curl -H "Accept-Language: ja" http://localhost:9001/v3/api-docs
    ```
 
-1. **通过Swagger UI分组**：
+2. **通过Swagger UI分组**：
    - **英文文档**: <http://localhost:9001/swagger-ui.html?urls.primaryName=english>
    - **中文文档**: <http://localhost:9001/swagger-ui.html?urls.primaryName=chinese>
    - **日文文档**: <http://localhost:9001/swagger-ui.html?urls.primaryName=japanese>
@@ -223,22 +269,11 @@ API文档支持三种语言，可以通过以下方式切换：
 - 🇨🇳 **中文 (简体)** - 完整的中文API文档
 - 🇯🇵 **日本語** - 完整的日文API文档
 
-#### 多语言测试
-
-通过以下方式测试多语言功能：
-
-```bash
-# 测试不同语言的API文档
-curl -H "Accept-Language: en" http://localhost:9001/v3/api-docs
-curl -H "Accept-Language: zh-CN" http://localhost:9001/v3/api-docs
-curl -H "Accept-Language: ja" http://localhost:9001/v3/api-docs
-```bash
-
 ### 基础URL
 
 ```text
 http://localhost:9001/api/v1/employee
-```text
+```
 
 ### 端点列表
 
@@ -246,7 +281,7 @@ http://localhost:9001/api/v1/employee
 
 ```http
 GET /api/v1/employee
-```http
+```
 
 **响应示例:**
 
@@ -260,13 +295,13 @@ GET /api/v1/employee
     "birthday": "1990-05-15"
   }
 ]
-```json
+```
 
 #### 2. 根据ID获取员工
 
 ```http
 GET /api/v1/employee/{id}
-```http
+```
 
 **参数:**
 
@@ -276,7 +311,7 @@ GET /api/v1/employee/{id}
 
 ```http
 GET /api/v1/employee/number/{employeeNumber}
-```http
+```
 
 **参数:**
 
@@ -286,7 +321,7 @@ GET /api/v1/employee/number/{employeeNumber}
 
 ```http
 GET /api/v1/employee/search/name?name={name}
-```http
+```
 
 **参数:**
 
@@ -296,7 +331,7 @@ GET /api/v1/employee/search/name?name={name}
 
 ```http
 GET /api/v1/employee/search/furigana?furigana={furigana}
-```http
+```
 
 **参数:**
 
@@ -307,7 +342,7 @@ GET /api/v1/employee/search/furigana?furigana={furigana}
 ```http
 POST /api/v1/employee
 Content-Type: application/json
-```http
+```
 
 **请求体:**
 
@@ -318,32 +353,67 @@ Content-Type: application/json
   "furigana": "タナカタロウ",
   "birthday": "1990-05-15"
 }
-```json
+```
 
 #### 7. 更新员工
 
 ```http
 PUT /api/v1/employee/{id}
 Content-Type: application/json
-```http
+```
 
 #### 8. 根据ID删除员工
 
 ```http
 DELETE /api/v1/employee/{id}
-```http
+```
 
 #### 9. 根据员工编号删除员工
 
 ```http
 DELETE /api/v1/employee/number/{employeeNumber}
-```http
+```
 
 #### 10. 健康检查
 
 ```http
 GET /api/v1/employee/health
+```
+
+### 监控端点
+
+#### 缓存监控
+
 ```http
+GET /api/v1/monitoring/cache/stats
+DELETE /api/v1/monitoring/cache/clear
+DELETE /api/v1/monitoring/cache/clear/{cacheName}
+```
+
+#### 数据库审计
+
+```http
+GET /api/v1/audit/database/stats
+GET /api/v1/audit/database/logs/operation/{operationType}
+GET /api/v1/audit/database/logs/table/{tableName}
+GET /api/v1/audit/database/logs/user/{userId}
+GET /api/v1/audit/database/logs/time-range?startTime={startTime}&endTime={endTime}
+DELETE /api/v1/audit/database/logs/cleanup?retentionDays={retentionDays}
+```
+
+#### 事务监控
+
+```http
+GET /api/v1/monitoring/transaction/stats
+```
+
+#### 日志监控
+
+```http
+GET /api/v1/monitoring/logs/stats
+GET /api/v1/monitoring/logs/health
+POST /api/v1/monitoring/logs/reset
+```
 
 ### 错误响应格式
 
@@ -354,7 +424,7 @@ GET /api/v1/employee/health
   "details": "详细错误信息",
   "status": 400
 }
-```json
+```
 
 ### HTTP状态码
 
@@ -373,7 +443,7 @@ GET /api/v1/employee/health
 
 ```bash
 ./gradlew test
-```bash
+```
 
 ### 运行特定测试类
 
@@ -381,7 +451,7 @@ GET /api/v1/employee/health
 ./gradlew test --tests "EmployeeServiceTest"
 ./gradlew test --tests "EmployeeRepositoryTest"
 ./gradlew test --tests "EmployeeIntegrationTest"
-```bash
+```
 
 ### 测试覆盖率
 
@@ -394,6 +464,10 @@ GET /api/v1/employee/health
 - **参数验证测试** - 输入验证测试
 - **集成测试** - 端到端测试
 - **配置测试** - 配置类测试
+- **缓存测试** - 缓存功能测试
+- **限流测试** - 限流功能测试
+- **事务测试** - 事务管理测试
+- **审计测试** - 数据库审计测试
 
 ## 🔧 配置
 
@@ -435,7 +509,7 @@ management.endpoint.flyway.enabled=true
 # 日志配置
 logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 logging.file.name=logs/revenue-calculator-employee.log
-```properties
+```
 
 ### 环境变量
 
@@ -474,7 +548,7 @@ logging.file.name=logs/revenue-calculator-employee.log
     }
   }
 }
-```json
+```
 
 ### 自定义指标
 
@@ -486,6 +560,14 @@ logging.file.name=logs/revenue-calculator-employee.log
 - `cache.hits.total` - 缓存命中总数
 - `cache.misses.total` - 缓存未命中总数
 - `rate.limit.triggered.total` - 限流触发总数
+- `transaction.start` - 事务开始次数
+- `transaction.commit` - 事务提交次数
+- `transaction.rollback` - 事务回滚次数
+- `transaction.error` - 事务错误次数
+- `logs.audit` - 审计日志数量
+- `logs.security` - 安全日志数量
+- `logs.performance` - 性能日志数量
+- `logs.error` - 错误日志数量
 
 ## 🗄️ 数据库
 
@@ -501,9 +583,36 @@ CREATE TABLE employees (
     furigana VARCHAR(200),
     birthday DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
+    deleted_by VARCHAR(100)
 );
+```
+
+#### database_audit_logs表
+
 ```sql
+CREATE TABLE database_audit_logs (
+    id BIGSERIAL PRIMARY KEY,
+    operation_type VARCHAR(20) NOT NULL,
+    table_name VARCHAR(100) NOT NULL,
+    record_id VARCHAR(100),
+    user_id VARCHAR(100),
+    session_id VARCHAR(100),
+    request_id VARCHAR(100),
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    old_values TEXT,
+    new_values TEXT,
+    sql_statement TEXT,
+    execution_time_ms BIGINT,
+    affected_rows INTEGER,
+    error_message TEXT,
+    operation_status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    created_by VARCHAR(100)
+);
+```
 
 ### 数据库约束
 
@@ -520,6 +629,8 @@ CREATE TABLE employees (
 - `V1__Create_employees_table.sql` - 创建员工表
 - `V2__Insert_initial_employee_data.sql` - 插入初始数据
 - `V3__Add_constraints_to_employees_table.sql` - 添加约束
+- `V4__Add_soft_delete_columns.sql` - 添加软删除支持
+- `V5__Create_database_audit_logs_table.sql` - 创建审计日志表
 
 ## 🚀 部署
 
@@ -534,7 +645,7 @@ CREATE TABLE employees (
    ENTRYPOINT ["java", "-jar", "/app.jar"]
    ```
 
-1. **构建和运行**
+2. **构建和运行**
 
    ```bash
    ./gradlew build
@@ -557,7 +668,7 @@ spring.r2dbc.pool.max-idle-time=30m
 # 日志配置
 logging.level.root=WARN
 logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
-```properties
+```
 
 ## 🔒 安全特性
 
@@ -567,7 +678,7 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 - **搜索API**: 50请求/分钟
 - **写操作API**: 20请求/分钟
 
-### 数据验证
+### 安全验证
 
 - 输入参数验证
 - SQL注入防护
@@ -583,8 +694,10 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 
 ### 缓存策略
 
-- **员工信息缓存**: 15分钟TTL
-- **员工列表缓存**: 5分钟TTL
+- **员工信息缓存**: 1小时TTL
+- **员工列表缓存**: 30分钟TTL
+- **搜索缓存**: 15分钟TTL
+- **分页缓存**: 10分钟TTL
 - **自动缓存失效**: 写操作时清除相关缓存
 
 ### 响应式编程
@@ -598,14 +711,15 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 - 连接池配置
 - 查询优化
 - 索引优化
+- 全面审计日志，性能影响最小
 
 ## 🤝 贡献指南
 
 1. Fork项目
-1. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-1. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-1. 推送到分支 (`git push origin feature/AmazingFeature`)
-1. 创建Pull Request
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 创建Pull Request
 
 ### 编码规范
 

@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 /**
- * 无数据库测试配置
- * 用于不需要数据库连接的配置测试
+ * No database test configuration
+ * Used for configuration tests that do not require database connections
  */
 @TestConfiguration
 @Profile("test")
@@ -17,7 +17,7 @@ public class NoDatabaseTestConfig {
     @Primary
     @Profile("test")
     public String disableFlyway() {
-        // 禁用 Flyway 的占位符 Bean
+        // Placeholder Bean to disable Flyway
         return "flyway-disabled";
     }
 }

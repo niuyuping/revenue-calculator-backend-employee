@@ -9,11 +9,9 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.time.LocalDateTime;
-
 /**
- * 数据库审计配置类
- * 启用R2DBC审计功能和定时清理任务
+ * Database audit configuration class
+ * Enables R2DBC auditing functionality and scheduled cleanup tasks
  */
 @Configuration
 @EnableR2dbcRepositories(basePackages = "jp.asatex.revenue_calculator_backend_employee.repository")
@@ -22,8 +20,8 @@ import java.time.LocalDateTime;
 public class DatabaseAuditConfig {
 
     /**
-     * 配置数据库客户端
-     * @param connectionFactory 连接工厂
+     * Configure database client
+     * @param connectionFactory Connection factory
      * @return DatabaseClient
      */
     @Bean
@@ -32,12 +30,12 @@ public class DatabaseAuditConfig {
     }
 
     /**
-     * 定时清理过期的审计日志
-     * 每天凌晨2点执行，保留90天的审计日志
+     * Scheduled cleanup of expired audit logs
+     * Executes daily at 2 AM, retains audit logs for 90 days
      */
     @Scheduled(cron = "0 0 2 * * ?")
     public void cleanupOldAuditLogs() {
-        // 这个任务会在DatabaseAuditService中实现
-        // 这里只是配置定时任务的调度
+        // This task will be implemented in DatabaseAuditService
+        // This is just configuring the scheduled task
     }
 }

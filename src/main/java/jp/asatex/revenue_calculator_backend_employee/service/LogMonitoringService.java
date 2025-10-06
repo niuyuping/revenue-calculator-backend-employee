@@ -5,7 +5,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -14,15 +13,14 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 日志监控服务
- * 提供日志相关的监控和统计功能
+ * Log monitoring service
+ * Provides log-related monitoring and statistics functionality
  */
 @Service
 public class LogMonitoringService {
 
     private static final Logger logger = LoggerFactory.getLogger(LogMonitoringService.class);
 
-    private final MeterRegistry meterRegistry;
     private final Counter auditLogCounter;
     private final Counter securityLogCounter;
     private final Counter performanceLogCounter;
@@ -30,46 +28,43 @@ public class LogMonitoringService {
     private final Counter requestLogCounter;
     private final Timer logProcessingTimer;
 
-    // 日志统计信息
+    // Log statistics
     private final Map<String, AtomicLong> logCounts = new HashMap<>();
     private final Map<String, AtomicLong> errorCounts = new HashMap<>();
     private final AtomicLong totalLogs = new AtomicLong(0);
     private final AtomicLong totalErrors = new AtomicLong(0);
 
-    @Autowired
-    public LogMonitoringService(MeterRegistry meterRegistry) {
-        this.meterRegistry = meterRegistry;
-        
+   public LogMonitoringService(MeterRegistry meterRegistry) {
         this.auditLogCounter = Counter.builder("logs.audit")
-                .description("审计日志数量")
+                .description("Audit log count")
                 .register(meterRegistry);
 
         this.securityLogCounter = Counter.builder("logs.security")
-                .description("安全日志数量")
+                .description("Security log count")
                 .register(meterRegistry);
 
         this.performanceLogCounter = Counter.builder("logs.performance")
-                .description("性能日志数量")
+                .description("Performance log count")
                 .register(meterRegistry);
 
         this.errorLogCounter = Counter.builder("logs.error")
-                .description("错误日志数量")
+                .description("Error log count")
                 .register(meterRegistry);
 
         this.requestLogCounter = Counter.builder("logs.request")
-                .description("请求日志数量")
+                .description("Request log count")
                 .register(meterRegistry);
 
         this.logProcessingTimer = Timer.builder("logs.processing.duration")
-                .description("日志处理时间")
+                .description("Log processing time")
                 .register(meterRegistry);
 
-        // 初始化日志统计
+        // Initialize log statistics
         initializeLogStatistics();
     }
 
     /**
-     * 初始化日志统计信息
+     * Initialize log statistics
      */
     private void initializeLogStatistics() {
         logCounts.put("AUDIT", new AtomicLong(0));
@@ -86,35 +81,35 @@ public class LogMonitoringService {
     }
 
     /**
-     * 记录审计日志
-     * @param operation 操作类型
-     * @param resource 资源类型
+     * Record audit log
+     * @param operation Operation type
+     * @param resource Resource type
      */
     public void recordAuditLog(String operation, String resource) {
         auditLogCounter.increment();
         logCounts.get("AUDIT").incrementAndGet();
         totalLogs.incrementAndGet();
         
-        logger.debug("审计日志记录 - 操作: {}, 资源: {}", operation, resource);
+        logger.debug("Audit log recorded - Operation: {}, Resource: {}", operation, resource);
     }
 
     /**
-     * 记录安全日志
-     * @param eventType 事件类型
-     * @param severity 严重程度
+     * Record security log
+     * @param eventType Event type
+     * @param severity Severity level
      */
     public void recordSecurityLog(String eventType, String severity) {
         securityLogCounter.increment();
         logCounts.get("SECURITY").incrementAndGet();
         totalLogs.incrementAndGet();
         
-        logger.debug("安全日志记录 - 事件类型: {}, 严重程度: {}", eventType, severity);
+        logger.debug("Security log recorded - Event type: {}, Severity: {}", eventType, severity);
     }
 
     /**
-     * 记录性能日志
-     * @param operation 操作名称
-     * @param duration 执行时间（毫秒）
+     * Record performance log
+     * @param operation Operation name
+     * @param duration Execution time (milliseconds)
      */
     public void recordPerformanceLog(String operation, long duration) {
         performanceLogCounter.increment();
@@ -122,13 +117,13 @@ public class LogMonitoringService {
         totalLogs.incrementAndGet();
         logProcessingTimer.record(duration, java.util.concurrent.TimeUnit.MILLISECONDS);
         
-        logger.debug("性能日志记录 - 操作: {}, 耗时: {}ms", operation, duration);
+        logger.debug("Performance log recorded - Operation: {}, Duration: {}ms", operation, duration);
     }
 
     /**
-     * 记录错误日志
-     * @param errorType 错误类型
-     * @param component 组件名称
+     * Record error log
+     * @param errorType Error type
+     * @param component Component name
      */
     public void recordErrorLog(String errorType, String component) {
         errorLogCounter.increment();
@@ -136,43 +131,43 @@ public class LogMonitoringService {
         totalLogs.incrementAndGet();
         totalErrors.incrementAndGet();
         
-        // 根据错误类型记录特定计数器
+        // Record specific counter based on error type
         if (errorCounts.containsKey(errorType)) {
             errorCounts.get(errorType).incrementAndGet();
         }
         
-        logger.debug("错误日志记录 - 错误类型: {}, 组件: {}", errorType, component);
+        logger.debug("Error log recorded - Error type: {}, Component: {}", errorType, component);
     }
 
     /**
-     * 记录请求日志
-     * @param method HTTP方法
-     * @param uri 请求URI
-     * @param statusCode 响应状态码
+     * Record request log
+     * @param method HTTP method
+     * @param uri Request URI
+     * @param statusCode Response status code
      */
     public void recordRequestLog(String method, String uri, int statusCode) {
         requestLogCounter.increment();
         logCounts.get("REQUEST").incrementAndGet();
         totalLogs.incrementAndGet();
         
-        logger.debug("请求日志记录 - 方法: {}, URI: {}, 状态码: {}", method, uri, statusCode);
+        logger.debug("Request log recorded - Method: {}, URI: {}, Status code: {}", method, uri, statusCode);
     }
 
     /**
-     * 记录应用日志
-     * @param level 日志级别
-     * @param component 组件名称
+     * Record application log
+     * @param level Log level
+     * @param component Component name
      */
     public void recordApplicationLog(String level, String component) {
         logCounts.get("APPLICATION").incrementAndGet();
         totalLogs.incrementAndGet();
         
-        logger.debug("应用日志记录 - 级别: {}, 组件: {}", level, component);
+        logger.debug("Application log recorded - Level: {}, Component: {}", level, component);
     }
 
     /**
-     * 获取日志统计信息
-     * @return 日志统计信息
+     * Get log statistics
+     * @return Log statistics
      */
     public LogStats getLogStats() {
         Map<String, Long> logCountsMap = new HashMap<>();
@@ -191,7 +186,7 @@ public class LogMonitoringService {
     }
 
     /**
-     * 重置日志统计信息
+     * Reset log statistics
      */
     public void resetLogStats() {
         logCounts.values().forEach(atomicLong -> atomicLong.set(0));
@@ -199,12 +194,12 @@ public class LogMonitoringService {
         totalLogs.set(0);
         totalErrors.set(0);
         
-        logger.info("日志统计信息已重置");
+        logger.info("Log statistics have been reset");
     }
 
     /**
-     * 获取日志健康状态
-     * @return 日志健康状态
+     * Get log health status
+     * @return Log health status
      */
     public LogHealthStatus getLogHealthStatus() {
         long totalLogsCount = totalLogs.get();
@@ -213,9 +208,9 @@ public class LogMonitoringService {
         double errorRate = totalLogsCount > 0 ? (double) totalErrorsCount / totalLogsCount : 0.0;
         
         String status;
-        if (errorRate < 0.01) { // 错误率小于1%
+        if (errorRate < 0.01) { // Error rate less than 1%
             status = "HEALTHY";
-        } else if (errorRate < 0.05) { // 错误率小于5%
+        } else if (errorRate < 0.05) { // Error rate less than 5%
             status = "WARNING";
         } else {
             status = "CRITICAL";
@@ -225,7 +220,7 @@ public class LogMonitoringService {
     }
 
     /**
-     * 日志统计信息类
+     * Log statistics class
      */
     public static class LogStats {
         private final long totalLogs;
@@ -260,7 +255,7 @@ public class LogMonitoringService {
     }
 
     /**
-     * 日志健康状态类
+     * Log health status class
      */
     public static class LogHealthStatus {
         private final String status;

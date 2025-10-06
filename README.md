@@ -1,28 +1,28 @@
 # Employee Management Microservice (Revenue Calculator Backend Employee)
 
-A reactive employee management system backend service based on Spring Boot 3.x, R2DBC, and WebFlux.
+A reactive employee management system backend service based on Spring Boot 3.x, R2DBC, and WebFlux with comprehensive enterprise features.
 
 ## 🌐 Language Selection / 语言选择 / 言語選択
 
-Choose your preferred language to view the documentation:
+Choose your preferred language to view the complete documentation:
 
 ### 🇨🇳 中文版 (Chinese)
 
 [**README_ZH.md**](README_ZH.md) - 完整的中文文档
 
-基于 Spring Boot 3.x、R2DBC、WebFlux 的响应式员工管理系统后端服务。支持英、中、日三种语言的API文档，包含完整的CRUD操作、搜索功能、数据验证、缓存支持、限流保护等特性。
+基于 Spring Boot 3.x、R2DBC、WebFlux 的响应式员工管理系统后端服务。支持英、中、日三种语言的API文档，包含完整的CRUD操作、搜索功能、数据验证、缓存支持、限流保护、数据库审计、事务管理、全面日志等企业级特性。
 
 ### 🇺🇸 English Version
 
 [**README_EN.md**](README_EN.md) - Complete English documentation
 
-A reactive employee management system backend service based on Spring Boot 3.x, R2DBC, and WebFlux. Features multi-language API documentation (English, Chinese, Japanese), complete CRUD operations, search functionality, data validation, cache support, rate limiting, and more.
+A reactive employee management system backend service based on Spring Boot 3.x, R2DBC, and WebFlux. Features multi-language API documentation (English, Chinese, Japanese), complete CRUD operations, search functionality, data validation, cache support, rate limiting, database audit, transaction management, comprehensive logging, and more.
 
 ### 🇯🇵 日本語版 (Japanese)
 
 [**README_JA.md**](README_JA.md) - 完全な日本語文書
 
-Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業員管理システムのバックエンドサービス。多言語API文書（英語、中国語、日本語）、完全なCRUD操作、検索機能、データ検証、キャッシュサポート、レート制限などの機能を提供します。
+Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業員管理システムのバックエンドサービス。多言語API文書（英語、中国語、日本語）、完全なCRUD操作、検索機能、データ検証、キャッシュサポート、レート制限、データベース監査、トランザクション管理、包括的ログなどの機能を提供します。
 
 ---
 
@@ -37,7 +37,10 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 - ✅ **Data Validation** / **数据验证** / **データ検証** (Jakarta Validation)
 - ✅ **Cache Support** / **缓存支持** / **キャッシュサポート** (Redis)
 - ✅ **Rate Limiting** / **限流保护** / **レート制限** (Resilience4j)
-- ✅ **Monitoring & Metrics** / **监控指标** / **監視・メトリクス** (Actuator)
+- ✅ **Database Audit** / **数据库审计** / **データベース監査** (Complete audit trail)
+- ✅ **Transaction Management** / **事务管理** / **トランザクション管理** (ACID compliance)
+- ✅ **Comprehensive Logging** / **全面日志** / **包括的ログ** (Structured logging)
+- ✅ **Monitoring & Metrics** / **监控指标** / **監視・メトリクス** (Actuator + Custom metrics)
 
 ### Technology Stack / 技术栈 / 技術スタック
 

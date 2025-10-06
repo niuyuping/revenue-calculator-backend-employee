@@ -5,30 +5,30 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
 /**
- * 分页请求参数
+ * Pagination request parameters
  */
-@Schema(description = "分页请求参数")
+@Schema(description = "Pagination request parameters")
 public class PageRequest {
     
-    @Schema(description = "页码，从0开始", example = "0", minimum = "0")
-    @Min(value = 0, message = "页码不能小于0")
+    @Schema(description = "Page number, starting from 0", example = "0", minimum = "0")
+    @Min(value = 0, message = "Page number cannot be less than 0")
     private int page = 0;
     
-    @Schema(description = "每页大小", example = "10", minimum = "1", maximum = "100")
-    @Min(value = 1, message = "每页大小不能小于1")
-    @Max(value = 100, message = "每页大小不能超过100")
+    @Schema(description = "Page size", example = "10", minimum = "1", maximum = "100")
+    @Min(value = 1, message = "Page size cannot be less than 1")
+    @Max(value = 100, message = "Page size cannot exceed 100")
     private int size = 10;
     
-    @Schema(description = "排序字段", example = "name")
+    @Schema(description = "Sort field", example = "name")
     private String sortBy = "employeeId";
     
-    @Schema(description = "排序方向", example = "ASC", allowableValues = {"ASC", "DESC"})
+    @Schema(description = "Sort direction", example = "ASC", allowableValues = {"ASC", "DESC"})
     private SortDirection sortDirection = SortDirection.ASC;
     
-    // 默认构造函数
+    // Default constructor
     public PageRequest() {}
     
-    // 全参数构造函数
+    // All parameters constructor
     public PageRequest(int page, int size, String sortBy, SortDirection sortDirection) {
         this.page = page;
         this.size = size;
@@ -36,7 +36,7 @@ public class PageRequest {
         this.sortDirection = sortDirection;
     }
     
-    // Getter 和 Setter 方法
+    // Getter and Setter methods
     public int getPage() {
         return page;
     }
@@ -69,7 +69,7 @@ public class PageRequest {
         this.sortDirection = sortDirection;
     }
     
-    // 计算偏移量
+    // Calculate offset
     public int getOffset() {
         return page * size;
     }

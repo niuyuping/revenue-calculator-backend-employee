@@ -5,7 +5,6 @@ import jp.asatex.revenue_calculator_backend_employee.entity.Employee;
 import jp.asatex.revenue_calculator_backend_employee.exception.DuplicateEmployeeNumberException;
 import jp.asatex.revenue_calculator_backend_employee.exception.EmployeeNotFoundException;
 import jp.asatex.revenue_calculator_backend_employee.repository.EmployeeRepository;
-import jp.asatex.revenue_calculator_backend_employee.service.DatabaseAuditService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,21 +20,20 @@ import reactor.test.StepVerifier;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
- * EmployeeService単体テスト
- * すべてのビジネスロジックメソッドをテスト
+ * EmployeeService unit test
+ * Tests all business logic methods
  */
 @ExtendWith(MockitoExtension.class)
 @Import(jp.asatex.revenue_calculator_backend_employee.config.TestConfig.class)
 class EmployeeServiceTest {
     
     /**
-     * 创建LocalDate对象的工具方法
+     * Utility method to create LocalDate objects
      */
     private LocalDate createDate(int year, int month, int day) {
         return LocalDate.of(year, month, day);
@@ -86,25 +84,39 @@ class EmployeeServiceTest {
         testEmployeeDto = new EmployeeDto();
         testEmployeeDto.setEmployeeId(1L);
         testEmployeeDto.setEmployeeNumber("EMP001");
-        testEmployeeDto.setName("田中太郎");
-        testEmployeeDto.setFurigana("タナカタロウ");
+        testEmployeeDto.setName("Tanaka Taro");
+        testEmployeeDto.setFurigana("tanaka taro");
         testEmployeeDto.setBirthday(createDate(1990, 5, 15));
 
         testEmployee = new Employee();
         testEmployee.setEmployeeId(1L);
         testEmployee.setEmployeeNumber("EMP001");
-        testEmployee.setName("田中太郎");
-        testEmployee.setFurigana("タナカタロウ");
+        testEmployee.setName("Tanaka Taro");
+        testEmployee.setFurigana("tanaka taro");
         testEmployee.setBirthday(createDate(1990, 5, 15));
 
-        // 配置 TransactionMonitoringService Mock - 使用 lenient() 避免不必要的 stubbing 错误
-        org.mockito.Mockito.lenient().when(transactionMonitoringService.monitorTransaction(any(String.class), any(String.class), any(Mono.class)))
+        // Configure TransactionMonitoringService Mock - using lenient() to avoid unnecessary stubbing errors
+        org.mockito.Mockito.lenient().when(transactionMonitoringService.monitorTransaction(any(String.class), any(String.class), any()))
                 .thenAnswer(invocation -> {
-                    Mono<?> operation = invocation.getArgument(2);
+                    @SuppressWarnings("unchecked")
+                    Mono<Object> operation = (Mono<Object>) invocation.getArgument(2);
                     return operation;
                 });
 
-        // AuditLogService 的方法调用是可选的，不需要Mock配置
+        // Configure DatabaseAuditService Mock
+        org.mockito.Mockito.lenient().when(databaseAuditService.logInsertOperation(any(String.class), any(String.class), any(), any(String.class), any(Long.class), any(Integer.class)))
+                .thenReturn(Mono.empty());
+        
+        org.mockito.Mockito.lenient().when(databaseAuditService.logUpdateOperation(any(String.class), any(String.class), any(), any(), any(String.class), any(Long.class), any(Integer.class)))
+                .thenReturn(Mono.empty());
+        
+        org.mockito.Mockito.lenient().when(databaseAuditService.logDeleteOperation(any(String.class), any(String.class), any(), any(String.class), any(Long.class), any(Integer.class)))
+                .thenReturn(Mono.empty());
+        
+        org.mockito.Mockito.lenient().when(databaseAuditService.logFailedOperation(any(String.class), any(String.class), any(String.class), any(String.class), any(Long.class), any(String.class)))
+                .thenReturn(Mono.empty());
+
+        // AuditLogService method calls are optional, no Mock configuration needed
     }
 
     @Test
@@ -167,11 +179,11 @@ class EmployeeServiceTest {
     void searchEmployeesByName_ShouldReturnMatchingEmployees() {
         // Given
         List<Employee> employees = Arrays.asList(testEmployee);
-        when(employeeRepository.findByNameContaining("%田中%")).thenReturn(Flux.fromIterable(employees));
+        when(employeeRepository.findByNameContaining("%Tanaka%")).thenReturn(Flux.fromIterable(employees));
 
         // When & Then
-        StepVerifier.create(employeeService.searchEmployeesByName("田中"))
-                .expectNextMatches(dto -> dto.getName().contains("田中"))
+        StepVerifier.create(employeeService.searchEmployeesByName("Tanaka"))
+                .expectNextMatches(dto -> dto.getName().contains("Tanaka"))
                 .verifyComplete();
     }
 
@@ -179,11 +191,11 @@ class EmployeeServiceTest {
     void searchEmployeesByFurigana_ShouldReturnMatchingEmployees() {
         // Given
         List<Employee> employees = Arrays.asList(testEmployee);
-        when(employeeRepository.findByFuriganaContaining("%タナカ%")).thenReturn(Flux.fromIterable(employees));
+        when(employeeRepository.findByFuriganaContaining("%tanaka%")).thenReturn(Flux.fromIterable(employees));
 
         // When & Then
-        StepVerifier.create(employeeService.searchEmployeesByFurigana("タナカ"))
-                .expectNextMatches(dto -> dto.getFurigana().contains("タナカ"))
+        StepVerifier.create(employeeService.searchEmployeesByFurigana("tanaka"))
+                .expectNextMatches(dto -> dto.getFurigana().contains("tanaka"))
                 .verifyComplete();
     }
 
@@ -192,7 +204,7 @@ class EmployeeServiceTest {
         // Given
         when(employeeRepository.existsByEmployeeNumber("EMP001")).thenReturn(Mono.just(false));
         when(employeeRepository.save(any(Employee.class))).thenReturn(Mono.just(testEmployee));
-        when(databaseAuditService.logInsertOperation(any(String.class), any(String.class), any(Map.class), any(String.class), any(Long.class), any(Integer.class)))
+        when(databaseAuditService.logInsertOperation(any(String.class), any(String.class), any(), any(String.class), any(Long.class), any(Integer.class)))
                 .thenReturn(Mono.empty());
 
         // When & Then
@@ -217,13 +229,13 @@ class EmployeeServiceTest {
         // Given
         EmployeeDto updateDto = new EmployeeDto();
         updateDto.setEmployeeNumber("EMP001");
-        updateDto.setName("田中太郎（更新）");
-        updateDto.setFurigana("タナカタロウ（コウシン）");
+        updateDto.setName("Tanaka Taro (Updated)");
+        updateDto.setFurigana("tanaka taro (updated)");
         updateDto.setBirthday(createDate(1990, 5, 15));
 
         when(employeeRepository.findById(1L)).thenReturn(Mono.just(testEmployee));
         when(employeeRepository.save(any(Employee.class))).thenReturn(Mono.just(testEmployee));
-        when(databaseAuditService.logUpdateOperation(any(String.class), any(String.class), any(Map.class), any(Map.class), any(String.class), any(Long.class), any(Integer.class)))
+        when(databaseAuditService.logUpdateOperation(any(String.class), any(String.class), any(), any(), any(String.class), any(Long.class), any(Integer.class)))
                 .thenReturn(Mono.empty());
 
         // When & Then
@@ -237,22 +249,22 @@ class EmployeeServiceTest {
         // Given
         EmployeeDto updateDto = new EmployeeDto();
         updateDto.setEmployeeNumber("EMP002");
-        updateDto.setName("田中太郎（更新）");
-        updateDto.setFurigana("タナカタロウ（コウシン）");
+        updateDto.setName("Tanaka Taro (Updated)");
+        updateDto.setFurigana("tanaka taro (updated)");
         updateDto.setBirthday(createDate(1990, 5, 15));
 
-        // 创建更新后的员工实体
+        // Create updated employee entity
         Employee updatedEmployee = new Employee();
         updatedEmployee.setEmployeeId(1L);
         updatedEmployee.setEmployeeNumber("EMP002");
-        updatedEmployee.setName("田中太郎（更新）");
-        updatedEmployee.setFurigana("タナカタロウ（コウシン）");
+        updatedEmployee.setName("Tanaka Taro (Updated)");
+        updatedEmployee.setFurigana("tanaka taro (updated)");
         updatedEmployee.setBirthday(createDate(1990, 5, 15));
 
         when(employeeRepository.findById(1L)).thenReturn(Mono.just(testEmployee));
         when(employeeRepository.existsByEmployeeNumber("EMP002")).thenReturn(Mono.just(false));
         when(employeeRepository.save(any(Employee.class))).thenReturn(Mono.just(updatedEmployee));
-        when(databaseAuditService.logUpdateOperation(any(String.class), any(String.class), any(Map.class), any(Map.class), any(String.class), any(Long.class), any(Integer.class)))
+        when(databaseAuditService.logUpdateOperation(any(String.class), any(String.class), any(), any(), any(String.class), any(Long.class), any(Integer.class)))
                 .thenReturn(Mono.empty());
 
         // When & Then
@@ -277,8 +289,8 @@ class EmployeeServiceTest {
         // Given
         EmployeeDto updateDto = new EmployeeDto();
         updateDto.setEmployeeNumber("EMP002");
-        updateDto.setName("田中太郎（更新）");
-        updateDto.setFurigana("タナカタロウ（コウシン）");
+        updateDto.setName("Tanaka Taro (Updated)");
+        updateDto.setFurigana("tanaka taro (updated)");
         updateDto.setBirthday(createDate(1990, 5, 15));
 
         when(employeeRepository.findById(1L)).thenReturn(Mono.just(testEmployee));
@@ -295,7 +307,7 @@ class EmployeeServiceTest {
         // Given
         when(employeeRepository.existsById(1L)).thenReturn(Mono.just(true));
         when(employeeRepository.deleteById(1L)).thenReturn(Mono.empty());
-        when(databaseAuditService.logDeleteOperation(any(String.class), any(String.class), any(Map.class), any(String.class), any(Long.class), any(Integer.class)))
+        when(databaseAuditService.logDeleteOperation(any(String.class), any(String.class), any(), any(String.class), any(Long.class), any(Integer.class)))
                 .thenReturn(Mono.empty());
 
         // When & Then
@@ -319,7 +331,7 @@ class EmployeeServiceTest {
         // Given
         when(employeeRepository.existsByEmployeeNumber("EMP001")).thenReturn(Mono.just(true));
         when(employeeRepository.deleteByEmployeeNumber("EMP001")).thenReturn(Mono.empty());
-        when(databaseAuditService.logDeleteOperation(any(String.class), any(String.class), any(Map.class), any(String.class), any(Long.class), any(Integer.class)))
+        when(databaseAuditService.logDeleteOperation(any(String.class), any(String.class), any(), any(String.class), any(Long.class), any(Integer.class)))
                 .thenReturn(Mono.empty());
 
         // When & Then

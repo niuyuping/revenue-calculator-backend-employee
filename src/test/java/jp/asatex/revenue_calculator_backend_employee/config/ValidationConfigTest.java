@@ -10,20 +10,17 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * ValidationConfigテスト
- * 検証設定が正しいかテスト
+ * ValidationConfig test
+ * Tests if validation configuration is correct
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, 
                 properties = {"spring.flyway.enabled=false"})
 @ActiveProfiles("test")
 @Import(jp.asatex.revenue_calculator_backend_employee.config.TestConfig.class)
-@DisplayName("ValidationConfig テスト")
+@DisplayName("ValidationConfig Test")
 class ValidationConfigTest {
 
     @Autowired
@@ -36,88 +33,88 @@ class ValidationConfigTest {
     private LocalValidatorFactoryBean validator;
 
     @Nested
-    @DisplayName("Bean存在確認テスト")
+    @DisplayName("Bean Existence Tests")
     class BeanExistenceTests {
 
         @Test
-        @DisplayName("ValidationConfig Beanが正しく作成される")
+        @DisplayName("ValidationConfig Bean should be created correctly")
         void testValidationConfigBean() {
             assertThat(validationConfig).isNotNull();
         }
 
         @Test
-        @DisplayName("MethodValidationPostProcessor Beanが正しく作成される")
+        @DisplayName("MethodValidationPostProcessor Bean should be created correctly")
         void testMethodValidationPostProcessorBean() {
             assertThat(methodValidationPostProcessor).isNotNull();
         }
 
         @Test
-        @DisplayName("LocalValidatorFactoryBean Beanが正しく作成される")
+        @DisplayName("LocalValidatorFactoryBean Bean should be created correctly")
         void testLocalValidatorFactoryBean() {
             assertThat(validator).isNotNull();
         }
     }
 
     @Nested
-    @DisplayName("Bean設定確認テスト")
+    @DisplayName("Bean Configuration Tests")
     class BeanConfigurationTests {
 
         @Test
-        @DisplayName("MethodValidationPostProcessorが正しい型で作成される")
+        @DisplayName("MethodValidationPostProcessor should be created with correct type")
         void testMethodValidationPostProcessorConfiguration() {
             assertThat(methodValidationPostProcessor).isInstanceOf(MethodValidationPostProcessor.class);
         }
 
         @Test
-        @DisplayName("LocalValidatorFactoryBeanが正しい型で作成される")
+        @DisplayName("LocalValidatorFactoryBean should be created with correct type")
         void testLocalValidatorFactoryBeanConfiguration() {
             assertThat(validator).isInstanceOf(LocalValidatorFactoryBean.class);
         }
 
         @Test
-        @DisplayName("MethodValidationPostProcessorにValidatorが正しく設定される")
+        @DisplayName("MethodValidationPostProcessor should have Validator configured correctly")
         void testMethodValidationPostProcessorValidatorConfiguration() {
-            // MethodValidationPostProcessorのvalidatorプロパティが設定されているか確認
-            // Spring Boot 3.xではgetValidator()メソッドが利用できないため、Beanの存在確認のみ
+            // Check if validator property of MethodValidationPostProcessor is configured
+            // In Spring Boot 3.x, getValidator() method is not available, so only check Bean existence
             assertThat(methodValidationPostProcessor).isNotNull();
             assertThat(validator).isNotNull();
         }
     }
 
     @Nested
-    @DisplayName("Validator機能テスト")
+    @DisplayName("Validator Functionality Tests")
     class ValidatorFunctionalityTests {
 
         @Test
-        @DisplayName("Validatorが正常に動作する")
+        @DisplayName("Validator should work normally")
         void testValidatorFunctionality() {
-            // Validatorが正常に動作するかテスト
-            // Spring Boot 3.xでは直接getValidatorFactory()が利用できないため、Beanの存在確認のみ
+            // Test if Validator works normally
+            // In Spring Boot 3.x, getValidatorFactory() is not directly available, so only check Bean existence
             assertThat(validator).isNotNull();
             assertThat(validator).isInstanceOf(LocalValidatorFactoryBean.class);
         }
 
         @Test
-        @DisplayName("ValidatorがBeanとして正しく登録されている")
+        @DisplayName("Validator should be registered correctly as Bean")
         void testValidatorBeanRegistration() {
-            // ValidatorがSpringコンテキストに正しく登録されているか確認
+            // Check if Validator is correctly registered in Spring context
             assertThat(validator).isNotNull();
             assertThat(validator).isInstanceOf(LocalValidatorFactoryBean.class);
         }
     }
 
     @Nested
-    @DisplayName("設定クラス機能テスト")
+    @DisplayName("Configuration Class Functionality Tests")
     class ConfigurationClassTests {
 
         @Test
-        @DisplayName("ValidationConfigがWebFluxConfigurerを実装している")
+        @DisplayName("ValidationConfig should implement WebFluxConfigurer")
         void testValidationConfigImplementsWebFluxConfigurer() {
             assertThat(validationConfig).isInstanceOf(org.springframework.web.reactive.config.WebFluxConfigurer.class);
         }
 
         @Test
-        @DisplayName("ValidationConfigのvalidatorメソッドが正しく動作する")
+        @DisplayName("ValidationConfig validator method should work correctly")
         void testValidatorMethod() {
             LocalValidatorFactoryBean validatorBean = validationConfig.validator();
             assertThat(validatorBean).isNotNull();
@@ -125,36 +122,36 @@ class ValidationConfigTest {
         }
 
         @Test
-        @DisplayName("ValidationConfigのmethodValidationPostProcessorメソッドが正しく動作する")
+        @DisplayName("ValidationConfig methodValidationPostProcessor method should work correctly")
         void testMethodValidationPostProcessorMethod() {
             MethodValidationPostProcessor processor = validationConfig.methodValidationPostProcessor();
             assertThat(processor).isNotNull();
             assertThat(processor).isInstanceOf(MethodValidationPostProcessor.class);
-            // Spring Boot 3.xではgetValidator()メソッドが利用できないため、型確認のみ
+            // In Spring Boot 3.x, getValidator() method is not available, so only check type
         }
     }
 
     @Nested
-    @DisplayName("統合テスト")
+    @DisplayName("Integration Tests")
     class IntegrationTests {
 
         @Test
-        @DisplayName("すべてのBeanが正しく連携して動作する")
+        @DisplayName("All Beans should work together correctly")
         void testAllBeansWorkTogether() {
-            // すべてのBeanが正しく連携しているか確認
+            // Check if all Beans are correctly integrated
             assertThat(validationConfig).isNotNull();
             assertThat(methodValidationPostProcessor).isNotNull();
             assertThat(validator).isNotNull();
             
-            // Spring Boot 3.xでは直接的な依存関係確認が困難なため、Beanの存在確認のみ
+            // In Spring Boot 3.x, direct dependency verification is difficult, so only check Bean existence
             assertThat(methodValidationPostProcessor).isInstanceOf(MethodValidationPostProcessor.class);
             assertThat(validator).isInstanceOf(LocalValidatorFactoryBean.class);
         }
 
         @Test
-        @DisplayName("ValidationConfigのBean定義が正しい")
+        @DisplayName("ValidationConfig Bean definition should be correct")
         void testValidationConfigBeanDefinition() {
-            // ValidationConfigのBean定義が正しいか確認
+            // Check if ValidationConfig Bean definition is correct
             assertThat(validationConfig).isNotNull();
             assertThat(validationConfig.getClass().getSimpleName()).contains("ValidationConfig");
         }

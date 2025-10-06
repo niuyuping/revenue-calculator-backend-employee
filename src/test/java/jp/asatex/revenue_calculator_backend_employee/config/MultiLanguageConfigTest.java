@@ -11,7 +11,7 @@ import java.util.Locale;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * 多语言配置测试
+ * Multi-language configuration test
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
                 properties = {"spring.flyway.enabled=false"})
@@ -31,11 +31,11 @@ class MultiLanguageConfigTest {
 
     @Test
     void testEnglishMessages() {
-        // 测试英文消息
+        // Test English messages
         String title = messageSource.getMessage("app.title", null, Locale.ENGLISH);
         assertNotNull(title, "English title should not be null");
-        assertTrue(title.contains("API") || title.contains("收入计算器"), 
-            "Title should contain API or Chinese equivalent: " + title);
+        assertTrue(title.contains("API") || title.contains("Revenue Calculator"), 
+            "Title should contain API or Revenue Calculator: " + title);
         
         String description = messageSource.getMessage("app.description", null, Locale.ENGLISH);
         assertNotNull(description, "English description should not be null");
@@ -45,7 +45,7 @@ class MultiLanguageConfigTest {
     void testChineseMessages() {
         String title = messageSource.getMessage("app.title", null, Locale.SIMPLIFIED_CHINESE);
         assertNotNull(title, "Chinese title should not be null");
-        assertTrue(title.contains("收入计算器") || title.contains("API"), 
+        assertTrue(title.contains("Revenue Calculator") || title.contains("API"), 
             "Title should contain Chinese or English: " + title);
         
         String description = messageSource.getMessage("app.description", null, Locale.SIMPLIFIED_CHINESE);
@@ -63,14 +63,14 @@ class MultiLanguageConfigTest {
 
     @Test
     void testDefaultLocale() {
-        // 测试默认语言
+        // Test default language
         String title = messageSource.getMessage("app.title", null, null);
         assertNotNull(title, "Default locale title should not be null");
     }
 
     @Test
     void testFeaturesMessages() {
-        // 测试功能特性消息
+        // Test feature messages
         String featuresTitle = messageSource.getMessage("features.title", null, Locale.ENGLISH);
         assertNotNull(featuresTitle, "Features title should not be null");
         

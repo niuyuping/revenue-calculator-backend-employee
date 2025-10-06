@@ -15,14 +15,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * グローバル例外ハンドラー
- * 検証エラーとその他の例外を処理
+ * Global exception handler
+ * Handles validation errors and other exceptions
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     /**
-     * 検証エラーの処理
+     * Handle validation errors
      */
     @ExceptionHandler(WebExchangeBindException.class)
     public Mono<ResponseEntity<Map<String, Object>>> handleValidationException(WebExchangeBindException ex) {
@@ -32,12 +32,12 @@ public class GlobalExceptionHandler {
                 .stream()
                 .collect(Collectors.toMap(
                         error -> error.getField(),
-                        error -> error.getDefaultMessage() != null ? error.getDefaultMessage() : "検証失敗",
+                        error -> error.getDefaultMessage() != null ? error.getDefaultMessage() : "Validation Failed",
                         (existing, replacement) -> existing
                 ));
         
-        response.put("error", "検証失敗");
-        response.put("message", "リクエストパラメータ検証失敗");
+        response.put("error", "Validation Failed");
+        response.put("message", "Request parameter validation failed");
         response.put("details", errors);
         response.put("status", HttpStatus.BAD_REQUEST.value());
         
@@ -46,12 +46,12 @@ public class GlobalExceptionHandler {
 
 
     /**
-     * 従業員未発見例外の処理
+     * Handle employee not found exception
      */
     @ExceptionHandler(EmployeeNotFoundException.class)
     public Mono<ResponseEntity<Map<String, Object>>> handleEmployeeNotFoundException(EmployeeNotFoundException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("error", "従業員未発見");
+        response.put("error", "Employee not found");
         response.put("message", ex.getMessage());
         response.put("status", HttpStatus.NOT_FOUND.value());
         
@@ -59,12 +59,12 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 従業員番号重複例外の処理
+     * Handle duplicate employee number exception
      */
     @ExceptionHandler(DuplicateEmployeeNumberException.class)
     public Mono<ResponseEntity<Map<String, Object>>> handleDuplicateEmployeeNumberException(DuplicateEmployeeNumberException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("error", "従業員番号重複");
+        response.put("error", "Duplicate employee number");
         response.put("message", ex.getMessage());
         response.put("status", HttpStatus.CONFLICT.value());
         
@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 制約違反例外の処理（パスパラメータとクエリパラメータ検証）
+     * Handle constraint violation exception (path parameter and query parameter validation)
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public Mono<ResponseEntity<Map<String, Object>>> handleConstraintViolationException(ConstraintViolationException ex) {
@@ -88,18 +88,18 @@ public class GlobalExceptionHandler {
                     ));
             response.put("details", errors);
         } else {
-            response.put("details", "パラメータ検証失敗");
+            response.put("details", "Parameter validation failed");
         }
 
-        response.put("error", "パラメータ検証失敗");
-        response.put("message", "リクエストパラメータが検証ルールに適合しません");
+        response.put("error", "Parameter validation failed");
+        response.put("message", "Request parameters do not meet validation rules");
         response.put("status", HttpStatus.BAD_REQUEST.value());
 
         return Mono.just(ResponseEntity.badRequest().body(response));
     }
 
     /**
-     * サーバー入力例外の処理（必須パラメータ不足など）
+     * Handle server input exceptions (missing required parameters, etc.)
      */
     @ExceptionHandler(ServerWebInputException.class)
     public Mono<ResponseEntity<Map<String, Object>>> handleServerWebInputException(ServerWebInputException ex) {
@@ -107,17 +107,17 @@ public class GlobalExceptionHandler {
         
         String message = ex.getMessage();
         if (message != null && message.contains("Required query parameter")) {
-            response.put("error", "パラメータ検証失敗");
-            response.put("message", "必須のクエリパラメータが不足しています");
-            response.put("details", "必要なパラメータを確認してください");
+            response.put("error", "Parameter validation failed");
+            response.put("message", "Required query parameters are missing");
+            response.put("details", "Please check required parameters");
         } else if (message != null && message.contains("Required request parameter")) {
-            response.put("error", "パラメータ検証失敗");
-            response.put("message", "必須のリクエストパラメータが不足しています");
-            response.put("details", "必要なパラメータを確認してください");
+            response.put("error", "Parameter validation failed");
+            response.put("message", "Required request parameter is missing");
+            response.put("details", "Please check required parameters");
         } else {
-            response.put("error", "パラメータ検証失敗");
-            response.put("message", "リクエストパラメータが検証ルールに適合しません");
-            response.put("details", message != null ? message : "パラメータ検証失敗");
+            response.put("error", "Parameter validation failed");
+            response.put("message", "Request parameters do not meet validation rules");
+            response.put("details", message != null ? message : "Parameter validation failed");
         }
         
         response.put("status", HttpStatus.BAD_REQUEST.value());
@@ -125,12 +125,12 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 事务异常的处理
+     * Handle transaction exceptions
      */
     @ExceptionHandler(TransactionException.class)
     public Mono<ResponseEntity<Map<String, Object>>> handleTransactionException(TransactionException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("error", "事务处理失败");
+        response.put("error", "Transaction processing failed");
         response.put("message", ex.getMessage());
         response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         
@@ -138,22 +138,22 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 汎用例外の処理
+     * Handle generic exceptions
      */
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<Map<String, Object>>> handleGenericException(Exception ex) {
         Map<String, Object> response = new HashMap<>();
         
-        // 検証関連の例外かチェック
+        // Check if it's a validation-related exception
         if (ex.getMessage() != null && ex.getMessage().contains("Validation failure")) {
-            response.put("error", "検証失敗");
-            response.put("message", "リクエストデータが検証ルールに適合しません");
-            response.put("details", "入力データのフォーマットと長さを確認してください");
+            response.put("error", "Validation Failed");
+            response.put("message", "Request data does not conform to validation rules");
+            response.put("details", "Please check input data format and length");
             response.put("status", HttpStatus.BAD_REQUEST.value());
             return Mono.just(ResponseEntity.badRequest().body(response));
         }
         
-        // その他のタイプの検証例外かチェック
+        // Check for other types of validation exceptions
         if (ex.getCause() instanceof ConstraintViolationException) {
             ConstraintViolationException cve = (ConstraintViolationException) ex.getCause();
             
@@ -167,17 +167,17 @@ public class GlobalExceptionHandler {
                         ));
                 response.put("details", errors);
             } else {
-                response.put("details", "パラメータ検証失敗");
+                response.put("details", "Parameter validation failed");
             }
             
-            response.put("error", "検証失敗");
-            response.put("message", "リクエストデータが検証ルールに適合しません");
+            response.put("error", "Validation Failed");
+            response.put("message", "Request data does not conform to validation rules");
             response.put("status", HttpStatus.BAD_REQUEST.value());
             return Mono.just(ResponseEntity.badRequest().body(response));
         }
         
-        response.put("error", "サーバー内部エラー");
-        response.put("message", ex.getMessage() != null ? ex.getMessage() : "不明なエラー");
+        response.put("error", "Internal Server Error");
+        response.put("message", ex.getMessage() != null ? ex.getMessage() : "Unknown error");
         response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         
         return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response));

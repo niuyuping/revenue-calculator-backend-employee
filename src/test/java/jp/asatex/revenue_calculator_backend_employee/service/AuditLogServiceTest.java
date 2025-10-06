@@ -17,10 +17,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * AuditLogService 测试类
+ * AuditLogService test class
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AuditLogService テスト")
+@DisplayName("AuditLogService Test")
 class AuditLogServiceTest {
 
     @Mock
@@ -31,7 +31,7 @@ class AuditLogServiceTest {
 
     @BeforeEach
     void setUp() {
-        // 设置MDC
+        // Set MDC
         MDC.put("sessionId", "test-session-123");
         MDC.put("requestId", "test-request-456");
         MDC.put("ipAddress", "192.168.1.100");
@@ -39,7 +39,7 @@ class AuditLogServiceTest {
     }
 
     @Test
-    @DisplayName("记录用户操作审计日志应该正确工作")
+    @DisplayName("Logging user operation audit should work correctly")
     void testLogUserOperation() throws Exception {
         // Given
         String operation = "CREATE";
@@ -47,7 +47,7 @@ class AuditLogServiceTest {
         String resourceId = "123";
         String userId = "user123";
         Map<String, Object> details = new HashMap<>();
-        details.put("name", "测试员工");
+        details.put("name", "Test Employee");
         details.put("employeeNumber", "EMP001");
 
         when(objectMapper.writeValueAsString(any())).thenReturn("{\"operation\":\"CREATE\"}");
@@ -60,7 +60,7 @@ class AuditLogServiceTest {
     }
 
     @Test
-    @DisplayName("记录数据访问审计日志应该正确工作")
+    @DisplayName("Logging data access audit should work correctly")
     void testLogDataAccess() throws Exception {
         // Given
         String operation = "UPDATE";
@@ -68,9 +68,9 @@ class AuditLogServiceTest {
         String recordId = "123";
         String userId = "user123";
         Map<String, Object> oldValues = new HashMap<>();
-        oldValues.put("name", "旧名称");
+        oldValues.put("name", "Old Name");
         Map<String, Object> newValues = new HashMap<>();
-        newValues.put("name", "新名称");
+        newValues.put("name", "New Name");
 
         when(objectMapper.writeValueAsString(any())).thenReturn("{\"operation\":\"UPDATE\"}");
 
@@ -82,12 +82,12 @@ class AuditLogServiceTest {
     }
 
     @Test
-    @DisplayName("记录安全事件日志应该正确工作")
+    @DisplayName("Recording security event logs should work correctly")
     void testLogSecurityEvent() throws Exception {
         // Given
         String eventType = "LOGIN_FAILED";
         String severity = "HIGH";
-        String description = "登录失败次数过多";
+        String description = "Too many login failures";
         String userId = "user123";
         Map<String, Object> details = new HashMap<>();
         details.put("attempts", 5);
@@ -103,7 +103,7 @@ class AuditLogServiceTest {
     }
 
     @Test
-    @DisplayName("记录性能日志应该正确工作")
+    @DisplayName("Recording performance logs should work correctly")
     void testLogPerformance() throws Exception {
         // Given
         String operation = "CREATE_EMPLOYEE";
@@ -123,7 +123,7 @@ class AuditLogServiceTest {
     }
 
     @Test
-    @DisplayName("记录API调用审计日志应该正确工作")
+    @DisplayName("Recording API call audit logs should work correctly")
     void testLogApiCall() throws Exception {
         // Given
         String method = "POST";
@@ -144,7 +144,7 @@ class AuditLogServiceTest {
     }
 
     @Test
-    @DisplayName("记录业务操作审计日志应该正确工作")
+    @DisplayName("Recording business operation audit logs should work correctly")
     void testLogBusinessOperation() throws Exception {
         // Given
         String businessOperation = "CREATE_EMPLOYEE";
@@ -154,7 +154,7 @@ class AuditLogServiceTest {
         String result = "SUCCESS";
         Map<String, Object> details = new HashMap<>();
         details.put("employeeNumber", "EMP001");
-        details.put("name", "测试员工");
+        details.put("name", "Test Employee");
 
         when(objectMapper.writeValueAsString(any())).thenReturn("{\"businessOperation\":\"CREATE_EMPLOYEE\"}");
 
@@ -166,12 +166,12 @@ class AuditLogServiceTest {
     }
 
     @Test
-    @DisplayName("记录系统事件日志应该正确工作")
+    @DisplayName("Recording system event logs should work correctly")
     void testLogSystemEvent() throws Exception {
         // Given
         String eventType = "STARTUP";
         String component = "Application";
-        String description = "应用启动完成";
+        String description = "Application startup completed";
         Map<String, Object> details = new HashMap<>();
         details.put("version", "1.0.0");
         details.put("startupTime", "2024-01-01T10:00:00Z");
@@ -186,12 +186,12 @@ class AuditLogServiceTest {
     }
 
     @Test
-    @DisplayName("记录错误审计日志应该正确工作")
+    @DisplayName("Recording error audit logs should work correctly")
     void testLogError() throws Exception {
         // Given
         String errorType = "VALIDATION_ERROR";
         String component = "EmployeeService";
-        String errorMessage = "员工号格式不正确";
+        String errorMessage = "Employee number format is incorrect";
         String userId = "user123";
         Map<String, Object> details = new HashMap<>();
         details.put("employeeNumber", "invalid-number");
@@ -207,7 +207,7 @@ class AuditLogServiceTest {
     }
 
     @Test
-    @DisplayName("JSON序列化失败时应该记录错误日志")
+    @DisplayName("Should record error logs when JSON serialization fails")
     void testJsonSerializationFailure() throws Exception {
         // Given
         String operation = "CREATE";
@@ -216,18 +216,18 @@ class AuditLogServiceTest {
         String userId = "user123";
         Map<String, Object> details = new HashMap<>();
 
-        when(objectMapper.writeValueAsString(any())).thenThrow(new com.fasterxml.jackson.core.JsonProcessingException("序列化失败") {});
+        when(objectMapper.writeValueAsString(any())).thenThrow(new com.fasterxml.jackson.core.JsonProcessingException("Serialization failed") {});
 
         // When & Then
-        // 验证方法不会抛出异常，而是内部处理错误
+        // Verify that the method does not throw an exception, but handles errors internally
         try {
             auditLogService.logUserOperation(operation, resource, resourceId, userId, details);
         } catch (Exception e) {
-            // 不应该抛出异常
-            throw new AssertionError("方法不应该抛出异常", e);
+            // Should not throw an exception
+            throw new AssertionError("Method should not throw an exception", e);
         }
 
-        // 验证方法被调用
+        // Verify method is called
         verify(objectMapper, times(1)).writeValueAsString(any());
     }
 }

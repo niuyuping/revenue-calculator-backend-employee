@@ -9,8 +9,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.ServerResponse;
-
 import jp.asatex.revenue_calculator_backend_employee.controller.EmployeeController;
 import jp.asatex.revenue_calculator_backend_employee.service.EmployeeService;
 import jp.asatex.revenue_calculator_backend_employee.repository.EmployeeRepository;
@@ -19,14 +17,14 @@ import jp.asatex.revenue_calculator_backend_employee.exception.GlobalExceptionHa
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * メインアプリケーションクラスのテスト
- * アプリケーションコンテキストの読み込みと主要コンポーネントの存在確認
+ * Main application class test
+ * Tests application context loading and verification of main components
  */
 @SpringBootTest
 @ActiveProfiles("test")
 @Import({jp.asatex.revenue_calculator_backend_employee.config.TestConfig.class, 
          jp.asatex.revenue_calculator_backend_employee.config.TestContainersConfig.class})
-@DisplayName("RevenueCalculatorBackendEmployeeApplication テスト")
+@DisplayName("RevenueCalculatorBackendEmployeeApplication Test")
 class RevenueCalculatorBackendEmployeeApplicationTests {
 
     @Autowired
@@ -45,19 +43,19 @@ class RevenueCalculatorBackendEmployeeApplicationTests {
     private GlobalExceptionHandler globalExceptionHandler;
 
     @Nested
-    @DisplayName("アプリケーションコンテキストテスト")
+    @DisplayName("Application Context Test")
     class ApplicationContextTests {
 
         @Test
-        @DisplayName("アプリケーションコンテキストが正常に読み込まれる")
+        @DisplayName("Application context should load successfully")
         void contextLoads() {
             assertThat(applicationContext).isNotNull();
         }
 
         @Test
-        @DisplayName("アプリケーションコンテキストに必要なBeanが存在する")
+        @DisplayName("Required beans should exist in application context")
         void testApplicationContextHasRequiredBeans() {
-            // 主要なBeanが存在するか確認
+            // Check if main beans exist
             assertThat(applicationContext.containsBean("employeeController")).isTrue();
             assertThat(applicationContext.containsBean("employeeService")).isTrue();
             assertThat(applicationContext.containsBean("employeeRepository")).isTrue();
@@ -65,40 +63,40 @@ class RevenueCalculatorBackendEmployeeApplicationTests {
         }
 
         @Test
-        @DisplayName("アプリケーションコンテキストのBean定義数が期待値以上")
+        @DisplayName("Application context bean definition count should be above expected value")
         void testApplicationContextBeanCount() {
             String[] beanNames = applicationContext.getBeanDefinitionNames();
-            assertThat(beanNames.length).isGreaterThan(50); // 最低限のBean数
+            assertThat(beanNames.length).isGreaterThan(50); // Minimum number of beans
         }
     }
 
     @Nested
-    @DisplayName("主要コンポーネント存在確認テスト")
+    @DisplayName("Main Component Existence Verification Test")
     class ComponentExistenceTests {
 
         @Test
-        @DisplayName("EmployeeControllerが正しく注入される")
+        @DisplayName("EmployeeController should be injected correctly")
         void testEmployeeControllerInjection() {
             assertThat(employeeController).isNotNull();
             assertThat(employeeController).isInstanceOf(EmployeeController.class);
         }
 
         @Test
-        @DisplayName("EmployeeServiceが正しく注入される")
+        @DisplayName("EmployeeService should be injected correctly")
         void testEmployeeServiceInjection() {
             assertThat(employeeService).isNotNull();
             assertThat(employeeService).isInstanceOf(EmployeeService.class);
         }
 
         @Test
-        @DisplayName("EmployeeRepositoryが正しく注入される")
+        @DisplayName("EmployeeRepository should be injected correctly")
         void testEmployeeRepositoryInjection() {
             assertThat(employeeRepository).isNotNull();
             assertThat(employeeRepository).isInstanceOf(EmployeeRepository.class);
         }
 
         @Test
-        @DisplayName("GlobalExceptionHandlerが正しく注入される")
+        @DisplayName("GlobalExceptionHandler should be injected correctly")
         void testGlobalExceptionHandlerInjection() {
             assertThat(globalExceptionHandler).isNotNull();
             assertThat(globalExceptionHandler).isInstanceOf(GlobalExceptionHandler.class);
@@ -106,80 +104,80 @@ class RevenueCalculatorBackendEmployeeApplicationTests {
     }
 
     @Nested
-    @DisplayName("設定クラス存在確認テスト")
+    @DisplayName("Configuration Class Existence Verification Test")
     class ConfigurationClassTests {
 
         @Test
-        @DisplayName("ValidationConfigが存在する")
+        @DisplayName("ValidationConfig should exist")
         void testValidationConfigExists() {
             assertThat(applicationContext.containsBean("validationConfig")).isTrue();
         }
 
         @Test
-        @DisplayName("LoggingConfigが存在する")
+        @DisplayName("LoggingConfig should exist")
         void testLoggingConfigExists() {
             assertThat(applicationContext.containsBean("loggingConfig")).isTrue();
         }
 
         @Test
-        @DisplayName("SwaggerConfigが存在する")
+        @DisplayName("SwaggerConfig should exist")
         void testSwaggerConfigExists() {
             assertThat(applicationContext.containsBean("swaggerConfig")).isTrue();
         }
 
         @Test
-        @DisplayName("CacheConfigが存在する")
+        @DisplayName("CacheConfig should exist")
         void testCacheConfigExists() {
             assertThat(applicationContext.containsBean("cacheConfig")).isTrue();
         }
 
         @Test
-        @DisplayName("RateLimitConfigが存在する")
+        @DisplayName("RateLimitConfig should exist")
         void testRateLimitConfigExists() {
             assertThat(applicationContext.containsBean("rateLimitConfig")).isTrue();
         }
 
         @Test
-        @DisplayName("MetricsConfigが存在する")
+        @DisplayName("MetricsConfig should exist")
         void testMetricsConfigExists() {
             assertThat(applicationContext.containsBean("metricsConfig")).isTrue();
         }
     }
 
     @Nested
-    @DisplayName("WebFlux設定テスト")
+    @DisplayName("WebFlux Configuration Test")
     class WebFluxConfigurationTests {
 
         @Test
-        @DisplayName("RouterFunctionが存在する")
+        @DisplayName("RouterFunction should exist")
         void testRouterFunctionExists() {
-            // RouterFunctionのBeanが存在するか確認（WebFluxアプリケーションでは必ずしも存在しない）
+            // Check if RouterFunction bean exists (not always present in WebFlux applications)
             String[] beanNames = applicationContext.getBeanNamesForType(RouterFunction.class);
-            // RouterFunctionは存在しない場合もあるため、テストをスキップ
+            // RouterFunction may not exist, so skip test
             assertThat(beanNames.length).isGreaterThanOrEqualTo(0);
         }
 
         @Test
-        @DisplayName("WebTestClientが利用可能")
+        @DisplayName("WebTestClient should be available")
         void testWebTestClientAvailable() {
-            // WebTestClientが利用可能か確認（テスト環境でのみ利用可能）
+            // Check if WebTestClient is available (only available in test environment)
             String[] beanNames = applicationContext.getBeanDefinitionNames();
             boolean hasWebTestClient = java.util.Arrays.stream(beanNames)
                     .anyMatch(name -> name.contains("webTestClient"));
-            // WebTestClientはテスト環境でのみ利用可能なため、存在確認のみ
-            // 存在しない場合もあるため、テストをスキップ（常にtrueを返す）
-            assertThat(true).isTrue(); // 常に成功するテスト
+            // WebTestClient is only available in test environment, so only check existence
+            // May not exist, so skip test (always return true)
+            assertThat(hasWebTestClient || true).isTrue(); // Always successful test
         }
     }
 
     @Nested
-    @DisplayName("データベース設定テスト")
+    @DisplayName("Database Configuration Test")
     class DatabaseConfigurationTests {
 
         @Test
-        @DisplayName("データベース関連のBeanが存在する")
+        @DisplayName("Database-related beans should exist")
         void testDatabaseBeansExist() {
-            // データベース関連のBeanが存在するか確認（一部のBean名は環境によって異なる可能性があるため、存在確認のみ）
+            // Check if database-related beans exist (some bean names may vary by environment, so only check existence)
             String[] beanNames = applicationContext.getBeanDefinitionNames();
             boolean hasR2dbcBeans = java.util.Arrays.stream(beanNames)
                     .anyMatch(name -> name.contains("r2dbc") || name.contains("database"));
@@ -187,21 +185,21 @@ class RevenueCalculatorBackendEmployeeApplicationTests {
         }
 
         @Test
-        @DisplayName("Flywayが設定されている")
+        @DisplayName("Flyway should be configured")
         void testFlywayConfiguration() {
-            // FlywayのBeanが存在するか確認
+            // Check if Flyway bean exists
             assertThat(applicationContext.containsBean("flyway")).isTrue();
         }
     }
 
     @Nested
-    @DisplayName("メトリクス・監視設定テスト")
+    @DisplayName("Metrics and Monitoring Configuration Test")
     class MetricsConfigurationTests {
 
         @Test
-        @DisplayName("Micrometer関連のBeanが存在する")
+        @DisplayName("Micrometer-related beans should exist")
         void testMicrometerBeansExist() {
-            // Micrometer関連のBeanが存在するか確認（一部のBean名は環境によって異なる可能性があるため、存在確認のみ）
+            // Check if Micrometer-related beans exist (some bean names may vary by environment, so only check existence)
             String[] beanNames = applicationContext.getBeanDefinitionNames();
             boolean hasMeterBeans = java.util.Arrays.stream(beanNames)
                     .anyMatch(name -> name.contains("meter") || name.contains("counter") || name.contains("timer"));
@@ -209,36 +207,36 @@ class RevenueCalculatorBackendEmployeeApplicationTests {
         }
 
         @Test
-        @DisplayName("Actuatorエンドポイントが有効")
+        @DisplayName("Actuator endpoints should be enabled")
         void testActuatorEndpointsEnabled() {
-            // Actuator関連のBeanが存在するか確認
+            // Check if Actuator-related beans exist
             assertThat(applicationContext.containsBean("healthEndpoint")).isTrue();
             assertThat(applicationContext.containsBean("infoEndpoint")).isTrue();
         }
     }
 
     @Nested
-    @DisplayName("統合テスト")
+    @DisplayName("Integration Test")
     class IntegrationTests {
 
         @Test
-        @DisplayName("アプリケーションが完全に起動する")
+        @DisplayName("Application should start completely")
         void testApplicationStartsCompletely() {
-            // アプリケーションが完全に起動するか確認
+            // Check if application starts completely
             assertThat(applicationContext).isNotNull();
             assertThat(applicationContext.getStartupDate()).isGreaterThan(0);
         }
 
         @Test
-        @DisplayName("すべての主要コンポーネントが連携して動作する")
+        @DisplayName("All main components should work together")
         void testAllComponentsWorkTogether() {
-            // すべての主要コンポーネントが正しく連携しているか確認
+            // Check if all main components are properly integrated
             assertThat(employeeController).isNotNull();
             assertThat(employeeService).isNotNull();
             assertThat(employeeRepository).isNotNull();
             assertThat(globalExceptionHandler).isNotNull();
             
-            // コンポーネント間の依存関係が正しく設定されているか確認
+            // Check if dependencies between components are properly configured
             assertThat(employeeController).isNotNull();
             assertThat(employeeService).isNotNull();
         }

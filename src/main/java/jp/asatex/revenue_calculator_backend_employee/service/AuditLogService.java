@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 审计日志服务
- * 提供结构化的审计日志记录功能
+ * Audit log service
+ * Provides structured audit logging functionality
  */
 @Service
 public class AuditLogService {
@@ -27,12 +27,12 @@ public class AuditLogService {
     private ObjectMapper objectMapper;
 
     /**
-     * 记录用户操作审计日志
-     * @param operation 操作类型
-     * @param resource 资源类型
-     * @param resourceId 资源ID
-     * @param userId 用户ID
-     * @param details 详细信息
+     * Log user operation audit
+     * @param operation Operation type
+     * @param resource Resource type
+     * @param resourceId Resource ID
+     * @param userId User ID
+     * @param details Details
      */
     public void logUserOperation(String operation, String resource, String resourceId, 
                                 String userId, Map<String, Object> details) {
@@ -50,20 +50,20 @@ public class AuditLogService {
             auditData.put("details", details);
 
             String auditJson = objectMapper.writeValueAsString(auditData);
-            auditLogger.info("用户操作审计: {}", auditJson);
+            auditLogger.info("User operation audit: {}", auditJson);
         } catch (JsonProcessingException e) {
-            auditLogger.error("审计日志序列化失败", e);
+            auditLogger.error("Audit log serialization failed", e);
         }
     }
 
     /**
-     * 记录数据访问审计日志
-     * @param operation 操作类型 (CREATE, READ, UPDATE, DELETE)
-     * @param table 表名
-     * @param recordId 记录ID
-     * @param userId 用户ID
-     * @param oldValues 旧值
-     * @param newValues 新值
+     * Log data access audit
+     * @param operation Operation type (CREATE, READ, UPDATE, DELETE)
+     * @param table Table name
+     * @param recordId Record ID
+     * @param userId User ID
+     * @param oldValues Old values
+     * @param newValues New values
      */
     public void logDataAccess(String operation, String table, String recordId, 
                              String userId, Map<String, Object> oldValues, Map<String, Object> newValues) {
@@ -81,19 +81,19 @@ public class AuditLogService {
             auditData.put("newValues", newValues);
 
             String auditJson = objectMapper.writeValueAsString(auditData);
-            auditLogger.info("数据访问审计: {}", auditJson);
+            auditLogger.info("Data access audit: {}", auditJson);
         } catch (JsonProcessingException e) {
-            auditLogger.error("数据访问审计日志序列化失败", e);
+            auditLogger.error("Data access audit log serialization failed", e);
         }
     }
 
     /**
-     * 记录安全事件日志
-     * @param eventType 事件类型
-     * @param severity 严重程度 (LOW, MEDIUM, HIGH, CRITICAL)
-     * @param description 描述
-     * @param userId 用户ID
-     * @param details 详细信息
+     * Log security event
+     * @param eventType Event type
+     * @param severity Severity (LOW, MEDIUM, HIGH, CRITICAL)
+     * @param description Description
+     * @param userId User ID
+     * @param details Details
      */
     public void logSecurityEvent(String eventType, String severity, String description, 
                                 String userId, Map<String, Object> details) {
@@ -111,18 +111,18 @@ public class AuditLogService {
             securityData.put("details", details);
 
             String securityJson = objectMapper.writeValueAsString(securityData);
-            securityLogger.warn("安全事件: {}", securityJson);
+            securityLogger.warn("Security event: {}", securityJson);
         } catch (JsonProcessingException e) {
-            securityLogger.error("安全日志序列化失败", e);
+            securityLogger.error("Security log serialization failed", e);
         }
     }
 
     /**
-     * 记录性能日志
-     * @param operation 操作名称
-     * @param duration 执行时间（毫秒）
-     * @param status 状态 (SUCCESS, FAILURE, TIMEOUT)
-     * @param details 详细信息
+     * Log performance
+     * @param operation Operation name
+     * @param duration Execution time (milliseconds)
+     * @param status Status (SUCCESS, FAILURE, TIMEOUT)
+     * @param details Details
      */
     public void logPerformance(String operation, long duration, String status, Map<String, Object> details) {
         try {
@@ -136,21 +136,21 @@ public class AuditLogService {
             performanceData.put("details", details);
 
             String performanceJson = objectMapper.writeValueAsString(performanceData);
-            performanceLogger.info("性能监控: {}", performanceJson);
+            performanceLogger.info("Performance monitoring: {}", performanceJson);
         } catch (JsonProcessingException e) {
-            performanceLogger.error("性能日志序列化失败", e);
+            performanceLogger.error("Performance log serialization failed", e);
         }
     }
 
     /**
-     * 记录API调用审计日志
-     * @param method HTTP方法
-     * @param uri 请求URI
-     * @param statusCode 响应状态码
-     * @param duration 执行时间（毫秒）
-     * @param userId 用户ID
-     * @param requestSize 请求大小
-     * @param responseSize 响应大小
+     * Log API call audit
+     * @param method HTTP method
+     * @param uri Request URI
+     * @param statusCode Response status code
+     * @param duration Execution time (milliseconds)
+     * @param userId User ID
+     * @param requestSize Request size
+     * @param responseSize Response size
      */
     public void logApiCall(String method, String uri, int statusCode, long duration, 
                           String userId, long requestSize, long responseSize) {
@@ -170,20 +170,20 @@ public class AuditLogService {
             apiData.put("userAgent", MDC.get("userAgent"));
 
             String apiJson = objectMapper.writeValueAsString(apiData);
-            auditLogger.info("API调用审计: {}", apiJson);
+            auditLogger.info("API call audit: {}", apiJson);
         } catch (JsonProcessingException e) {
-            auditLogger.error("API调用审计日志序列化失败", e);
+            auditLogger.error("API call audit log serialization failed", e);
         }
     }
 
     /**
-     * 记录业务操作审计日志
-     * @param businessOperation 业务操作
-     * @param entityType 实体类型
-     * @param entityId 实体ID
-     * @param userId 用户ID
-     * @param result 操作结果
-     * @param details 详细信息
+     * Log business operation audit
+     * @param businessOperation Business operation
+     * @param entityType Entity type
+     * @param entityId Entity ID
+     * @param userId User ID
+     * @param result Operation result
+     * @param details Details
      */
     public void logBusinessOperation(String businessOperation, String entityType, String entityId, 
                                    String userId, String result, Map<String, Object> details) {
@@ -201,18 +201,18 @@ public class AuditLogService {
             businessData.put("details", details);
 
             String businessJson = objectMapper.writeValueAsString(businessData);
-            auditLogger.info("业务操作审计: {}", businessJson);
+            auditLogger.info("Business operation audit: {}", businessJson);
         } catch (JsonProcessingException e) {
-            auditLogger.error("业务操作审计日志序列化失败", e);
+            auditLogger.error("Business operation audit log serialization failed", e);
         }
     }
 
     /**
-     * 记录系统事件日志
-     * @param eventType 事件类型
-     * @param component 组件名称
-     * @param description 描述
-     * @param details 详细信息
+     * Log system event
+     * @param eventType Event type
+     * @param component Component name
+     * @param description Description
+     * @param details Details
      */
     public void logSystemEvent(String eventType, String component, String description, 
                               Map<String, Object> details) {
@@ -227,19 +227,19 @@ public class AuditLogService {
             systemData.put("details", details);
 
             String systemJson = objectMapper.writeValueAsString(systemData);
-            auditLogger.info("系统事件: {}", systemJson);
+            auditLogger.info("System event: {}", systemJson);
         } catch (JsonProcessingException e) {
-            auditLogger.error("系统事件日志序列化失败", e);
+            auditLogger.error("System event log serialization failed", e);
         }
     }
 
     /**
-     * 记录错误审计日志
-     * @param errorType 错误类型
-     * @param component 组件名称
-     * @param errorMessage 错误消息
-     * @param userId 用户ID
-     * @param details 详细信息
+     * Log error audit
+     * @param errorType Error type
+     * @param component Component name
+     * @param errorMessage Error message
+     * @param userId User ID
+     * @param details Details
      */
     public void logError(String errorType, String component, String errorMessage, 
                         String userId, Map<String, Object> details) {
@@ -256,9 +256,9 @@ public class AuditLogService {
             errorData.put("details", details);
 
             String errorJson = objectMapper.writeValueAsString(errorData);
-            auditLogger.error("错误审计: {}", errorJson);
+            auditLogger.error("Error audit: {}", errorJson);
         } catch (JsonProcessingException e) {
-            auditLogger.error("错误审计日志序列化失败", e);
+            auditLogger.error("Error audit log serialization failed", e);
         }
     }
 }

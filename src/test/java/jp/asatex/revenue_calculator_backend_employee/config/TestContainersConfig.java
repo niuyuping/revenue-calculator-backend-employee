@@ -8,9 +8,9 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
 /**
- * TestContainers配置类
- * 为测试提供PostgreSQL容器
- * Redis使用本地Docker服务
+ * TestContainers configuration class
+ * Provides PostgreSQL container for testing
+ * Redis uses local Docker service
  */
 @TestConfiguration
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -18,7 +18,7 @@ public class TestContainersConfig {
 
     @Bean
     @ServiceConnection
-    @SuppressWarnings("resource") // TestContainers在Spring Boot测试环境中会自动管理容器生命周期
+    @SuppressWarnings("resource") // TestContainers automatically manages container lifecycle in Spring Boot test environment
     public PostgreSQLContainer<?> postgreSQLContainer() {
         PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:15-alpine")
                 .withDatabaseName("asatex-revenue-test")
@@ -27,7 +27,7 @@ public class TestContainersConfig {
                 .waitingFor(Wait.forListeningPort())
                 .withReuse(true);
         
-        // 启动容器
+        // Start container
         container.start();
         return container;
     }

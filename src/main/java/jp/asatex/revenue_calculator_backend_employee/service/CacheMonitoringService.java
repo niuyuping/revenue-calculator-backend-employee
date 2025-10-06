@@ -5,7 +5,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
@@ -15,8 +14,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 缓存监控服务
- * 提供缓存相关的监控和统计功能
+ * Cache monitoring service
+ * Provides cache-related monitoring and statistics functionality
  */
 @Service
 public class CacheMonitoringService {
@@ -30,7 +29,7 @@ public class CacheMonitoringService {
     private final Counter cachePutCounter;
     private final Timer cacheOperationTimer;
 
-    // 缓存统计信息
+    // Cache statistics
     private final Map<String, AtomicLong> cacheHitCounts = new HashMap<>();
     private final Map<String, AtomicLong> cacheMissCounts = new HashMap<>();
     private final Map<String, AtomicLong> cacheEvictCounts = new HashMap<>();
@@ -40,31 +39,31 @@ public class CacheMonitoringService {
         this.cacheManager = cacheManager;
         
         this.cacheHitCounter = Counter.builder("cache.hit")
-                .description("缓存命中次数")
+                .description("Cache hit count")
                 .register(meterRegistry);
 
         this.cacheMissCounter = Counter.builder("cache.miss")
-                .description("缓存未命中次数")
+                .description("Cache miss count")
                 .register(meterRegistry);
 
         this.cacheEvictCounter = Counter.builder("cache.evict")
-                .description("缓存清除次数")
+                .description("Cache evict count")
                 .register(meterRegistry);
 
         this.cachePutCounter = Counter.builder("cache.put")
-                .description("缓存存储次数")
+                .description("Cache put count")
                 .register(meterRegistry);
 
         this.cacheOperationTimer = Timer.builder("cache.operation.duration")
-                .description("缓存操作执行时间")
+                .description("Cache operation execution time")
                 .register(meterRegistry);
 
-        // 初始化缓存统计
+        // Initialize cache statistics
         initializeCacheStatistics();
     }
 
     /**
-     * 初始化缓存统计信息
+     * Initialize cache statistics
      */
     private void initializeCacheStatistics() {
         for (String cacheName : cacheManager.getCacheNames()) {
@@ -76,70 +75,70 @@ public class CacheMonitoringService {
     }
 
     /**
-     * 记录缓存命中
-     * @param cacheName 缓存名称
-     * @param key 缓存键
+     * Record cache hit
+     * @param cacheName Cache name
+     * @param key Cache key
      */
     public void recordCacheHit(String cacheName, String key) {
         cacheHitCounter.increment();
         cacheHitCounts.computeIfAbsent(cacheName, k -> new AtomicLong(0)).incrementAndGet();
         
-        logger.debug("缓存命中 - 缓存: {}, 键: {}", cacheName, key);
+        logger.debug("Cache hit - Cache: {}, Key: {}", cacheName, key);
     }
 
     /**
-     * 记录缓存未命中
-     * @param cacheName 缓存名称
-     * @param key 缓存键
+     * Record cache miss
+     * @param cacheName Cache name
+     * @param key Cache key
      */
     public void recordCacheMiss(String cacheName, String key) {
         cacheMissCounter.increment();
         cacheMissCounts.computeIfAbsent(cacheName, k -> new AtomicLong(0)).incrementAndGet();
         
-        logger.debug("缓存未命中 - 缓存: {}, 键: {}", cacheName, key);
+        logger.debug("Cache miss - Cache: {}, Key: {}", cacheName, key);
     }
 
     /**
-     * 记录缓存存储
-     * @param cacheName 缓存名称
-     * @param key 缓存键
+     * Record cache put
+     * @param cacheName Cache name
+     * @param key Cache key
      */
     public void recordCachePut(String cacheName, String key) {
         cachePutCounter.increment();
         cachePutCounts.computeIfAbsent(cacheName, k -> new AtomicLong(0)).incrementAndGet();
         
-        logger.debug("缓存存储 - 缓存: {}, 键: {}", cacheName, key);
+        logger.debug("Cache put - Cache: {}, Key: {}", cacheName, key);
     }
 
     /**
-     * 记录缓存清除
-     * @param cacheName 缓存名称
-     * @param key 缓存键（如果为null表示清除所有）
+     * Record cache evict
+     * @param cacheName Cache name
+     * @param key Cache key (null means evict all)
      */
     public void recordCacheEvict(String cacheName, String key) {
         cacheEvictCounter.increment();
         cacheEvictCounts.computeIfAbsent(cacheName, k -> new AtomicLong(0)).incrementAndGet();
         
         if (key != null) {
-            logger.debug("缓存清除 - 缓存: {}, 键: {}", cacheName, key);
+            logger.debug("Cache evict - Cache: {}, Key: {}", cacheName, key);
         } else {
-            logger.debug("缓存全部清除 - 缓存: {}", cacheName);
+            logger.debug("Cache evict all - Cache: {}", cacheName);
         }
     }
 
     /**
-     * 记录缓存操作时间
-     * @param operation 操作类型
-     * @param duration 执行时间（毫秒）
+     * Record cache operation time
+     * @param operation Operation type
+     * @param duration Execution time (milliseconds)
      */
     public void recordCacheOperationTime(String operation, long duration) {
         cacheOperationTimer.record(duration, java.util.concurrent.TimeUnit.MILLISECONDS);
-        logger.debug("缓存操作时间 - 操作: {}, 耗时: {}ms", operation, duration);
+        logger.debug("Cache operation time - Operation: {}, Duration: {}ms", operation, duration);
     }
 
     /**
-     * 获取缓存统计信息
-     * @return 缓存统计信息
+     * Get cache statistics
+     * @return Cache statistics
      */
     public CacheStats getCacheStats() {
         Map<String, CacheInfo> cacheInfos = new HashMap<>();
@@ -163,7 +162,7 @@ public class CacheMonitoringService {
     }
 
     /**
-     * 清除所有缓存
+     * Clear all caches
      */
     public void clearAllCaches() {
         for (String cacheName : cacheManager.getCacheNames()) {
@@ -171,26 +170,26 @@ public class CacheMonitoringService {
             if (cache != null) {
                 cache.clear();
                 recordCacheEvict(cacheName, null);
-                logger.info("清除缓存: {}", cacheName);
+                logger.info("Clear cache: {}", cacheName);
             }
         }
     }
 
     /**
-     * 清除指定缓存
-     * @param cacheName 缓存名称
+     * Clear specified cache
+     * @param cacheName Cache name
      */
     public void clearCache(String cacheName) {
         Cache cache = cacheManager.getCache(cacheName);
         if (cache != null) {
             cache.clear();
             recordCacheEvict(cacheName, null);
-            logger.info("清除缓存: {}", cacheName);
+            logger.info("Clear cache: {}", cacheName);
         }
     }
 
     /**
-     * 缓存统计信息类
+     * Cache statistics class
      */
     public static class CacheStats {
         private final Map<String, CacheInfo> cacheInfos;
@@ -224,7 +223,7 @@ public class CacheMonitoringService {
     }
 
     /**
-     * 单个缓存信息类
+     * Individual cache info class
      */
     public static class CacheInfo {
         private final String name;

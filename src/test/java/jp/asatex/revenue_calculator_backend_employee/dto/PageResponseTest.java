@@ -11,17 +11,17 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * PageResponse 测试类
+ * PageResponse test class
  */
-@DisplayName("PageResponse 测试")
+@DisplayName("PageResponse Test")
 class PageResponseTest {
 
     @Nested
-    @DisplayName("构造函数测试")
+    @DisplayName("Constructor Test")
     class ConstructorTests {
 
         @Test
-        @DisplayName("全参数构造函数应该正确设置所有值")
+        @DisplayName("All-parameter constructor should correctly set all values")
         void testFullParameterConstructor() {
             List<String> content = Arrays.asList("item1", "item2", "item3");
             PageResponse<String> response = new PageResponse<>(content, 1, 10, 25L, "name", "ASC");
@@ -39,7 +39,7 @@ class PageResponseTest {
         }
 
         @Test
-        @DisplayName("第一页应该正确标识")
+        @DisplayName("First page should be correctly identified")
         void testFirstPage() {
             List<String> content = Arrays.asList("item1", "item2");
             PageResponse<String> response = new PageResponse<>(content, 0, 10, 15L, "name", "ASC");
@@ -49,7 +49,7 @@ class PageResponseTest {
         }
 
         @Test
-        @DisplayName("最后一页应该正确标识")
+        @DisplayName("Last page should be correctly identified")
         void testLastPage() {
             List<String> content = Arrays.asList("item1", "item2");
             PageResponse<String> response = new PageResponse<>(content, 1, 10, 15L, "name", "ASC");
@@ -59,7 +59,7 @@ class PageResponseTest {
         }
 
         @Test
-        @DisplayName("空内容应该正确处理")
+        @DisplayName("Empty content should be handled correctly")
         void testEmptyContent() {
             List<String> content = Collections.emptyList();
             PageResponse<String> response = new PageResponse<>(content, 0, 10, 0L, "name", "ASC");
@@ -72,11 +72,11 @@ class PageResponseTest {
     }
 
     @Nested
-    @DisplayName("Getter 和 Setter 测试")
+    @DisplayName("Getter and Setter Test")
     class GetterSetterTests {
 
         @Test
-        @DisplayName("所有 getter 和 setter 应该正常工作")
+        @DisplayName("All getters and setters should work correctly")
         void testGettersAndSetters() {
             PageResponse<String> response = new PageResponse<>();
             
@@ -106,11 +106,11 @@ class PageResponseTest {
     }
 
     @Nested
-    @DisplayName("toString 测试")
+    @DisplayName("toString Test")
     class ToStringTests {
 
         @Test
-        @DisplayName("toString 应该返回有意义的字符串")
+        @DisplayName("toString should return meaningful string")
         void testToString() {
             List<String> content = Arrays.asList("item1", "item2");
             PageResponse<String> response = new PageResponse<>(content, 1, 10, 25L, "name", "ASC");

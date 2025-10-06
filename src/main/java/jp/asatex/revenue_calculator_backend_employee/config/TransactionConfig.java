@@ -9,16 +9,16 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.reactive.TransactionalOperator;
 
 /**
- * 事务配置类
- * 配置 R2DBC 响应式事务管理器
+ * Transaction configuration class
+ * Configures R2DBC reactive transaction manager
  */
 @Configuration
 @EnableTransactionManagement
 public class TransactionConfig {
 
     /**
-     * 配置 R2DBC 响应式事务管理器
-     * @param connectionFactory R2DBC 连接工厂
+     * Configure R2DBC reactive transaction manager
+     * @param connectionFactory R2DBC connection factory
      * @return ReactiveTransactionManager
      */
     @Bean
@@ -27,8 +27,8 @@ public class TransactionConfig {
     }
 
     /**
-     * 配置事务操作器
-     * @param transactionManager 事务管理器
+     * Configure transaction operator
+     * @param transactionManager Transaction manager
      * @return TransactionalOperator
      */
     @Bean

@@ -7,8 +7,8 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 /**
- * 検証設定クラス
- * WebFluxのパラメータ検証を設定
+ * Validation configuration class
+ * Configures WebFlux parameter validation
  */
 @Configuration
 public class ValidationConfig implements WebFluxConfigurer {

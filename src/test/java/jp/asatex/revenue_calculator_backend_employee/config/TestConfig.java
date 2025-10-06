@@ -8,11 +8,10 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
- * 测试配置类
- * 为测试提供必要的Bean
+ * Test configuration class
+ * Provides necessary beans for testing
  */
 @TestConfiguration
 public class TestConfig {

@@ -6,11 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.codec.ServerCodecConfigurer;
+import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 /**
- * WebFlux Jackson配置类
- * 通过WebFluxConfigurer强制配置编解码器以支持Java 8时间类型
+ * WebFlux Jackson configuration class
+ * Forces configuration of codecs through WebFluxConfigurer to support Java 8 time types
  */
 @Configuration
 public class WebFluxJacksonConfig implements WebFluxConfigurer {
@@ -21,18 +22,18 @@ public class WebFluxJacksonConfig implements WebFluxConfigurer {
     private ObjectMapper objectMapper;
 
     @Override
-    public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
-        logger.info("=== WebFluxJacksonConfig.configureHttpMessageCodecs() 开始执行 ===");
-        logger.info("使用统一的ObjectMapper实例（已配置JSR310支持）");
+    public void configureHttpMessageCodecs(@NonNull ServerCodecConfigurer configurer) {
+        logger.info("=== WebFluxJacksonConfig.configureHttpMessageCodecs() started ===");
+        logger.info("Using unified ObjectMapper instance (configured with JSR310 support)");
         
-        // 配置编码器（响应序列化）
+        // Configure encoder (response serialization)
         configurer.defaultCodecs().jackson2JsonEncoder(new org.springframework.http.codec.json.Jackson2JsonEncoder(objectMapper));
-        logger.info("配置Jackson2JsonEncoder");
+        logger.info("Configured Jackson2JsonEncoder");
         
-        // 配置解码器（请求反序列化）
+        // Configure decoder (request deserialization)
         configurer.defaultCodecs().jackson2JsonDecoder(new org.springframework.http.codec.json.Jackson2JsonDecoder(objectMapper));
-        logger.info("配置Jackson2JsonDecoder");
+        logger.info("Configured Jackson2JsonDecoder");
         
-        logger.info("=== WebFluxJacksonConfig.configureHttpMessageCodecs() 执行完成 ===");
+        logger.info("=== WebFluxJacksonConfig.configureHttpMessageCodecs() completed ===");
     }
 }

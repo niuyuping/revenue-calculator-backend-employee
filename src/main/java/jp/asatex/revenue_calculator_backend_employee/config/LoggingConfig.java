@@ -5,17 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
-import org.springframework.web.server.WebFilter;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.UUID;
 
 /**
- * 日志配置类
- * 提供请求日志、响应日志和分布式追踪支持
+ * Logging configuration class
+ * Provides request logging, response logging and distributed tracing support
  */
 @Configuration
 public class LoggingConfig {
@@ -24,8 +21,8 @@ public class LoggingConfig {
 
 
     /**
-     * HTTP客户端请求日志过滤器
-     * 用于记录对外部服务的HTTP请求
+     * HTTP client request logging filter
+     * Used to log HTTP requests to external services
      */
     @Bean
     public ExchangeFilterFunction clientRequestLoggingFilter() {
@@ -42,7 +39,7 @@ public class LoggingConfig {
     }
 
     /**
-     * HTTP客户端响应日志过滤器
+     * HTTP client response logging filter
      */
     @Bean
     public ExchangeFilterFunction clientResponseLoggingFilter() {

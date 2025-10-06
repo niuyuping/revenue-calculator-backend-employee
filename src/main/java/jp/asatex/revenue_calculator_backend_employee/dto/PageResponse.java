@@ -4,45 +4,45 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 /**
- * 分页响应结果
+ * Pagination response result
  */
-@Schema(description = "分页响应结果")
+@Schema(description = "Pagination response result")
 public class PageResponse<T> {
     
-    @Schema(description = "数据列表")
+    @Schema(description = "Data list")
     private List<T> content;
     
-    @Schema(description = "当前页码", example = "0")
+    @Schema(description = "Current page number", example = "0")
     private int page;
     
-    @Schema(description = "每页大小", example = "10")
+    @Schema(description = "Page size", example = "10")
     private int size;
     
-    @Schema(description = "总元素数量", example = "100")
+    @Schema(description = "Total number of elements", example = "100")
     private long totalElements;
     
-    @Schema(description = "总页数", example = "10")
+    @Schema(description = "Total number of pages", example = "10")
     private int totalPages;
     
-    @Schema(description = "是否为第一页", example = "true")
+    @Schema(description = "Whether it is the first page", example = "true")
     private boolean first;
     
-    @Schema(description = "是否为最后一页", example = "false")
+    @Schema(description = "Whether it is the last page", example = "false")
     private boolean last;
     
-    @Schema(description = "当前页元素数量", example = "10")
+    @Schema(description = "Number of elements in current page", example = "10")
     private int numberOfElements;
     
-    @Schema(description = "排序字段", example = "name")
+    @Schema(description = "Sort field", example = "name")
     private String sortBy;
     
-    @Schema(description = "排序方向", example = "ASC")
+    @Schema(description = "Sort direction", example = "ASC")
     private String sortDirection;
     
-    // 默认构造函数
+    // Default constructor
     public PageResponse() {}
     
-    // 全参数构造函数
+    // All parameters constructor
     public PageResponse(List<T> content, int page, int size, long totalElements, 
                        String sortBy, String sortDirection) {
         this.content = content;
@@ -52,14 +52,14 @@ public class PageResponse<T> {
         this.sortBy = sortBy;
         this.sortDirection = sortDirection;
         
-        // 计算派生属性
+        // Calculate derived properties
         this.totalPages = (int) Math.ceil((double) totalElements / size);
         this.first = page == 0;
         this.last = page >= totalPages - 1;
         this.numberOfElements = content != null ? content.size() : 0;
     }
     
-    // Getter 和 Setter 方法
+    // Getter and Setter methods
     public List<T> getContent() {
         return content;
     }

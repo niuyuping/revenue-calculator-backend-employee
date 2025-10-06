@@ -18,257 +18,257 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
- * 数据库审计控制器
- * 提供数据库审计日志的查询和管理API端点
+ * Database audit controller
+ * Provides API endpoints for database audit log query and management
  */
 @RestController
 @RequestMapping("/api/v1/audit/database")
-@Tag(name = "数据库审计", description = "数据库审计日志查询和管理API")
+@Tag(name = "Database Audit", description = "Database audit log query and management API")
 public class DatabaseAuditController {
 
     @Autowired
     private DatabaseAuditService databaseAuditService;
 
     /**
-     * 获取审计日志统计信息
-     * @return 统计信息
+     * Get audit log statistics
+     * @return Statistics information
      */
     @GetMapping(value = "/stats", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "获取数据库审计统计信息", description = "返回数据库审计日志的统计信息，包括操作类型、成功失败率等")
+    @Operation(summary = "Get database audit statistics", description = "Returns database audit log statistics including operation types, success/failure rates, etc.")
     public Mono<Map<String, Object>> getAuditStatistics() {
         return databaseAuditService.getAuditStatistics();
     }
 
     /**
-     * 根据操作类型查询审计日志
-     * @param operationType 操作类型
-     * @return 审计日志列表
+     * Query audit logs by operation type
+     * @param operationType Operation type
+     * @return Audit log list
      */
     @GetMapping(value = "/logs/operation/{operationType}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "根据操作类型查询审计日志", description = "根据操作类型（INSERT, UPDATE, DELETE, SELECT）查询审计日志")
+    @Operation(summary = "Query audit logs by operation type", description = "Query audit logs by operation type (INSERT, UPDATE, DELETE, SELECT)")
     public Flux<DatabaseAuditLog> getLogsByOperationType(
-            @Parameter(description = "操作类型", required = true, example = "INSERT")
+            @Parameter(description = "Operation type", required = true, example = "INSERT")
             @PathVariable String operationType) {
         return databaseAuditService.findByOperationType(operationType);
     }
 
     /**
-     * 根据表名查询审计日志
-     * @param tableName 表名
-     * @return 审计日志列表
+     * Query audit logs by table name
+     * @param tableName Table name
+     * @return Audit log list
      */
     @GetMapping(value = "/logs/table/{tableName}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "根据表名查询审计日志", description = "根据表名查询审计日志")
+    @Operation(summary = "Query audit logs by table name", description = "Query audit logs by table name")
     public Flux<DatabaseAuditLog> getLogsByTableName(
-            @Parameter(description = "表名", required = true, example = "employees")
+            @Parameter(description = "Table name", required = true, example = "employees")
             @PathVariable String tableName) {
         return databaseAuditService.findByTableName(tableName);
     }
 
     /**
-     * 根据用户ID查询审计日志
-     * @param userId 用户ID
-     * @return 审计日志列表
+     * Query audit logs by user ID
+     * @param userId User ID
+     * @return Audit log list
      */
     @GetMapping(value = "/logs/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "根据用户ID查询审计日志", description = "根据用户ID查询审计日志")
+    @Operation(summary = "Query audit logs by user ID", description = "Query audit logs by user ID")
     public Flux<DatabaseAuditLog> getLogsByUserId(
-            @Parameter(description = "用户ID", required = true, example = "user123")
+            @Parameter(description = "User ID", required = true, example = "user123")
             @PathVariable String userId) {
         return databaseAuditService.findByUserId(userId);
     }
 
     /**
-     * 根据会话ID查询审计日志
-     * @param sessionId 会话ID
-     * @return 审计日志列表
+     * Query audit logs by session ID
+     * @param sessionId Session ID
+     * @return Audit log list
      */
     @GetMapping(value = "/logs/session/{sessionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "根据会话ID查询审计日志", description = "根据会话ID查询审计日志")
+    @Operation(summary = "Query audit logs by session ID", description = "Query audit logs by session ID")
     public Flux<DatabaseAuditLog> getLogsBySessionId(
-            @Parameter(description = "会话ID", required = true, example = "session-123")
+            @Parameter(description = "Session ID", required = true, example = "session-123")
             @PathVariable String sessionId) {
         return databaseAuditService.findBySessionId(sessionId);
     }
 
     /**
-     * 根据请求ID查询审计日志
-     * @param requestId 请求ID
-     * @return 审计日志列表
+     * Query audit logs by request ID
+     * @param requestId Request ID
+     * @return Audit log list
      */
     @GetMapping(value = "/logs/request/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "根据请求ID查询审计日志", description = "根据请求ID查询审计日志")
+    @Operation(summary = "Query audit logs by request ID", description = "Query audit logs by request ID")
     public Flux<DatabaseAuditLog> getLogsByRequestId(
-            @Parameter(description = "请求ID", required = true, example = "request-123")
+            @Parameter(description = "Request ID", required = true, example = "request-123")
             @PathVariable String requestId) {
         return databaseAuditService.findByRequestId(requestId);
     }
 
     /**
-     * 根据记录ID查询审计日志
-     * @param recordId 记录ID
-     * @return 审计日志列表
+     * Query audit logs by record ID
+     * @param recordId Record ID
+     * @return Audit log list
      */
     @GetMapping(value = "/logs/record/{recordId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "根据记录ID查询审计日志", description = "根据记录ID查询审计日志")
+    @Operation(summary = "Query audit logs by record ID", description = "Query audit logs by record ID")
     public Flux<DatabaseAuditLog> getLogsByRecordId(
-            @Parameter(description = "记录ID", required = true, example = "123")
+            @Parameter(description = "Record ID", required = true, example = "123")
             @PathVariable String recordId) {
         return databaseAuditService.findByRecordId(recordId);
     }
 
     /**
-     * 根据操作状态查询审计日志
-     * @param operationStatus 操作状态
-     * @return 审计日志列表
+     * Query audit logs by operation status
+     * @param operationStatus Operation status
+     * @return Audit log list
      */
     @GetMapping(value = "/logs/status/{operationStatus}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "根据操作状态查询审计日志", description = "根据操作状态（SUCCESS, FAILURE, ROLLBACK）查询审计日志")
+    @Operation(summary = "Query audit logs by operation status", description = "Query audit logs by operation status (SUCCESS, FAILURE, ROLLBACK)")
     public Flux<DatabaseAuditLog> getLogsByOperationStatus(
-            @Parameter(description = "操作状态", required = true, example = "SUCCESS")
+            @Parameter(description = "Operation status", required = true, example = "SUCCESS")
             @PathVariable String operationStatus) {
         return databaseAuditService.findByOperationStatus(operationStatus);
     }
 
     /**
-     * 根据时间范围查询审计日志
-     * @param startTime 开始时间
-     * @param endTime 结束时间
-     * @return 审计日志列表
+     * Query audit logs by time range
+     * @param startTime Start time
+     * @param endTime End time
+     * @return Audit log list
      */
     @GetMapping(value = "/logs/time-range", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "根据时间范围查询审计日志", description = "根据指定的时间范围查询审计日志")
+    @Operation(summary = "Query audit logs by time range", description = "Query audit logs within specified time range")
     public Flux<DatabaseAuditLog> getLogsByTimeRange(
-            @Parameter(description = "开始时间", required = true, example = "2024-01-01T00:00:00")
+            @Parameter(description = "Start time", required = true, example = "2024-01-01T00:00:00")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-            @Parameter(description = "结束时间", required = true, example = "2024-01-31T23:59:59")
+            @Parameter(description = "End time", required = true, example = "2024-01-31T23:59:59")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
         return databaseAuditService.findByCreatedAtBetween(startTime, endTime);
     }
 
     /**
-     * 根据表名和记录ID查询审计日志
-     * @param tableName 表名
-     * @param recordId 记录ID
-     * @return 审计日志列表
+     * Query audit logs by table name and record ID
+     * @param tableName Table name
+     * @param recordId Record ID
+     * @return Audit log list
      */
     @GetMapping(value = "/logs/table/{tableName}/record/{recordId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "根据表名和记录ID查询审计日志", description = "根据表名和记录ID查询特定记录的审计日志")
+    @Operation(summary = "Query audit logs by table name and record ID", description = "Query audit logs for specific record by table name and record ID")
     public Flux<DatabaseAuditLog> getLogsByTableAndRecord(
-            @Parameter(description = "表名", required = true, example = "employees")
+            @Parameter(description = "Table name", required = true, example = "employees")
             @PathVariable String tableName,
-            @Parameter(description = "记录ID", required = true, example = "123")
+            @Parameter(description = "Record ID", required = true, example = "123")
             @PathVariable String recordId) {
         return databaseAuditService.findByTableNameAndRecordId(tableName, recordId);
     }
 
     /**
-     * 根据用户ID和时间范围查询审计日志
-     * @param userId 用户ID
-     * @param startTime 开始时间
-     * @param endTime 结束时间
-     * @return 审计日志列表
+     * Query audit logs by user ID and time range
+     * @param userId User ID
+     * @param startTime Start time
+     * @param endTime End time
+     * @return Audit log list
      */
     @GetMapping(value = "/logs/user/{userId}/time-range", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "根据用户ID和时间范围查询审计日志", description = "根据用户ID和时间范围查询审计日志")
+    @Operation(summary = "Query audit logs by user ID and time range", description = "Query audit logs by user ID and time range")
     public Flux<DatabaseAuditLog> getLogsByUserAndTimeRange(
-            @Parameter(description = "用户ID", required = true, example = "user123")
+            @Parameter(description = "User ID", required = true, example = "user123")
             @PathVariable String userId,
-            @Parameter(description = "开始时间", required = true, example = "2024-01-01T00:00:00")
+            @Parameter(description = "Start time", required = true, example = "2024-01-01T00:00:00")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-            @Parameter(description = "结束时间", required = true, example = "2024-01-31T23:59:59")
+            @Parameter(description = "End time", required = true, example = "2024-01-31T23:59:59")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
         return databaseAuditService.findByUserIdAndCreatedAtBetween(userId, startTime, endTime);
     }
 
     /**
-     * 根据操作类型和表名查询审计日志
-     * @param operationType 操作类型
-     * @param tableName 表名
-     * @return 审计日志列表
+     * Query audit logs by operation type and table name
+     * @param operationType Operation type
+     * @param tableName Table name
+     * @return Audit log list
      */
     @GetMapping(value = "/logs/operation/{operationType}/table/{tableName}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "根据操作类型和表名查询审计日志", description = "根据操作类型和表名查询审计日志")
+    @Operation(summary = "Query audit logs by operation type and table name", description = "Query audit logs by operation type and table name")
     public Flux<DatabaseAuditLog> getLogsByOperationAndTable(
-            @Parameter(description = "操作类型", required = true, example = "INSERT")
+            @Parameter(description = "Operation type", required = true, example = "INSERT")
             @PathVariable String operationType,
-            @Parameter(description = "表名", required = true, example = "employees")
+            @Parameter(description = "Table name", required = true, example = "employees")
             @PathVariable String tableName) {
         return databaseAuditService.findByOperationTypeAndTableName(operationType, tableName);
     }
 
     /**
-     * 查询最近的审计日志
-     * @param limit 限制数量
-     * @return 审计日志列表
+     * Query recent audit logs
+     * @param limit Limit count
+     * @return Audit log list
      */
     @GetMapping(value = "/logs/recent", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "查询最近的审计日志", description = "查询最近的审计日志，可指定数量限制")
+    @Operation(summary = "Query recent audit logs", description = "Query recent audit logs with optional limit")
     public Flux<DatabaseAuditLog> getRecentLogs(
-            @Parameter(description = "限制数量", example = "100")
+            @Parameter(description = "Limit count", example = "100")
             @RequestParam(defaultValue = "100") int limit) {
         return databaseAuditService.findRecentLogs(limit);
     }
 
     /**
-     * 查询错误审计日志
-     * @param startTime 开始时间
-     * @param endTime 结束时间
-     * @return 错误审计日志列表
+     * Query error audit logs
+     * @param startTime Start time
+     * @param endTime End time
+     * @return Error audit log list
      */
     @GetMapping(value = "/logs/errors", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "查询错误审计日志", description = "查询指定时间范围内的错误审计日志")
+    @Operation(summary = "Query error audit logs", description = "Query error audit logs within specified time range")
     public Flux<DatabaseAuditLog> getErrorLogs(
-            @Parameter(description = "开始时间", required = true, example = "2024-01-01T00:00:00")
+            @Parameter(description = "Start time", required = true, example = "2024-01-01T00:00:00")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-            @Parameter(description = "结束时间", required = true, example = "2024-01-31T23:59:59")
+            @Parameter(description = "End time", required = true, example = "2024-01-31T23:59:59")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
         return databaseAuditService.findErrorLogsByCreatedAtBetween(startTime, endTime);
     }
 
     /**
-     * 查询指定用户的错误审计日志
-     * @param userId 用户ID
-     * @return 错误审计日志列表
+     * Query error audit logs for specific user
+     * @param userId User ID
+     * @return Error audit log list
      */
     @GetMapping(value = "/logs/errors/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "查询指定用户的错误审计日志", description = "查询指定用户的错误审计日志")
+    @Operation(summary = "Query error audit logs for specific user", description = "Query error audit logs for specific user")
     public Flux<DatabaseAuditLog> getErrorLogsByUserId(
-            @Parameter(description = "用户ID", required = true, example = "user123")
+            @Parameter(description = "User ID", required = true, example = "user123")
             @PathVariable String userId) {
         return databaseAuditService.findErrorLogsByUserId(userId);
     }
 
     /**
-     * 清理过期的审计日志
-     * @param retentionDays 保留天数
-     * @return 删除的记录数
+     * Clean up expired audit logs
+     * @param retentionDays Retention days
+     * @return Number of deleted records
      */
     @DeleteMapping(value = "/logs/cleanup", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "清理过期的审计日志", description = "清理指定天数之前的审计日志")
+    @Operation(summary = "Clean up expired audit logs", description = "Clean up audit logs older than specified days")
     public Mono<ResponseEntity<Map<String, Object>>> cleanupOldLogs(
-            @Parameter(description = "保留天数", example = "90")
+            @Parameter(description = "Retention days", example = "90")
             @RequestParam(defaultValue = "90") int retentionDays) {
         return databaseAuditService.cleanupOldAuditLogs(retentionDays)
                 .map(deletedCount -> {
                     Map<String, Object> response = Map.of(
-                            "message", "审计日志清理完成",
+                            "message", "Audit log cleanup completed",
                             "deletedCount", deletedCount,
                             "retentionDays", retentionDays,
                             "timestamp", LocalDateTime.now().toString()

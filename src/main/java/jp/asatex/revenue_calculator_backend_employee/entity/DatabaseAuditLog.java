@@ -7,8 +7,8 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.time.LocalDateTime;
 
 /**
- * 数据库审计日志实体
- * 记录所有数据库操作的详细信息
+ * Database audit log entity
+ * Records detailed information for all database operations
  */
 @Table("database_audit_logs")
 public class DatabaseAuditLog {
@@ -42,10 +42,10 @@ public class DatabaseAuditLog {
     private String userAgent;
 
     @Column("old_values")
-    private String oldValues; // JSON格式的旧值
+    private String oldValues; // Old values in JSON format
 
     @Column("new_values")
-    private String newValues; // JSON格式的新值
+    private String newValues; // New values in JSON format
 
     @Column("sql_statement")
     private String sqlStatement;
@@ -68,7 +68,7 @@ public class DatabaseAuditLog {
     @Column("created_by")
     private String createdBy;
 
-    // 构造函数
+    // Constructor
     public DatabaseAuditLog() {}
 
     public DatabaseAuditLog(String operationType, String tableName, String recordId, 

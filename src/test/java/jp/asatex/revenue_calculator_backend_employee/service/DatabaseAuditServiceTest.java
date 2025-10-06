@@ -24,10 +24,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * DatabaseAuditService 测试类
+ * DatabaseAuditService test class
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("DatabaseAuditService テスト")
+@DisplayName("DatabaseAuditService Test")
 class DatabaseAuditServiceTest {
 
     @Mock
@@ -41,7 +41,7 @@ class DatabaseAuditServiceTest {
 
     @BeforeEach
     void setUp() {
-        // 设置MDC
+        // Set MDC
         MDC.put("userId", "test-user");
         MDC.put("sessionId", "test-session");
         MDC.put("requestId", "test-request");
@@ -50,7 +50,7 @@ class DatabaseAuditServiceTest {
     }
 
     @Test
-    @DisplayName("记录成功的数据库操作应该正确工作")
+    @DisplayName("Logging successful database operations should work correctly")
     void testLogSuccessfulOperation() {
         // Given
         String operationType = "INSERT";
@@ -58,7 +58,7 @@ class DatabaseAuditServiceTest {
         String recordId = "123";
         Map<String, Object> oldValues = new HashMap<>();
         Map<String, Object> newValues = new HashMap<>();
-        newValues.put("name", "测试员工");
+        newValues.put("name", "Test Employee");
         String sqlStatement = "INSERT INTO employees (name) VALUES (?)";
         Long executionTimeMs = 150L;
         Integer affectedRows = 1;
@@ -84,7 +84,7 @@ class DatabaseAuditServiceTest {
     }
 
     @Test
-    @DisplayName("记录失败的数据库操作应该正确工作")
+    @DisplayName("Logging failed database operations should work correctly")
     void testLogFailedOperation() {
         // Given
         String operationType = "UPDATE";
@@ -115,13 +115,13 @@ class DatabaseAuditServiceTest {
     }
 
     @Test
-    @DisplayName("记录INSERT操作应该正确工作")
+    @DisplayName("Logging INSERT operations should work correctly")
     void testLogInsertOperation() {
         // Given
         String tableName = "employees";
         String recordId = "123";
         Map<String, Object> newValues = new HashMap<>();
-        newValues.put("name", "新员工");
+        newValues.put("name", "New Employee");
         String sqlStatement = "INSERT INTO employees (name) VALUES (?)";
         Long executionTimeMs = 120L;
         Integer affectedRows = 1;
@@ -145,15 +145,15 @@ class DatabaseAuditServiceTest {
     }
 
     @Test
-    @DisplayName("记录UPDATE操作应该正确工作")
+    @DisplayName("Recording UPDATE operations should work correctly")
     void testLogUpdateOperation() {
         // Given
         String tableName = "employees";
         String recordId = "123";
         Map<String, Object> oldValues = new HashMap<>();
-        oldValues.put("name", "旧名称");
+        oldValues.put("name", "Old Name");
         Map<String, Object> newValues = new HashMap<>();
-        newValues.put("name", "新名称");
+        newValues.put("name", "New Name");
         String sqlStatement = "UPDATE employees SET name = ? WHERE id = ?";
         Long executionTimeMs = 80L;
         Integer affectedRows = 1;
@@ -177,13 +177,13 @@ class DatabaseAuditServiceTest {
     }
 
     @Test
-    @DisplayName("记录DELETE操作应该正确工作")
+    @DisplayName("Recording DELETE operations should work correctly")
     void testLogDeleteOperation() {
         // Given
         String tableName = "employees";
         String recordId = "123";
         Map<String, Object> oldValues = new HashMap<>();
-        oldValues.put("name", "被删除的员工");
+        oldValues.put("name", "Deleted Employee");
         String sqlStatement = "DELETE FROM employees WHERE id = ?";
         Long executionTimeMs = 60L;
         Integer affectedRows = 1;
@@ -207,7 +207,7 @@ class DatabaseAuditServiceTest {
     }
 
     @Test
-    @DisplayName("记录SELECT操作应该正确工作")
+    @DisplayName("Recording SELECT operations should work correctly")
     void testLogSelectOperation() {
         // Given
         String tableName = "employees";
@@ -235,19 +235,13 @@ class DatabaseAuditServiceTest {
     }
 
     @Test
-    @DisplayName("获取审计统计信息应该正确工作")
+    @DisplayName("Getting audit statistics should work correctly")
     void testGetAuditStatistics() {
-        // Given
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime oneDayAgo = now.minusDays(1);
-        LocalDateTime oneWeekAgo = now.minusWeeks(1);
-        LocalDateTime oneMonthAgo = now.minusMonths(1);
-
-        // 为不同的时间范围返回不同的值
+        // Return different values for different time ranges
         org.mockito.Mockito.lenient().when(databaseAuditLogRepository.countByCreatedAtBetween(any(LocalDateTime.class), any(LocalDateTime.class)))
-                .thenReturn(Mono.just(10L))  // 24小时
-                .thenReturn(Mono.just(50L))  // 7天
-                .thenReturn(Mono.just(200L)); // 30天
+                .thenReturn(Mono.just(10L))  // 24 hours
+                .thenReturn(Mono.just(50L))  // 7 days
+                .thenReturn(Mono.just(200L)); // 30 days
         org.mockito.Mockito.lenient().when(databaseAuditLogRepository.countByOperationType("INSERT")).thenReturn(Mono.just(50L));
         org.mockito.Mockito.lenient().when(databaseAuditLogRepository.countByOperationType("UPDATE")).thenReturn(Mono.just(30L));
         org.mockito.Mockito.lenient().when(databaseAuditLogRepository.countByOperationType("DELETE")).thenReturn(Mono.just(10L));
@@ -277,7 +271,7 @@ class DatabaseAuditServiceTest {
     }
 
     @Test
-    @DisplayName("清理过期审计日志应该正确工作")
+    @DisplayName("Cleaning up expired audit logs should work correctly")
     void testCleanupOldAuditLogs() {
         // Given
         int retentionDays = 90;
@@ -300,7 +294,7 @@ class DatabaseAuditServiceTest {
     }
 
     @Test
-    @DisplayName("根据操作类型查询审计日志应该正确工作")
+    @DisplayName("Querying audit logs by operation type should work correctly")
     void testFindByOperationType() {
         // Given
         String operationType = "INSERT";
@@ -331,7 +325,7 @@ class DatabaseAuditServiceTest {
     }
 
     @Test
-    @DisplayName("根据表名查询审计日志应该正确工作")
+    @DisplayName("Querying audit logs by table name should work correctly")
     void testFindByTableName() {
         // Given
         String tableName = "employees";
@@ -356,7 +350,7 @@ class DatabaseAuditServiceTest {
     }
 
     @Test
-    @DisplayName("根据用户ID查询审计日志应该正确工作")
+    @DisplayName("Querying audit logs by user ID should work correctly")
     void testFindByUserId() {
         // Given
         String userId = "user123";
@@ -381,7 +375,7 @@ class DatabaseAuditServiceTest {
     }
 
     @Test
-    @DisplayName("根据时间范围查询审计日志应该正确工作")
+    @DisplayName("Querying audit logs by time range should work correctly")
     void testFindByCreatedAtBetween() {
         // Given
         LocalDateTime startTime = LocalDateTime.now().minusDays(1);

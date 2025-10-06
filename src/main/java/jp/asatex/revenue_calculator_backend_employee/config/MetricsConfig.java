@@ -7,14 +7,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 自定义指标配置类
- * 配置业务相关的监控指标
+ * Custom metrics configuration class
+ * Configures business-related monitoring metrics
  */
 @Configuration
 public class MetricsConfig {
 
     /**
-     * 员工操作计数器
+     * Employee operation counter
      */
     @Bean
     public Counter employeeOperationCounter(MeterRegistry meterRegistry) {
@@ -25,7 +25,7 @@ public class MetricsConfig {
     }
 
     /**
-     * 员工创建计数器
+     * Employee creation counter
      */
     @Bean
     public Counter employeeCreateCounter(MeterRegistry meterRegistry) {
@@ -36,7 +36,7 @@ public class MetricsConfig {
     }
 
     /**
-     * 员工更新计数器
+     * Employee update counter
      */
     @Bean
     public Counter employeeUpdateCounter(MeterRegistry meterRegistry) {
@@ -47,7 +47,7 @@ public class MetricsConfig {
     }
 
     /**
-     * 员工删除计数器
+     * Employee deletion counter
      */
     @Bean
     public Counter employeeDeleteCounter(MeterRegistry meterRegistry) {
@@ -58,7 +58,7 @@ public class MetricsConfig {
     }
 
     /**
-     * 员工查询计数器
+     * Employee query counter
      */
     @Bean
     public Counter employeeQueryCounter(MeterRegistry meterRegistry) {
@@ -69,7 +69,7 @@ public class MetricsConfig {
     }
 
     /**
-     * 员工操作计时器
+     * Employee operation timer
      */
     @Bean
     public Timer employeeOperationTimer(MeterRegistry meterRegistry) {
@@ -80,7 +80,7 @@ public class MetricsConfig {
     }
 
     /**
-     * 数据库操作计时器
+     * Database operation timer
      */
     @Bean
     public Timer databaseOperationTimer(MeterRegistry meterRegistry) {
@@ -91,7 +91,7 @@ public class MetricsConfig {
     }
 
     /**
-     * 缓存命中计数器
+     * Cache hit counter
      */
     @Bean
     public Counter cacheHitCounter(MeterRegistry meterRegistry) {
@@ -102,7 +102,7 @@ public class MetricsConfig {
     }
 
     /**
-     * 缓存未命中计数器
+     * Cache miss counter
      */
     @Bean
     public Counter cacheMissCounter(MeterRegistry meterRegistry) {
@@ -113,7 +113,7 @@ public class MetricsConfig {
     }
 
     /**
-     * 限流触发计数器
+     * Rate limit trigger counter
      */
     @Bean
     public Counter rateLimitTriggeredCounter(MeterRegistry meterRegistry) {

@@ -12,55 +12,55 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * 日志工具类测试
+ * Logging utility class test
  */
 class LoggingUtilTest {
 
     @Test
     void testLogBusinessOperation() {
-        // 测试业务操作日志记录
+        // Test business operation logging
         LoggingUtil.logBusinessOperation("TEST_OPERATION", "Test details: %s", "test-value");
-        // 这个测试主要验证方法不会抛出异常
+        // This test mainly verifies that the method does not throw an exception
     }
 
     @Test
     void testLogPerformance() {
-        // 测试性能日志记录
+        // Test performance logging
         Duration shortDuration = Duration.ofMillis(100);
         Duration longDuration = Duration.ofMillis(1500);
         
         LoggingUtil.logPerformance("SHORT_OPERATION", shortDuration, "Short operation details");
         LoggingUtil.logPerformance("LONG_OPERATION", longDuration, "Long operation details");
-        // 这个测试主要验证方法不会抛出异常
+        // This test mainly verifies that the method does not throw an exception
     }
 
     @Test
     void testLogError() {
-        // 测试错误日志记录
+        // Test error logging
         Exception testException = new RuntimeException("Test error");
         LoggingUtil.logError("TEST_ERROR", testException, "Test error details");
-        // 这个测试主要验证方法不会抛出异常
+        // This test mainly verifies that the method does not throw an exception
     }
 
     @Test
     void testLogDataAccess() {
-        // 测试数据访问日志记录
+        // Test data access logging
         LoggingUtil.logDataAccess("SELECT", "employees", 123L);
         LoggingUtil.logDataAccess("INSERT", "employees", 456L);
-        // 这个测试主要验证方法不会抛出异常
+        // This test mainly verifies that the method does not throw an exception
     }
 
     @Test
     void testLogSecurity() {
-        // 测试安全日志记录
+        // Test security logging
         LoggingUtil.logSecurity("LOGIN_ATTEMPT", "User attempted to login");
         LoggingUtil.logSecurity("ACCESS_DENIED", "Access denied for user");
-        // 这个测试主要验证方法不会抛出异常
+        // This test mainly verifies that the method does not throw an exception
     }
 
     @Test
     void testSetAndClearContext() {
-        // 测试MDC上下文设置和清除
+        // Test MDC context setting and clearing
         LoggingUtil.setContext("testKey", "testValue");
         assertThat(MDC.get("testKey")).isEqualTo("testValue");
         
@@ -70,7 +70,7 @@ class LoggingUtilTest {
 
     @Test
     void testLogOperationTime() {
-        // 测试操作时间日志记录
+        // Test operation time logging
         Mono<String> testMono = Mono.just("test-result")
                 .delayElement(Duration.ofMillis(100));
         
@@ -81,7 +81,7 @@ class LoggingUtilTest {
 
     @Test
     void testLogOperationTimeWithContext() {
-        // 测试带上下文的操作时间日志记录
+        // Test operation time logging with context
         Map<String, String> context = new HashMap<>();
         context.put("userId", "123");
         context.put("operation", "test");
@@ -96,12 +96,12 @@ class LoggingUtilTest {
 
     @Test
     void testLogApiCall() {
-        // 测试API调用日志记录
+        // Test API call logging
         LoggingUtil.logApiCall("/api/v1/employee", "GET", 200, Duration.ofMillis(100));
         LoggingUtil.logApiCall("/api/v1/employee", "POST", 201, Duration.ofMillis(200));
         LoggingUtil.logApiCall("/api/v1/employee", "GET", 404, Duration.ofMillis(50));
         LoggingUtil.logApiCall("/api/v1/employee", "GET", 200, Duration.ofMillis(1500));
-        // 这个测试主要验证方法不会抛出异常
+        // This test mainly verifies that the method does not throw an exception
     }
 }
 

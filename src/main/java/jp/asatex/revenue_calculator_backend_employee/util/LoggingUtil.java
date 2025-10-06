@@ -11,22 +11,22 @@ import java.time.Instant;
 import java.util.Map;
 
 /**
- * 日志工具类
- * 提供统一的日志记录方法和上下文管理
+ * Logging utility class
+ * Provides unified logging methods and context management
  */
 public class LoggingUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingUtil.class);
 
     /**
-     * 记录业务操作日志
+     * Log business operation
      */
     public static void logBusinessOperation(String operation, String details, Object... args) {
         logger.info("Business operation: {} - Details: {}", operation, String.format(details, args));
     }
 
     /**
-     * 记录性能日志
+     * Log performance
      */
     public static void logPerformance(String operation, Duration duration, String details) {
         if (duration.toMillis() > 1000) {
@@ -39,7 +39,7 @@ public class LoggingUtil {
     }
 
     /**
-     * 记录错误日志
+     * Log error
      */
     public static void logError(String operation, Throwable error, String details) {
         logger.error("Error in operation: {} - Details: {} - Error: {}", 
@@ -47,35 +47,35 @@ public class LoggingUtil {
     }
 
     /**
-     * 记录数据访问日志
+     * Log data access
      */
     public static void logDataAccess(String operation, String table, Object id) {
         logger.debug("Data access: {} on table {} with ID: {}", operation, table, id);
     }
 
     /**
-     * 记录安全相关日志
+     * Log security-related logs
      */
     public static void logSecurity(String event, String details) {
         logger.warn("Security event: {} - Details: {}", event, details);
     }
 
     /**
-     * 设置MDC上下文
+     * Set MDC context
      */
     public static void setContext(String key, String value) {
         MDC.put(key, value);
     }
 
     /**
-     * 清除MDC上下文
+     * Clear MDC context
      */
     public static void clearContext() {
         MDC.clear();
     }
 
     /**
-     * 在响应式流中记录操作时间
+     * Log operation time in reactive stream
      */
     public static <T> Mono<T> logOperationTime(String operation, Mono<T> mono) {
         Instant startTime = Instant.now();
@@ -91,7 +91,7 @@ public class LoggingUtil {
     }
 
     /**
-     * 在响应式流中记录操作时间（带上下文）
+     * Log operation time in reactive stream (with context)
      */
     public static <T> Mono<T> logOperationTimeWithContext(String operation, Mono<T> mono, Map<String, String> context) {
         return mono
@@ -106,7 +106,7 @@ public class LoggingUtil {
     }
 
     /**
-     * 记录API调用统计
+     * Log API call statistics
      */
     public static void logApiCall(String endpoint, String method, int statusCode, Duration duration) {
         String level = statusCode >= 400 ? "ERROR" : (duration.toMillis() > 1000 ? "WARN" : "INFO");

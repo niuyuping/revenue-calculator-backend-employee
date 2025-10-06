@@ -6,85 +6,66 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.models.GroupedOpenApi;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
-import java.util.Locale;
 
 /**
- * Swagger/OpenAPI設定クラス
- * API文書の設定とSwagger UIの設定を行う
- * 支持英、中、日三种语言的API文档
+ * Swagger/OpenAPI configuration class
+ * Configures API documentation and Swagger UI settings
  */
 @Configuration
 public class SwaggerConfig {
-
-    @Autowired
-    private MessageSource messageSource;
 
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title(getMessage("app.title", Locale.ENGLISH))
-                        .description(buildDescription(Locale.ENGLISH))
+                        .title("Revenue Calculator Employee API")
+                        .description(buildDescription())
                         .version("1.0.0")
                         .contact(new Contact()
-                                .name(getMessage("contact.name", Locale.ENGLISH))
-                                .email(getMessage("contact.email", Locale.ENGLISH))
-                                .url(getMessage("contact.url", Locale.ENGLISH)))
+                                .name("ASATEX Development Team")
+                                .email("dev@asatex.jp")
+                                .url("https://asatex.jp"))
                         .license(new License()
-                                .name(getMessage("license.name", Locale.ENGLISH))
-                                .url(getMessage("license.url", Locale.ENGLISH))))
+                                .name("MIT License")
+                                .url("https://opensource.org/licenses/MIT")))
                 .servers(List.of(
                         new Server()
                                 .url("http://localhost:9001")
-                                .description(getMessage("server.dev", Locale.ENGLISH)),
+                                .description("Development server"),
                         new Server()
                                 .url("https://api.asatex.jp")
-                                .description(getMessage("server.prod", Locale.ENGLISH))
+                                .description("Production server")
                 ));
     }
 
     /**
-     * 构建多语言描述
+     * Build API description
      */
-    private String buildDescription(Locale locale) {
-        return getMessage("app.description", locale) + "\n\n" +
-                "## " + getMessage("features.title", locale) + "\n" +
-                "- " + getMessage("features.crud", locale) + "\n" +
-                "- " + getMessage("features.search", locale) + "\n" +
-                "- " + getMessage("features.reactive", locale) + "\n" +
-                "- " + getMessage("features.cache", locale) + "\n" +
-                "- " + getMessage("features.ratelimit", locale) + "\n" +
-                "- " + getMessage("features.monitoring", locale) + "\n\n" +
-                "## " + getMessage("auth.title", locale) + "\n" +
-                getMessage("auth.note", locale) + "\n\n" +
-                "## " + getMessage("ratelimit.title", locale) + "\n" +
-                "- " + getMessage("ratelimit.general", locale) + "\n" +
-                "- " + getMessage("ratelimit.search", locale) + "\n" +
-                "- " + getMessage("ratelimit.write", locale);
-    }
-
-    /**
-     * 获取国际化消息
-     */
-    private String getMessage(String key, Locale locale) {
-        try {
-            return messageSource.getMessage(key, null, locale);
-        } catch (Exception e) {
-            // 如果获取失败，返回默认的英文消息
-            return messageSource.getMessage(key, null, Locale.ENGLISH);
-        }
+    private String buildDescription() {
+        return "Employee management API for Revenue Calculator system.\n\n" +
+                "## Features\n" +
+                "- Complete CRUD operations for employee data\n" +
+                "- Advanced search functionality (by name and furigana)\n" +
+                "- Reactive programming with Spring WebFlux\n" +
+                "- Redis caching for performance optimization\n" +
+                "- Rate limiting for API protection\n" +
+                "- Comprehensive monitoring and audit logging\n\n" +
+                "## Authentication\n" +
+                "Currently no authentication required. All endpoints are publicly accessible.\n\n" +
+                "## Rate Limiting\n" +
+                "- General API calls: 100 requests per minute\n" +
+                "- Search operations: 50 requests per minute\n" +
+                "- Write operations: 20 requests per minute";
     }
 
     @Bean
     public GroupedOpenApi employeeApi() {
         return GroupedOpenApi.builder()
-                .group(getMessage("api.group.employee", Locale.ENGLISH))
+                .group("Employee Management")
                 .pathsToMatch("/api/v1/employee/**")
                 .build();
     }

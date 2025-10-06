@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -20,8 +21,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * 请求日志过滤器
- * 记录所有HTTP请求的详细信息
+ * Request logging filter
+ * Records detailed information for all HTTP requests
  */
 @Component
 @Order(1)
@@ -34,16 +35,17 @@ public class RequestLoggingFilter implements WebFilter {
     private AuditLogService auditLogService;
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+    @NonNull
+    public Mono<Void> filter(@NonNull ServerWebExchange exchange, @NonNull WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();
 
-        // 生成请求ID
+        // Generate request ID
         String requestId = UUID.randomUUID().toString();
         final String sessionId = request.getHeaders().getFirst("X-Session-ID") != null ? 
                 request.getHeaders().getFirst("X-Session-ID") : UUID.randomUUID().toString();
 
-        // 设置MDC
+        // Set MDC
         MDC.put("requestId", requestId);
         MDC.put("sessionId", sessionId);
         MDC.put("ipAddress", getClientIpAddress(request));
@@ -51,10 +53,10 @@ public class RequestLoggingFilter implements WebFilter {
 
         long startTime = System.currentTimeMillis();
 
-        // 记录请求开始
+        // Log request start
         logRequestStart(request, requestId, sessionId);
 
-        // 添加请求ID到响应头
+        // Add request ID to response headers
         response.getHeaders().add("X-Request-ID", requestId);
         response.getHeaders().add("X-Session-ID", sessionId);
 
@@ -68,8 +70,13 @@ public class RequestLoggingFilter implements WebFilter {
                     logRequestEnd(request, response, requestId, sessionId, duration, false, throwable);
                 })
                 .doFinally(signalType -> {
-                    // 清理MDC
+                    // Clear MDC
                     MDC.clear();
+                })
+                .onErrorResume(throwable -> {
+                    // Ensure we always return a non-null Mono<Void>
+                    logger.error("Error in request filter", throwable);
+                    return Mono.empty();
                 });
     }
 
@@ -87,9 +94,9 @@ public class RequestLoggingFilter implements WebFilter {
             requestData.put("ipAddress", getClientIpAddress(request));
             requestData.put("userAgent", request.getHeaders().getFirst("User-Agent"));
 
-            requestLogger.info("请求开始: {}", requestData);
+            requestLogger.info("Request started: {}", requestData);
         } catch (Exception e) {
-            logger.error("记录请求开始日志失败", e);
+            logger.error("Failed to log request start", e);
         }
     }
 
@@ -104,7 +111,8 @@ public class RequestLoggingFilter implements WebFilter {
             responseData.put("method", request.getMethod().name());
             responseData.put("uri", request.getURI().toString());
             responseData.put("path", request.getPath().value());
-            responseData.put("statusCode", response.getStatusCode() != null ? response.getStatusCode().value() : 0);
+            var statusCode = response.getStatusCode();
+            responseData.put("statusCode", statusCode != null ? statusCode.value() : 0);
             responseData.put("duration", duration);
             responseData.put("success", success);
             responseData.put("ipAddress", getClientIpAddress(request));
@@ -115,24 +123,28 @@ public class RequestLoggingFilter implements WebFilter {
                 responseData.put("errorType", error.getClass().getSimpleName());
             }
 
-            requestLogger.info("请求结束: {}", responseData);
+            requestLogger.info("Request completed: {}", responseData);
 
-            // 记录API调用审计日志
+            // Log API call audit
             auditLogService.logApiCall(
                     request.getMethod().name(),
                     request.getURI().toString(),
-                    response.getStatusCode() != null ? response.getStatusCode().value() : 0,
+                    statusCode != null ? statusCode.value() : 0,
                     duration,
                     getCurrentUserId(request),
-                    0, // 请求大小（需要额外实现）
-                    0  // 响应大小（需要额外实现）
+                    0, // Request size (needs additional implementation)
+                    0  // Response size (needs additional implementation)
             );
         } catch (Exception e) {
-            logger.error("记录请求结束日志失败", e);
+            logger.error("Failed to log request completion", e);
         }
     }
 
     private String getClientIpAddress(ServerHttpRequest request) {
+        if (request == null) {
+            return "unknown";
+        }
+        
         String xForwardedFor = request.getHeaders().getFirst("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
             return xForwardedFor.split(",")[0].trim();
@@ -143,32 +155,42 @@ public class RequestLoggingFilter implements WebFilter {
             return xRealIp;
         }
 
-        return request.getRemoteAddress() != null && request.getRemoteAddress().getAddress() != null ? 
-                request.getRemoteAddress().getAddress().getHostAddress() : "unknown";
+        var remoteAddress = request.getRemoteAddress();
+        return remoteAddress != null && remoteAddress.getAddress() != null ? 
+                remoteAddress.getAddress().getHostAddress() : "unknown";
     }
 
     private String getCurrentUserId(ServerHttpRequest request) {
-        // 从请求头或JWT token中获取用户ID
+        if (request == null) {
+            return "anonymous";
+        }
+        
+        // Get user ID from request headers or JWT token
         String userId = request.getHeaders().getFirst("X-User-ID");
         if (userId == null) {
             userId = request.getHeaders().getFirst("Authorization");
-            // 这里可以解析JWT token获取用户ID
+            // Here you can parse JWT token to get user ID
         }
         return userId != null ? userId : "anonymous";
     }
 
     private Map<String, String> getFilteredHeaders(ServerHttpRequest request) {
         Map<String, String> filteredHeaders = new HashMap<>();
-        request.getHeaders().forEach((name, values) -> {
-            // 过滤敏感信息
-            if (!isSensitiveHeader(name)) {
-                filteredHeaders.put(name, String.join(", ", values));
-            }
-        });
+        if (request != null && request.getHeaders() != null) {
+            request.getHeaders().forEach((name, values) -> {
+                // Filter sensitive information
+                if (name != null && values != null && !isSensitiveHeader(name)) {
+                    filteredHeaders.put(name, String.join(", ", values));
+                }
+            });
+        }
         return filteredHeaders;
     }
 
     private boolean isSensitiveHeader(String headerName) {
+        if (headerName == null) {
+            return false;
+        }
         String lowerCase = headerName.toLowerCase();
         return lowerCase.contains("authorization") ||
                lowerCase.contains("cookie") ||

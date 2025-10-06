@@ -1,7 +1,7 @@
 package jp.asatex.revenue_calculator_backend_employee.exception;
 
 /**
- * 従業員番号重複例外
+ * Duplicate employee number exception
  */
 public class DuplicateEmployeeNumberException extends RuntimeException {
     

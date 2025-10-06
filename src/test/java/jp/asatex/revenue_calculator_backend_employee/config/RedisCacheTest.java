@@ -11,9 +11,9 @@ import org.springframework.test.context.ContextConfiguration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Redis缓存功能测试
- * 验证Redis连接和缓存功能是否正常工作
- * 使用本地Docker Redis服务
+ * Redis cache functionality test
+ * Verifies Redis connection and cache functionality work properly
+ * Uses local Docker Redis service
  */
 @SpringBootTest
 @ActiveProfiles("test")
@@ -28,39 +28,44 @@ class RedisCacheTest {
 
     @Test
     void testRedisConnection() {
-        // 测试Redis连接
+        // Test Redis connection
         redisTemplate.opsForValue().set("test:key", "test:value");
         String value = (String) redisTemplate.opsForValue().get("test:key");
         
         assertThat(value).isEqualTo("test:value");
         
-        // 清理测试数据
+        // Clean up test data
         redisTemplate.delete("test:key");
     }
 
     @Test
     void testCacheManager() {
-        // 验证缓存管理器是否正确配置
+        // Verify cache manager is configured correctly
         assertThat(cacheManager).isNotNull();
         assertThat(cacheManager.getCacheNames()).contains("employees", "employeeList", "employeeSearch", "employeePagination");
     }
 
     @Test
     void testCacheOperations() {
-        // 测试缓存操作
+        // Test cache operations
         var cache = cacheManager.getCache("employees");
         assertThat(cache).isNotNull();
         
-        // 存储缓存
-        cache.put("test:employee:1", "test:employee:data");
-        
-        // 获取缓存
-        var cachedValue = cache.get("test:employee:1");
-        assertThat(cachedValue).isNotNull();
-        assertThat(cachedValue.get()).isEqualTo("test:employee:data");
-        
-        // 清理测试数据
-        cache.evict("test:employee:1");
+        // Ensure cache is not null before operations
+        if (cache != null) {
+            // Store cache
+            cache.put("test:employee:1", "test:employee:data");
+            
+            // Get cache
+            var cachedValue = cache.get("test:employee:1");
+            assertThat(cachedValue).isNotNull();
+            if (cachedValue != null) {
+                assertThat(cachedValue.get()).isEqualTo("test:employee:data");
+            }
+            
+            // Clean up test data
+            cache.evict("test:employee:1");
+        }
     }
 }
 

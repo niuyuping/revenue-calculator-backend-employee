@@ -1,6 +1,14 @@
 # Employee Management Microservice (Revenue Calculator Backend Employee)
 
-A reactive employee management system backend service based on Spring Boot 3.x, R2DBC, and WebFlux.
+A reactive employee management system backend service based on Spring Boot 3.x, R2DBC, and WebFlux with comprehensive enterprise features.
+
+## 🌐 Language Selection
+
+- 🇨🇳 [中文版 (Chinese)](README_ZH.md) - 完整的中文文档
+- 🇺🇸 **English Version** - Complete English documentation (this file)
+- 🇯🇵 [日本語版 (Japanese)](README_JA.md) - 完全な日本語文書
+
+---
 
 ## 🚀 Technology Stack
 
@@ -35,6 +43,40 @@ A reactive employee management system backend service based on Spring Boot 3.x, 
 - ✅ **Monitoring Metrics** - Complete business and performance monitoring
 - ✅ **Multi-language Documentation** - API documentation in English, Chinese, and Japanese
 
+### Enterprise Features
+
+#### 🔄 Cache & Rate Limiting
+
+- **Redis Cache Manager**: Multi-level caching strategy
+- **Cache Strategies**:
+  - Employee Info Cache: 1 hour TTL
+  - Employee List Cache: 30 minutes TTL
+  - Search Cache: 15 minutes TTL
+  - Pagination Cache: 10 minutes TTL
+- **Rate Limiting**: Different limits for different operations (20-100 requests/minute)
+
+#### 🗄️ Database Audit
+
+- **Comprehensive Audit Trail**: INSERT, UPDATE, DELETE, SELECT operations
+- **Context Tracking**: User ID, Session ID, Request ID, IP Address
+- **Data Change Tracking**: Old values, new values, field-level changes
+- **Performance Monitoring**: Execution time, affected rows
+- **Error Tracking**: Failed operations with detailed error messages
+
+#### 🔄 Transaction Management
+
+- **ACID Compliance**: R2DBC-based transaction support
+- **Automatic Transaction Management**: `@Transactional` annotation support
+- **Transaction Monitoring**: Real-time transaction tracking
+- **Performance Metrics**: Transaction execution time monitoring
+
+#### 📊 Comprehensive Logging
+
+- **Log Categories**: Application, Audit, Security, Performance, Error logs
+- **Structured Logging**: JSON format with context information
+- **Log Rotation**: Automatic log rotation and compression
+- **Retention Policies**: Different retention periods for different log types
+
 ### Data Validation
 
 - Employee number format validation (letters, numbers, underscores, hyphens)
@@ -60,27 +102,37 @@ src/
 │   ├── java/jp/asatex/revenue_calculator_backend_employee/
 │   │   ├── config/           # Configuration classes
 │   │   │   ├── CacheConfig.java
+│   │   │   ├── DatabaseAuditConfig.java
 │   │   │   ├── InternationalizationConfig.java
 │   │   │   ├── LoggingConfig.java
 │   │   │   ├── MetricsConfig.java
 │   │   │   ├── MultiLanguageOpenApiConfig.java
 │   │   │   ├── RateLimitConfig.java
 │   │   │   ├── SwaggerConfig.java
+│   │   │   ├── TransactionConfig.java
 │   │   │   └── ValidationConfig.java
 │   │   ├── controller/       # REST controllers
 │   │   │   └── EmployeeController.java
 │   │   ├── dto/             # Data Transfer Objects
 │   │   │   └── EmployeeDto.java
 │   │   ├── entity/          # Entity classes
-│   │   │   └── Employee.java
+│   │   │   ├── Employee.java
+│   │   │   └── DatabaseAuditLog.java
 │   │   ├── exception/       # Exception handling
 │   │   │   ├── GlobalExceptionHandler.java
 │   │   │   ├── EmployeeNotFoundException.java
-│   │   │   └── DuplicateEmployeeNumberException.java
+│   │   │   ├── DuplicateEmployeeNumberException.java
+│   │   │   └── TransactionException.java
 │   │   ├── repository/      # Data access layer
-│   │   │   └── EmployeeRepository.java
+│   │   │   ├── EmployeeRepository.java
+│   │   │   └── DatabaseAuditLogRepository.java
 │   │   ├── service/         # Business logic layer
-│   │   │   └── EmployeeService.java
+│   │   │   ├── EmployeeService.java
+│   │   │   ├── AuditLogService.java
+│   │   │   ├── DatabaseAuditService.java
+│   │   │   ├── CacheMonitoringService.java
+│   │   │   ├── LogMonitoringService.java
+│   │   │   └── TransactionMonitoringService.java
 │   │   ├── util/            # Utility classes
 │   │   │   └── LoggingUtil.java
 │   │   └── RevenueCalculatorBackendEmployeeApplication.java
@@ -96,7 +148,9 @@ src/
 │       └── db/migration/    # Database migration scripts
 │           ├── V1__Create_employees_table.sql
 │           ├── V2__Insert_initial_employee_data.sql
-│           └── V3__Add_constraints_to_employees_table.sql
+│           ├── V3__Add_constraints_to_employees_table.sql
+│           ├── V4__Add_soft_delete_columns.sql
+│           └── V5__Create_database_audit_logs_table.sql
 └── test/                    # Test code
     ├── java/jp/asatex/revenue_calculator_backend_employee/
     │   ├── config/          # Configuration tests
@@ -326,6 +380,41 @@ DELETE /api/v1/employee/number/{employeeNumber}
 GET /api/v1/employee/health
 ```
 
+### Monitoring Endpoints
+
+#### Cache Monitoring
+
+```http
+GET /api/v1/monitoring/cache/stats
+DELETE /api/v1/monitoring/cache/clear
+DELETE /api/v1/monitoring/cache/clear/{cacheName}
+```
+
+#### Database Audit
+
+```http
+GET /api/v1/audit/database/stats
+GET /api/v1/audit/database/logs/operation/{operationType}
+GET /api/v1/audit/database/logs/table/{tableName}
+GET /api/v1/audit/database/logs/user/{userId}
+GET /api/v1/audit/database/logs/time-range?startTime={startTime}&endTime={endTime}
+DELETE /api/v1/audit/database/logs/cleanup?retentionDays={retentionDays}
+```
+
+#### Transaction Monitoring
+
+```http
+GET /api/v1/monitoring/transaction/stats
+```
+
+#### Log Monitoring
+
+```http
+GET /api/v1/monitoring/logs/stats
+GET /api/v1/monitoring/logs/health
+POST /api/v1/monitoring/logs/reset
+```
+
 ### Error Response Format
 
 ```json
@@ -375,6 +464,10 @@ The project has comprehensive test coverage:
 - **Parameter Validation Tests** - Input validation testing
 - **Integration Tests** - End-to-end testing
 - **Configuration Tests** - Configuration class testing
+- **Cache Tests** - Cache functionality testing
+- **Rate Limiting Tests** - Rate limiting testing
+- **Transaction Tests** - Transaction management testing
+- **Audit Tests** - Database audit testing
 
 ## 🔧 Configuration
 
@@ -467,6 +560,14 @@ logging.file.name=logs/revenue-calculator-employee.log
 - `cache.hits.total` - Total cache hits
 - `cache.misses.total` - Total cache misses
 - `rate.limit.triggered.total` - Total rate limit triggers
+- `transaction.start` - Transaction start count
+- `transaction.commit` - Transaction commit count
+- `transaction.rollback` - Transaction rollback count
+- `transaction.error` - Transaction error count
+- `logs.audit` - Audit log count
+- `logs.security` - Security log count
+- `logs.performance` - Performance log count
+- `logs.error` - Error log count
 
 ## 🗄️ Database
 
@@ -482,7 +583,34 @@ CREATE TABLE employees (
     furigana VARCHAR(200),
     birthday DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
+    deleted_by VARCHAR(100)
+);
+```
+
+#### database_audit_logs table
+
+```sql
+CREATE TABLE database_audit_logs (
+    id BIGSERIAL PRIMARY KEY,
+    operation_type VARCHAR(20) NOT NULL,
+    table_name VARCHAR(100) NOT NULL,
+    record_id VARCHAR(100),
+    user_id VARCHAR(100),
+    session_id VARCHAR(100),
+    request_id VARCHAR(100),
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    old_values TEXT,
+    new_values TEXT,
+    sql_statement TEXT,
+    execution_time_ms BIGINT,
+    affected_rows INTEGER,
+    error_message TEXT,
+    operation_status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    created_by VARCHAR(100)
 );
 ```
 
@@ -501,6 +629,8 @@ The project uses Flyway for database version management:
 - `V1__Create_employees_table.sql` - Create employee table
 - `V2__Insert_initial_employee_data.sql` - Insert initial data
 - `V3__Add_constraints_to_employees_table.sql` - Add constraints
+- `V4__Add_soft_delete_columns.sql` - Add soft delete support
+- `V5__Create_database_audit_logs_table.sql` - Create audit logs table
 
 ## 🚀 Deployment
 
@@ -564,8 +694,10 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 
 ### Cache Strategy
 
-- **Employee Information Cache**: 15 minutes TTL
-- **Employee List Cache**: 5 minutes TTL
+- **Employee Information Cache**: 1 hour TTL
+- **Employee List Cache**: 30 minutes TTL
+- **Search Cache**: 15 minutes TTL
+- **Pagination Cache**: 10 minutes TTL
 - **Automatic Cache Invalidation**: Clear related cache on write operations
 
 ### Reactive Programming
@@ -579,6 +711,7 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 - Connection pool configuration
 - Query optimization
 - Index optimization
+- Comprehensive audit logging with minimal performance impact
 
 ## 🤝 Contributing
 

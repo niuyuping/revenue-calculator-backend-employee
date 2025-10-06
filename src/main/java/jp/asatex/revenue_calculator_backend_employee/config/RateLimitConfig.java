@@ -9,14 +9,14 @@ import org.springframework.context.annotation.Configuration;
 import java.time.Duration;
 
 /**
- * 限流配置类
- * 配置不同API端点的限流策略
+ * Rate limiting configuration class
+ * Configures rate limiting strategies for different API endpoints
  */
 @Configuration
 public class RateLimitConfig {
 
     /**
-     * 配置限流器注册表
+     * Configure rate limiter registry
      * @return RateLimiterRegistry
      */
     @Bean
@@ -25,23 +25,23 @@ public class RateLimitConfig {
     }
 
     /**
-     * 员工API限流器
-     * 每分钟100次请求
+     * Employee API rate limiter
+     * 100 requests per minute
      */
     @Bean("employee-api")
     public RateLimiter employeeApiRateLimiter(RateLimiterRegistry registry) {
         RateLimiterConfig config = RateLimiterConfig.custom()
-                .limitForPeriod(100) // 每个时间窗口允许的请求数
-                .limitRefreshPeriod(Duration.ofMinutes(1)) // 时间窗口大小
-                .timeoutDuration(Duration.ofSeconds(1)) // 等待时间
+                .limitForPeriod(100) // Number of requests allowed per time window
+                .limitRefreshPeriod(Duration.ofMinutes(1)) // Time window size
+                .timeoutDuration(Duration.ofSeconds(1)) // Wait time
                 .build();
 
         return registry.rateLimiter("employee-api", config);
     }
 
     /**
-     * 员工搜索API限流器
-     * 每分钟50次请求
+     * Employee search API rate limiter
+     * 50 requests per minute
      */
     @Bean("employee-search")
     public RateLimiter employeeSearchRateLimiter(RateLimiterRegistry registry) {
@@ -55,8 +55,8 @@ public class RateLimitConfig {
     }
 
     /**
-     * 员工创建API限流器
-     * 每分钟20次请求
+     * Employee creation API rate limiter
+     * 20 requests per minute
      */
     @Bean("employee-create")
     public RateLimiter employeeCreateRateLimiter(RateLimiterRegistry registry) {
@@ -70,8 +70,8 @@ public class RateLimitConfig {
     }
 
     /**
-     * 员工更新API限流器
-     * 每分钟30次请求
+     * Employee update API rate limiter
+     * 30 requests per minute
      */
     @Bean("employee-update")
     public RateLimiter employeeUpdateRateLimiter(RateLimiterRegistry registry) {
@@ -85,8 +85,8 @@ public class RateLimitConfig {
     }
 
     /**
-     * 员工删除API限流器
-     * 每分钟10次请求
+     * Employee deletion API rate limiter
+     * 10 requests per minute
      */
     @Bean("employee-delete")
     public RateLimiter employeeDeleteRateLimiter(RateLimiterRegistry registry) {
@@ -100,8 +100,8 @@ public class RateLimitConfig {
     }
 
     /**
-     * 分页查询API限流器
-     * 每分钟200次请求
+     * Pagination query API rate limiter
+     * 200 requests per minute
      */
     @Bean("employee-pagination")
     public RateLimiter employeePaginationRateLimiter(RateLimiterRegistry registry) {
@@ -115,8 +115,8 @@ public class RateLimitConfig {
     }
 
     /**
-     * 监控API限流器
-     * 每分钟10次请求
+     * Monitoring API rate limiter
+     * 10 requests per minute
      */
     @Bean("monitoring-api")
     public RateLimiter monitoringApiRateLimiter(RateLimiterRegistry registry) {
@@ -130,8 +130,8 @@ public class RateLimitConfig {
     }
 
     /**
-     * 全局API限流器
-     * 每分钟1000次请求
+     * Global API rate limiter
+     * 1000 requests per minute
      */
     @Bean("global-api")
     public RateLimiter globalApiRateLimiter(RateLimiterRegistry registry) {

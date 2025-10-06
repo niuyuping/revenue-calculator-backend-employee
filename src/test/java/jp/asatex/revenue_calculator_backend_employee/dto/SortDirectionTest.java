@@ -7,24 +7,24 @@ import org.junit.jupiter.api.Nested;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * SortDirection 测试类
+ * SortDirection test class
  */
-@DisplayName("SortDirection 测试")
+@DisplayName("SortDirection Test")
 class SortDirectionTest {
 
     @Nested
-    @DisplayName("枚举值测试")
+    @DisplayName("Enum Value Tests")
     class EnumValueTests {
 
         @Test
-        @DisplayName("ASC 应该有正确的值")
+        @DisplayName("ASC should have correct value")
         void testAscValue() {
             assertEquals("ASC", SortDirection.ASC.getValue());
             assertEquals("ASC", SortDirection.ASC.toString());
         }
 
         @Test
-        @DisplayName("DESC 应该有正确的值")
+        @DisplayName("DESC should have correct value")
         void testDescValue() {
             assertEquals("DESC", SortDirection.DESC.getValue());
             assertEquals("DESC", SortDirection.DESC.toString());
@@ -32,47 +32,47 @@ class SortDirectionTest {
     }
 
     @Nested
-    @DisplayName("fromString 方法测试")
+    @DisplayName("fromString Method Tests")
     class FromStringTests {
 
         @Test
-        @DisplayName("null 应该返回 ASC")
+        @DisplayName("null should return ASC")
         void testFromStringNull() {
             assertEquals(SortDirection.ASC, SortDirection.fromString(null));
         }
 
         @Test
-        @DisplayName("空字符串应该返回 ASC")
+        @DisplayName("empty string should return ASC")
         void testFromStringEmpty() {
             assertEquals(SortDirection.ASC, SortDirection.fromString(""));
         }
 
         @Test
-        @DisplayName("'ASC' 应该返回 ASC")
+        @DisplayName("'ASC' should return ASC")
         void testFromStringAsc() {
             assertEquals(SortDirection.ASC, SortDirection.fromString("ASC"));
         }
 
         @Test
-        @DisplayName("'asc' 应该返回 ASC")
+        @DisplayName("'asc' should return ASC")
         void testFromStringAscLowercase() {
             assertEquals(SortDirection.ASC, SortDirection.fromString("asc"));
         }
 
         @Test
-        @DisplayName("'DESC' 应该返回 DESC")
+        @DisplayName("'DESC' should return DESC")
         void testFromStringDesc() {
             assertEquals(SortDirection.DESC, SortDirection.fromString("DESC"));
         }
 
         @Test
-        @DisplayName("'desc' 应该返回 DESC")
+        @DisplayName("'desc' should return DESC")
         void testFromStringDescLowercase() {
             assertEquals(SortDirection.DESC, SortDirection.fromString("desc"));
         }
 
         @Test
-        @DisplayName("无效值应该返回 ASC")
+        @DisplayName("invalid value should return ASC")
         void testFromStringInvalid() {
             assertEquals(SortDirection.ASC, SortDirection.fromString("INVALID"));
             assertEquals(SortDirection.ASC, SortDirection.fromString("random"));
@@ -80,7 +80,7 @@ class SortDirectionTest {
         }
 
         @Test
-        @DisplayName("带空格的字符串应该正确处理")
+        @DisplayName("string with spaces should be handled correctly")
         void testFromStringWithSpaces() {
             assertEquals(SortDirection.ASC, SortDirection.fromString(" ASC "));
             assertEquals(SortDirection.DESC, SortDirection.fromString(" DESC "));

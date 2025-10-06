@@ -1,6 +1,14 @@
 # 従業員管理マイクロサービス (Revenue Calculator Backend Employee)
 
-Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業員管理システムのバックエンドサービス。
+Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業員管理システムのバックエンドサービス。包括的なエンタープライズ機能を提供します。
+
+## 🌐 言語選択
+
+- 🇨🇳 [中文版 (Chinese)](README_ZH.md) - 完整的中文文档
+- 🇺🇸 [English Version](README_EN.md) - Complete English documentation
+- 🇯🇵 **日本語版** - 完全な日本語文書（このファイル）
+
+---
 
 ## 🚀 技術スタック
 
@@ -35,6 +43,40 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 - ✅ **監視メトリクス** - 完全なビジネスとパフォーマンス監視
 - ✅ **多言語文書** - 英語、中国語、日本語のAPI文書
 
+### エンタープライズ機能
+
+#### 🔄 キャッシュとレート制限
+
+- **Redisキャッシュマネージャー**: マルチレベルキャッシュ戦略
+- **キャッシュ戦略**:
+  - 従業員情報キャッシュ: 1時間TTL
+  - 従業員リストキャッシュ: 30分TTL
+  - 検索キャッシュ: 15分TTL
+  - ページネーションキャッシュ: 10分TTL
+- **レート制限**: 異なる操作タイプに異なる制限（20-100リクエスト/分）
+
+#### 🗄️ データベース監査
+
+- **包括的監査トレイル**: INSERT、UPDATE、DELETE、SELECT操作
+- **コンテキスト追跡**: ユーザーID、セッションID、リクエストID、IPアドレス
+- **データ変更追跡**: 旧値、新値、フィールドレベル変更
+- **パフォーマンス監視**: 実行時間、影響行数
+- **エラー追跡**: 失敗操作の詳細エラーメッセージ
+
+#### 🔄 トランザクション管理
+
+- **ACID準拠**: R2DBCベースのトランザクションサポート
+- **自動トランザクション管理**: `@Transactional`アノテーションサポート
+- **トランザクション監視**: リアルタイムトランザクション追跡
+- **パフォーマンスメトリクス**: トランザクション実行時間監視
+
+#### 📊 包括的ログ
+
+- **ログカテゴリ**: アプリケーション、監査、セキュリティ、パフォーマンス、エラーログ
+- **構造化ログ**: コンテキスト情報を含むJSON形式
+- **ログローテーション**: 自動ログローテーションと圧縮
+- **保持ポリシー**: 異なるログタイプに異なる保持期間
+
 ### データ検証
 
 - 従業員番号フォーマット検証（英数字、アンダースコア、ハイフン）
@@ -60,27 +102,37 @@ src/
 │   ├── java/jp/asatex/revenue_calculator_backend_employee/
 │   │   ├── config/           # 設定クラス
 │   │   │   ├── CacheConfig.java
+│   │   │   ├── DatabaseAuditConfig.java
 │   │   │   ├── InternationalizationConfig.java
 │   │   │   ├── LoggingConfig.java
 │   │   │   ├── MetricsConfig.java
 │   │   │   ├── MultiLanguageOpenApiConfig.java
 │   │   │   ├── RateLimitConfig.java
 │   │   │   ├── SwaggerConfig.java
+│   │   │   ├── TransactionConfig.java
 │   │   │   └── ValidationConfig.java
 │   │   ├── controller/       # RESTコントローラー
 │   │   │   └── EmployeeController.java
 │   │   ├── dto/             # データ転送オブジェクト
 │   │   │   └── EmployeeDto.java
 │   │   ├── entity/          # エンティティクラス
-│   │   │   └── Employee.java
+│   │   │   ├── Employee.java
+│   │   │   └── DatabaseAuditLog.java
 │   │   ├── exception/       # 例外処理
 │   │   │   ├── GlobalExceptionHandler.java
 │   │   │   ├── EmployeeNotFoundException.java
-│   │   │   └── DuplicateEmployeeNumberException.java
+│   │   │   ├── DuplicateEmployeeNumberException.java
+│   │   │   └── TransactionException.java
 │   │   ├── repository/      # データアクセス層
-│   │   │   └── EmployeeRepository.java
+│   │   │   ├── EmployeeRepository.java
+│   │   │   └── DatabaseAuditLogRepository.java
 │   │   ├── service/         # ビジネスロジック層
-│   │   │   └── EmployeeService.java
+│   │   │   ├── EmployeeService.java
+│   │   │   ├── AuditLogService.java
+│   │   │   ├── DatabaseAuditService.java
+│   │   │   ├── CacheMonitoringService.java
+│   │   │   ├── LogMonitoringService.java
+│   │   │   └── TransactionMonitoringService.java
 │   │   ├── util/            # ユーティリティクラス
 │   │   │   └── LoggingUtil.java
 │   │   └── RevenueCalculatorBackendEmployeeApplication.java
@@ -96,7 +148,9 @@ src/
 │       └── db/migration/    # データベースマイグレーションスクリプト
 │           ├── V1__Create_employees_table.sql
 │           ├── V2__Insert_initial_employee_data.sql
-│           └── V3__Add_constraints_to_employees_table.sql
+│           ├── V3__Add_constraints_to_employees_table.sql
+│           ├── V4__Add_soft_delete_columns.sql
+│           └── V5__Create_database_audit_logs_table.sql
 └── test/                    # テストコード
     ├── java/jp/asatex/revenue_calculator_backend_employee/
     │   ├── config/          # 設定テスト
@@ -326,6 +380,41 @@ DELETE /api/v1/employee/number/{employeeNumber}
 GET /api/v1/employee/health
 ```
 
+### 監視エンドポイント
+
+#### キャッシュ監視
+
+```http
+GET /api/v1/monitoring/cache/stats
+DELETE /api/v1/monitoring/cache/clear
+DELETE /api/v1/monitoring/cache/clear/{cacheName}
+```
+
+#### データベース監査
+
+```http
+GET /api/v1/audit/database/stats
+GET /api/v1/audit/database/logs/operation/{operationType}
+GET /api/v1/audit/database/logs/table/{tableName}
+GET /api/v1/audit/database/logs/user/{userId}
+GET /api/v1/audit/database/logs/time-range?startTime={startTime}&endTime={endTime}
+DELETE /api/v1/audit/database/logs/cleanup?retentionDays={retentionDays}
+```
+
+#### トランザクション監視
+
+```http
+GET /api/v1/monitoring/transaction/stats
+```
+
+#### ログ監視
+
+```http
+GET /api/v1/monitoring/logs/stats
+GET /api/v1/monitoring/logs/health
+POST /api/v1/monitoring/logs/reset
+```
+
 ### エラーレスポンス形式
 
 ```json
@@ -375,6 +464,10 @@ GET /api/v1/employee/health
 - **パラメータ検証テスト** - 入力検証テスト
 - **統合テスト** - エンドツーエンドテスト
 - **設定テスト** - 設定クラステスト
+- **キャッシュテスト** - キャッシュ機能テスト
+- **レート制限テスト** - レート制限機能テスト
+- **トランザクションテスト** - トランザクション管理テスト
+- **監査テスト** - データベース監査テスト
 
 ## 🔧 設定
 
@@ -467,6 +560,14 @@ logging.file.name=logs/revenue-calculator-employee.log
 - `cache.hits.total` - キャッシュヒット総数
 - `cache.misses.total` - キャッシュミス総数
 - `rate.limit.triggered.total` - レート制限トリガー総数
+- `transaction.start` - トランザクション開始回数
+- `transaction.commit` - トランザクションコミット回数
+- `transaction.rollback` - トランザクションロールバック回数
+- `transaction.error` - トランザクションエラー回数
+- `logs.audit` - 監査ログ数
+- `logs.security` - セキュリティログ数
+- `logs.performance` - パフォーマンスログ数
+- `logs.error` - エラーログ数
 
 ## 🗄️ データベース
 
@@ -482,7 +583,34 @@ CREATE TABLE employees (
     furigana VARCHAR(200),
     birthday DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
+    deleted_by VARCHAR(100)
+);
+```
+
+#### database_audit_logsテーブル
+
+```sql
+CREATE TABLE database_audit_logs (
+    id BIGSERIAL PRIMARY KEY,
+    operation_type VARCHAR(20) NOT NULL,
+    table_name VARCHAR(100) NOT NULL,
+    record_id VARCHAR(100),
+    user_id VARCHAR(100),
+    session_id VARCHAR(100),
+    request_id VARCHAR(100),
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    old_values TEXT,
+    new_values TEXT,
+    sql_statement TEXT,
+    execution_time_ms BIGINT,
+    affected_rows INTEGER,
+    error_message TEXT,
+    operation_status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    created_by VARCHAR(100)
 );
 ```
 
@@ -501,6 +629,8 @@ CREATE TABLE employees (
 - `V1__Create_employees_table.sql` - 従業員テーブル作成
 - `V2__Insert_initial_employee_data.sql` - 初期データ挿入
 - `V3__Add_constraints_to_employees_table.sql` - 制約追加
+- `V4__Add_soft_delete_columns.sql` - ソフト削除サポート追加
+- `V5__Create_database_audit_logs_table.sql` - 監査ログテーブル作成
 
 ## 🚀 デプロイ
 
@@ -564,8 +694,10 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 
 ### キャッシュ戦略
 
-- **従業員情報キャッシュ**: 15分TTL
-- **従業員リストキャッシュ**: 5分TTL
+- **従業員情報キャッシュ**: 1時間TTL
+- **従業員リストキャッシュ**: 30分TTL
+- **検索キャッシュ**: 15分TTL
+- **ページネーションキャッシュ**: 10分TTL
 - **自動キャッシュ無効化**: 書き込み操作時の関連キャッシュクリア
 
 ### リアクティブプログラミング
@@ -579,6 +711,7 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 - 接続プール設定
 - クエリ最適化
 - インデックス最適化
+- 包括的監査ログ、最小限のパフォーマンス影響
 
 ## 🤝 貢献
 

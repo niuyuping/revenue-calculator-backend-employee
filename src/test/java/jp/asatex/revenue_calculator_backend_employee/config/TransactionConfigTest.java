@@ -14,13 +14,13 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * TransactionConfig 测试类
+ * TransactionConfig test class
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
                 properties = {"spring.flyway.enabled=false"})
 @ActiveProfiles("test")
 @Import(jp.asatex.revenue_calculator_backend_employee.config.TestConfig.class)
-@DisplayName("TransactionConfig テスト")
+@DisplayName("TransactionConfig Test")
 class TransactionConfigTest {
 
     @Autowired
@@ -33,26 +33,26 @@ class TransactionConfigTest {
     private ConnectionFactory connectionFactory;
 
     @Test
-    @DisplayName("事务管理器应该正确配置")
+    @DisplayName("Transaction manager should be configured correctly")
     void testTransactionManagerConfiguration() {
         assertThat(transactionManager).isNotNull();
         assertThat(transactionManager).isInstanceOf(R2dbcTransactionManager.class);
     }
 
     @Test
-    @DisplayName("事务操作器应该正确配置")
+    @DisplayName("Transaction operator should be configured correctly")
     void testTransactionalOperatorConfiguration() {
         assertThat(transactionalOperator).isNotNull();
     }
 
     @Test
-    @DisplayName("连接工厂应该正确注入")
+    @DisplayName("Connection factory should be injected correctly")
     void testConnectionFactoryInjection() {
         assertThat(connectionFactory).isNotNull();
     }
 
     @Test
-    @DisplayName("事务管理器应该使用正确的连接工厂")
+    @DisplayName("Transaction manager should use correct connection factory")
     void testTransactionManagerUsesCorrectConnectionFactory() {
         R2dbcTransactionManager r2dbcTransactionManager = (R2dbcTransactionManager) transactionManager;
         assertThat(r2dbcTransactionManager.getConnectionFactory()).isSameAs(connectionFactory);

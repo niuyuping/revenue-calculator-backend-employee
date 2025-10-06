@@ -8,14 +8,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * LogMonitoringService 测试类
+ * LogMonitoringService test class
  */
-@DisplayName("LogMonitoringService テスト")
+@DisplayName("LogMonitoringService Test")
 class LogMonitoringServiceTest {
 
     private LogMonitoringService logMonitoringService;
@@ -28,91 +26,91 @@ class LogMonitoringServiceTest {
     }
 
     @Test
-    @DisplayName("记录审计日志应该正确工作")
+    @DisplayName("Recording audit logs should work correctly")
     void testRecordAuditLog() {
-        // 记录审计日志
+        // Record audit log
         logMonitoringService.recordAuditLog("CREATE", "Employee");
         logMonitoringService.recordAuditLog("UPDATE", "Employee");
 
-        // 验证计数器增加
+        // Verify counter increment
         Counter counter = meterRegistry.find("logs.audit").counter();
         assertThat(counter).isNotNull();
         assertThat(counter.count()).isEqualTo(2.0);
     }
 
     @Test
-    @DisplayName("记录安全日志应该正确工作")
+    @DisplayName("Recording security logs should work correctly")
     void testRecordSecurityLog() {
-        // 记录安全日志
+        // Record security log
         logMonitoringService.recordSecurityLog("LOGIN_FAILED", "HIGH");
         logMonitoringService.recordSecurityLog("UNAUTHORIZED_ACCESS", "CRITICAL");
 
-        // 验证计数器增加
+        // Verify counter increment
         Counter counter = meterRegistry.find("logs.security").counter();
         assertThat(counter).isNotNull();
         assertThat(counter.count()).isEqualTo(2.0);
     }
 
     @Test
-    @DisplayName("记录性能日志应该正确工作")
+    @DisplayName("Recording performance logs should work correctly")
     void testRecordPerformanceLog() {
-        // 记录性能日志
+        // Record performance log
         logMonitoringService.recordPerformanceLog("CREATE_EMPLOYEE", 150);
         logMonitoringService.recordPerformanceLog("UPDATE_EMPLOYEE", 200);
 
-        // 验证计数器增加
+        // Verify counter increment
         Counter counter = meterRegistry.find("logs.performance").counter();
         assertThat(counter).isNotNull();
         assertThat(counter.count()).isEqualTo(2.0);
 
-        // 验证计时器记录
+        // Verify timer recording
         Timer timer = meterRegistry.find("logs.processing.duration").timer();
         assertThat(timer).isNotNull();
         assertThat(timer.count()).isEqualTo(2);
     }
 
     @Test
-    @DisplayName("记录错误日志应该正确工作")
+    @DisplayName("Recording error logs should work correctly")
     void testRecordErrorLog() {
-        // 记录错误日志
+        // Record error log
         logMonitoringService.recordErrorLog("VALIDATION_ERROR", "EmployeeService");
         logMonitoringService.recordErrorLog("BUSINESS_ERROR", "EmployeeService");
 
-        // 验证计数器增加
+        // Verify counter increment
         Counter counter = meterRegistry.find("logs.error").counter();
         assertThat(counter).isNotNull();
         assertThat(counter.count()).isEqualTo(2.0);
     }
 
     @Test
-    @DisplayName("记录请求日志应该正确工作")
+    @DisplayName("Recording request logs should work correctly")
     void testRecordRequestLog() {
-        // 记录请求日志
+        // Record request log
         logMonitoringService.recordRequestLog("POST", "/api/v1/employee", 201);
         logMonitoringService.recordRequestLog("GET", "/api/v1/employee/1", 200);
 
-        // 验证计数器增加
+        // Verify counter increment
         Counter counter = meterRegistry.find("logs.request").counter();
         assertThat(counter).isNotNull();
         assertThat(counter.count()).isEqualTo(2.0);
     }
 
     @Test
-    @DisplayName("记录应用日志应该正确工作")
+    @DisplayName("Recording application logs should work correctly")
     void testRecordApplicationLog() {
-        // 记录应用日志
+        // Record application log
         logMonitoringService.recordApplicationLog("INFO", "EmployeeService");
         logMonitoringService.recordApplicationLog("DEBUG", "EmployeeRepository");
 
-        // 验证统计信息
+        // Verify statistics
         LogMonitoringService.LogStats stats = logMonitoringService.getLogStats();
         assertThat(stats.getLogCounts().get("APPLICATION")).isEqualTo(2);
     }
 
     @Test
-    @DisplayName("获取日志统计信息应该正确工作")
+    @DisplayName("Getting log statistics should work correctly")
     void testGetLogStats() {
-        // 执行一些操作
+        // Execute some operations
         logMonitoringService.recordAuditLog("CREATE", "Employee");
         logMonitoringService.recordSecurityLog("LOGIN_FAILED", "HIGH");
         logMonitoringService.recordPerformanceLog("CREATE_EMPLOYEE", 150);
@@ -120,7 +118,7 @@ class LogMonitoringServiceTest {
         logMonitoringService.recordRequestLog("POST", "/api/v1/employee", 201);
         logMonitoringService.recordApplicationLog("INFO", "EmployeeService");
 
-        // 获取统计信息
+        // Get statistics
         LogMonitoringService.LogStats stats = logMonitoringService.getLogStats();
 
         assertThat(stats).isNotNull();
@@ -136,30 +134,30 @@ class LogMonitoringServiceTest {
     }
 
     @Test
-    @DisplayName("重置日志统计信息应该正确工作")
+    @DisplayName("Resetting log statistics should work correctly")
     void testResetLogStats() {
-        // 执行一些操作
+        // Execute some operations
         logMonitoringService.recordAuditLog("CREATE", "Employee");
         logMonitoringService.recordErrorLog("VALIDATION_ERROR", "EmployeeService");
 
-        // 验证统计信息
+        // Verify statistics
         LogMonitoringService.LogStats statsBefore = logMonitoringService.getLogStats();
         assertThat(statsBefore.getTotalLogs()).isEqualTo(2);
         assertThat(statsBefore.getTotalErrors()).isEqualTo(1);
 
-        // 重置统计信息
+        // Reset statistics
         logMonitoringService.resetLogStats();
 
-        // 验证重置后的统计信息
+        // Verify statistics after reset
         LogMonitoringService.LogStats statsAfter = logMonitoringService.getLogStats();
         assertThat(statsAfter.getTotalLogs()).isEqualTo(0);
         assertThat(statsAfter.getTotalErrors()).isEqualTo(0);
     }
 
     @Test
-    @DisplayName("获取日志健康状态应该正确工作")
+    @DisplayName("Getting log health status should work correctly")
     void testGetLogHealthStatus() {
-        // 测试健康状态
+        // Test health status
         logMonitoringService.recordAuditLog("CREATE", "Employee");
         logMonitoringService.recordAuditLog("UPDATE", "Employee");
         logMonitoringService.recordAuditLog("DELETE", "Employee");
@@ -173,9 +171,9 @@ class LogMonitoringServiceTest {
     }
 
     @Test
-    @DisplayName("高错误率时应该返回警告状态")
+    @DisplayName("Should return warning status when error rate is high")
     void testGetLogHealthStatusWithHighErrorRate() {
-        // 记录大量日志，其中包含一些错误
+        // Record many logs, including some errors
         for (int i = 0; i < 10; i++) {
             logMonitoringService.recordAuditLog("CREATE", "Employee");
         }
@@ -191,7 +189,7 @@ class LogMonitoringServiceTest {
     }
 
     @Test
-    @DisplayName("日志统计信息toString应该正确格式化")
+    @DisplayName("Log statistics toString should format correctly")
     void testLogStatsToString() {
         logMonitoringService.recordAuditLog("CREATE", "Employee");
         logMonitoringService.recordErrorLog("VALIDATION_ERROR", "EmployeeService");
@@ -206,7 +204,7 @@ class LogMonitoringServiceTest {
     }
 
     @Test
-    @DisplayName("日志健康状态toString应该正确格式化")
+    @DisplayName("Log health status toString should format correctly")
     void testLogHealthStatusToString() {
         logMonitoringService.recordAuditLog("CREATE", "Employee");
 

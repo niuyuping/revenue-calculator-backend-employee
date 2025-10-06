@@ -12,47 +12,47 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 
 /**
- * 统一的Jackson配置类
- * 集中管理所有JSON序列化配置，确保一致性
+ * Unified Jackson configuration class
+ * Centralized management of all JSON serialization configurations to ensure consistency
  */
 @Configuration
 public class JacksonConfig {
 
     /**
-     * 创建统一的ObjectMapper Bean
-     * 支持Java 8时间类型，用于所有JSON序列化场景
+     * Create unified ObjectMapper Bean
+     * Supports Java 8 time types for all JSON serialization scenarios
      */
     @Bean
     @Primary
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         
-        // 注册JSR-310模块以支持Java 8时间类型
+        // Register JSR-310 module to support Java 8 time types
         mapper.registerModule(new JavaTimeModule());
         
-        // 禁用时间戳格式，使用ISO-8601格式
+        // Disable timestamp format, use ISO-8601 format
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         
-        // 忽略未知属性
+        // Ignore unknown properties
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         
-        // 允许空Bean序列化
+        // Allow empty Bean serialization
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         
         return mapper;
     }
 
     /**
-     * 创建支持JSR310的Redis序列化器
-     * 使用统一的ObjectMapper确保缓存序列化的一致性
-     * 配置类型信息以支持正确的反序列化
+     * Create JSR310-compatible Redis serializer
+     * Uses unified ObjectMapper to ensure consistency of cache serialization
+     * Configures type information to support correct deserialization
      */
     @Bean
     public GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer(ObjectMapper objectMapper) {
-        // 创建专门用于Redis的ObjectMapper
+        // Create ObjectMapper specifically for Redis
         ObjectMapper redisObjectMapper = objectMapper.copy();
         
-        // 启用类型信息以支持正确的反序列化
+        // Enable type information to support correct deserialization
         redisObjectMapper.activateDefaultTyping(
             LaissezFaireSubTypeValidator.instance,
             ObjectMapper.DefaultTyping.NON_FINAL,

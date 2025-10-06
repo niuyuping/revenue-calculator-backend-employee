@@ -15,21 +15,21 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * EmployeeDtoの単体テスト
- * すべてのgetter/setter、コンストラクタ、equals/hashCode/toStringメソッドをテスト
+ * Unit test for EmployeeDto
+ * Tests all getter/setter, constructor, equals/hashCode/toString methods
  */
-@DisplayName("EmployeeDto テスト")
+@DisplayName("EmployeeDto Test")
 class EmployeeDtoTest {
 
     private final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = factory.getValidator();
 
     @Nested
-    @DisplayName("コンストラクタテスト")
+    @DisplayName("Constructor Test")
     class ConstructorTests {
 
         @Test
-        @DisplayName("デフォルトコンストラクタでオブジェクトが作成される")
+        @DisplayName("Object is created with default constructor")
         void testDefaultConstructor() {
             // When
             EmployeeDto dto = new EmployeeDto();
@@ -44,13 +44,13 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("全パラメータコンストラクタでオブジェクトが作成される")
+        @DisplayName("Object is created with all parameters constructor")
         void testAllArgsConstructor() {
             // Given
             Long employeeId = 1L;
             String employeeNumber = "EMP001";
-            String name = "田中太郎";
-            String furigana = "たなかたろう";
+            String name = "Tanaka Taro";
+            String furigana = "tanaka taro";
             LocalDate birthday = LocalDate.of(1990, 5, 15);
 
             // When
@@ -66,7 +66,7 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("nullパラメータでコンストラクタが動作する")
+        @DisplayName("Constructor works with null parameters")
         void testAllArgsConstructorWithNulls() {
             // When
             EmployeeDto dto = new EmployeeDto(null, null, null, null, null);
@@ -82,11 +82,11 @@ class EmployeeDtoTest {
     }
 
     @Nested
-    @DisplayName("Getter/Setterテスト")
+    @DisplayName("Getter/Setter Test")
     class GetterSetterTests {
 
         @Test
-        @DisplayName("employeeIdのgetter/setterが正常に動作する")
+        @DisplayName("employeeId getter/setter works correctly")
         void testEmployeeIdGetterSetter() {
             // Given
             EmployeeDto dto = new EmployeeDto();
@@ -100,7 +100,7 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("employeeNumberのgetter/setterが正常に動作する")
+        @DisplayName("employeeNumber getter/setter works correctly")
         void testEmployeeNumberGetterSetter() {
             // Given
             EmployeeDto dto = new EmployeeDto();
@@ -114,11 +114,11 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("nameのgetter/setterが正常に動作する")
+        @DisplayName("name getter/setter works correctly")
         void testNameGetterSetter() {
             // Given
             EmployeeDto dto = new EmployeeDto();
-            String name = "山田太郎";
+            String name = "Yamada Taro";
 
             // When
             dto.setName(name);
@@ -128,11 +128,11 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("furiganaのgetter/setterが正常に動作する")
+        @DisplayName("furigana getter/setter works correctly")
         void testFuriganaGetterSetter() {
             // Given
             EmployeeDto dto = new EmployeeDto();
-            String furigana = "やまだたろう";
+            String furigana = "yamada taro";
 
             // When
             dto.setFurigana(furigana);
@@ -142,7 +142,7 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("birthdayのgetter/setterが正常に動作する")
+        @DisplayName("birthday getter/setter works correctly")
         void testBirthdayGetterSetter() {
             // Given
             EmployeeDto dto = new EmployeeDto();
@@ -156,10 +156,10 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("null値のsetterが正常に動作する")
+        @DisplayName("null value setter works correctly")
         void testNullValueSetters() {
             // Given
-            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "田中太郎", "たなかたろう", LocalDate.now());
+            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.now());
 
             // When
             dto.setEmployeeId(null);
@@ -178,15 +178,15 @@ class EmployeeDtoTest {
     }
 
     @Nested
-    @DisplayName("equals/hashCodeテスト")
+    @DisplayName("equals/hashCode Test")
     class EqualsHashCodeTests {
 
         @Test
-        @DisplayName("同じ内容のオブジェクトは等しい")
+        @DisplayName("Objects with same content are equal")
         void testEqualsWithSameContent() {
             // Given
-            EmployeeDto dto1 = new EmployeeDto(1L, "EMP001", "田中太郎", "たなかたろう", LocalDate.of(1990, 5, 15));
-            EmployeeDto dto2 = new EmployeeDto(1L, "EMP001", "田中太郎", "たなかたろう", LocalDate.of(1990, 5, 15));
+            EmployeeDto dto1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
+            EmployeeDto dto2 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
 
             // When & Then
             assertEquals(dto1, dto2);
@@ -194,11 +194,11 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("異なる内容のオブジェクトは等しくない")
+        @DisplayName("Objects with different content are not equal")
         void testEqualsWithDifferentContent() {
             // Given
-            EmployeeDto dto1 = new EmployeeDto(1L, "EMP001", "田中太郎", "たなかたろう", LocalDate.of(1990, 5, 15));
-            EmployeeDto dto2 = new EmployeeDto(2L, "EMP002", "佐藤花子", "さとうはなこ", LocalDate.of(1985, 12, 3));
+            EmployeeDto dto1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
+            EmployeeDto dto2 = new EmployeeDto(2L, "EMP002", "Sato Hanako", "sato hanako", LocalDate.of(1985, 12, 3));
 
             // When & Then
             assertNotEquals(dto1, dto2);
@@ -206,7 +206,7 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("null値を含むオブジェクトの比較が正常に動作する")
+        @DisplayName("Comparison of objects containing null values works correctly")
         void testEqualsWithNullValues() {
             // Given
             EmployeeDto dto1 = new EmployeeDto(null, null, null, null, null);
@@ -218,30 +218,30 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("自分自身との比較は等しい")
+        @DisplayName("Comparison with self is equal")
         void testEqualsWithSelf() {
             // Given
-            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "田中太郎", "たなかたろう", LocalDate.of(1990, 5, 15));
+            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
 
             // When & Then
             assertEquals(dto, dto);
         }
 
         @Test
-        @DisplayName("nullとの比較は等しくない")
+        @DisplayName("Comparison with null is not equal")
         void testEqualsWithNull() {
             // Given
-            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "田中太郎", "たなかたろう", LocalDate.of(1990, 5, 15));
+            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
 
             // When & Then
             assertNotEquals(dto, null);
         }
 
         @Test
-        @DisplayName("異なるクラスとの比較は等しくない")
+        @DisplayName("Comparison with different class is not equal")
         void testEqualsWithDifferentClass() {
             // Given
-            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "田中太郎", "たなかたろう", LocalDate.of(1990, 5, 15));
+            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
             String otherObject = "not an EmployeeDto";
 
             // When & Then
@@ -249,11 +249,11 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("一部のフィールドが異なる場合の比較")
+        @DisplayName("Comparison when some fields are different")
         void testEqualsWithPartialDifferences() {
             // Given
-            EmployeeDto dto1 = new EmployeeDto(1L, "EMP001", "田中太郎", "たなかたろう", LocalDate.of(1990, 5, 15));
-            EmployeeDto dto2 = new EmployeeDto(1L, "EMP001", "田中太郎", "たなかたろう", LocalDate.of(1990, 5, 16)); // birthdayが異なる
+            EmployeeDto dto1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
+            EmployeeDto dto2 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 16)); // birthday is different
 
             // When & Then
             assertNotEquals(dto1, dto2);
@@ -261,14 +261,14 @@ class EmployeeDtoTest {
     }
 
     @Nested
-    @DisplayName("toStringテスト")
+    @DisplayName("toString Test")
     class ToStringTests {
 
         @Test
-        @DisplayName("toStringが正しい形式で出力される")
+        @DisplayName("toString outputs in correct format")
         void testToString() {
             // Given
-            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "田中太郎", "たなかたろう", LocalDate.of(1990, 5, 15));
+            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
 
             // When
             String result = dto.toString();
@@ -278,13 +278,13 @@ class EmployeeDtoTest {
             assertTrue(result.contains("EmployeeDto"));
             assertTrue(result.contains("employeeId=1"));
             assertTrue(result.contains("employeeNumber='EMP001'"));
-            assertTrue(result.contains("name='田中太郎'"));
-            assertTrue(result.contains("furigana='たなかたろう'"));
+            assertTrue(result.contains("name='Tanaka Taro'"));
+            assertTrue(result.contains("furigana='tanaka taro'"));
             assertTrue(result.contains("birthday=1990-05-15"));
         }
 
         @Test
-        @DisplayName("null値を含むtoStringが正常に動作する")
+        @DisplayName("toString with null values works correctly")
         void testToStringWithNullValues() {
             // Given
             EmployeeDto dto = new EmployeeDto(null, null, null, null, null);
@@ -304,17 +304,17 @@ class EmployeeDtoTest {
     }
 
     @Nested
-    @DisplayName("バリデーションテスト")
+    @DisplayName("Validation Test")
     class ValidationTests {
 
         @Test
-        @DisplayName("有効なデータでバリデーションが通る")
+        @DisplayName("Validation passes with valid data")
         void testValidData() {
             // Given
             EmployeeDto dto = new EmployeeDto();
             dto.setEmployeeNumber("EMP001");
-            dto.setName("田中太郎");
-            dto.setFurigana("たなかたろう");
+            dto.setName("Tanaka Taro");
+            dto.setFurigana("tanaka taro");
             dto.setBirthday(LocalDate.of(1990, 5, 15));
 
             // When
@@ -325,12 +325,12 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("employeeNumberが空の場合バリデーションエラー")
+        @DisplayName("Validation error when employeeNumber is empty")
         void testEmptyEmployeeNumber() {
             // Given
             EmployeeDto dto = new EmployeeDto();
             dto.setEmployeeNumber("");
-            dto.setName("田中太郎");
+            dto.setName("Tanaka Taro");
 
             // When
             Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(dto);
@@ -341,11 +341,11 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("employeeNumberがnullの場合バリデーションエラー")
+        @DisplayName("Validation error when employeeNumber is null")
         void testNullEmployeeNumber() {
             // Given
             EmployeeDto dto = new EmployeeDto();
-            dto.setName("田中太郎");
+            dto.setName("Tanaka Taro");
 
             // When
             Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(dto);
@@ -356,12 +356,12 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("employeeNumberが長すぎる場合バリデーションエラー")
+        @DisplayName("Validation error when employeeNumber is too long")
         void testTooLongEmployeeNumber() {
             // Given
             EmployeeDto dto = new EmployeeDto();
-            dto.setEmployeeNumber("A".repeat(21)); // 21文字
-            dto.setName("田中太郎");
+            dto.setEmployeeNumber("A".repeat(21)); // 21 characters
+            dto.setName("Tanaka Taro");
 
             // When
             Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(dto);
@@ -372,12 +372,12 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("employeeNumberに無効な文字が含まれる場合バリデーションエラー")
+        @DisplayName("Validation error when employeeNumber contains invalid characters")
         void testInvalidEmployeeNumber() {
             // Given
             EmployeeDto dto = new EmployeeDto();
-            dto.setEmployeeNumber("EMP@001"); // @は無効
-            dto.setName("田中太郎");
+            dto.setEmployeeNumber("EMP@001"); // @ is invalid
+            dto.setName("Tanaka Taro");
 
             // When
             Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(dto);
@@ -388,7 +388,7 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("nameが空の場合バリデーションエラー")
+        @DisplayName("Validation error when name is empty")
         void testEmptyName() {
             // Given
             EmployeeDto dto = new EmployeeDto();
@@ -404,12 +404,12 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("nameが長すぎる場合バリデーションエラー")
+        @DisplayName("Validation error when name is too long")
         void testTooLongName() {
             // Given
             EmployeeDto dto = new EmployeeDto();
             dto.setEmployeeNumber("EMP001");
-            dto.setName("A".repeat(101)); // 101文字
+            dto.setName("A".repeat(101)); // 101 characters
 
             // When
             Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(dto);
@@ -420,13 +420,13 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("furiganaが長すぎる場合バリデーションエラー")
+        @DisplayName("Validation error when furigana is too long")
         void testTooLongFurigana() {
             // Given
             EmployeeDto dto = new EmployeeDto();
             dto.setEmployeeNumber("EMP001");
-            dto.setName("田中太郎");
-            dto.setFurigana("あ".repeat(201)); // 201文字
+            dto.setName("Tanaka Taro");
+            dto.setFurigana("a".repeat(201)); // 201 characters
 
             // When
             Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(dto);
@@ -437,13 +437,13 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("furiganaに無効な文字が含まれる場合バリデーションエラー")
+        @DisplayName("Validation error when furigana contains invalid characters")
         void testInvalidFurigana() {
             // Given
             EmployeeDto dto = new EmployeeDto();
             dto.setEmployeeNumber("EMP001");
-            dto.setName("田中太郎");
-            dto.setFurigana("たなか@たろう"); // @は無効
+            dto.setName("Tanaka Taro");
+            dto.setFurigana("tanaka@taro"); // @ is invalid
 
             // When
             Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(dto);
@@ -454,13 +454,13 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("birthdayが未来の日付の場合バリデーションエラー")
+        @DisplayName("Validation error when birthday is future date")
         void testFutureBirthday() {
             // Given
             EmployeeDto dto = new EmployeeDto();
             dto.setEmployeeNumber("EMP001");
-            dto.setName("田中太郎");
-            dto.setBirthday(LocalDate.now().plusDays(1)); // 未来の日付
+            dto.setName("Tanaka Taro");
+            dto.setBirthday(LocalDate.now().plusDays(1)); // Future date
 
             // When
             Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(dto);
@@ -471,12 +471,12 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("furiganaがnullの場合はバリデーションエラーにならない")
+        @DisplayName("Null furigana should not cause validation error")
         void testNullFuriganaIsValid() {
             // Given
             EmployeeDto dto = new EmployeeDto();
             dto.setEmployeeNumber("EMP001");
-            dto.setName("田中太郎");
+            dto.setName("Tanaka Taro");
             dto.setFurigana(null);
 
             // When
@@ -487,12 +487,12 @@ class EmployeeDtoTest {
         }
 
         @Test
-        @DisplayName("birthdayがnullの場合はバリデーションエラーにならない")
+        @DisplayName("Null birthday should not cause validation error")
         void testNullBirthdayIsValid() {
             // Given
             EmployeeDto dto = new EmployeeDto();
             dto.setEmployeeNumber("EMP001");
-            dto.setName("田中太郎");
+            dto.setName("Tanaka Taro");
             dto.setBirthday(null);
 
             // When

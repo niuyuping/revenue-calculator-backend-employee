@@ -16,8 +16,8 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * EmployeeRepositoryテスト
- * データベース操作とカスタムクエリをテスト
+ * EmployeeRepository test
+ * Tests database operations and custom queries
  */
 @DataR2dbcTest
 @ActiveProfiles("test")
@@ -32,20 +32,20 @@ class EmployeeRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // テストデータのクリーンアップ
+        // Clean up test data
         employeeRepository.deleteAll().block();
 
-        // テストデータの作成
+        // Create test data
         testEmployee1 = new Employee();
         testEmployee1.setEmployeeNumber("EMP001");
-        testEmployee1.setName("田中太郎");
-        testEmployee1.setFurigana("タナカタロウ");
+        testEmployee1.setName("Tanaka Taro");
+        testEmployee1.setFurigana("tanaka taro");
         testEmployee1.setBirthday(LocalDate.of(1990, 5, 15));
 
         testEmployee2 = new Employee();
         testEmployee2.setEmployeeNumber("EMP002");
-        testEmployee2.setName("佐藤花子");
-        testEmployee2.setFurigana("サトウハナコ");
+        testEmployee2.setName("Sato Hanako");
+        testEmployee2.setFurigana("sato hanako");
         testEmployee2.setBirthday(LocalDate.of(1985, 8, 20));
     }
 
@@ -59,8 +59,8 @@ class EmployeeRepositoryTest {
                 .assertNext(employee -> {
                     assertThat(employee.getEmployeeId()).isNotNull();
                     assertThat(employee.getEmployeeNumber()).isEqualTo("EMP001");
-                    assertThat(employee.getName()).isEqualTo("田中太郎");
-                    assertThat(employee.getFurigana()).isEqualTo("タナカタロウ");
+                    assertThat(employee.getName()).isEqualTo("Tanaka Taro");
+                    assertThat(employee.getFurigana()).isEqualTo("tanaka taro");
                     assertThat(employee.getBirthday()).isEqualTo(LocalDate.of(1990, 5, 15));
                 })
                 .verifyComplete();
@@ -78,7 +78,7 @@ class EmployeeRepositoryTest {
         StepVerifier.create(result)
                 .assertNext(employee -> {
                     assertThat(employee.getEmployeeNumber()).isEqualTo("EMP001");
-                    assertThat(employee.getName()).isEqualTo("田中太郎");
+                    assertThat(employee.getName()).isEqualTo("Tanaka Taro");
                 })
                 .verifyComplete();
     }
@@ -105,7 +105,7 @@ class EmployeeRepositoryTest {
         StepVerifier.create(result)
                 .assertNext(employee -> {
                     assertThat(employee.getEmployeeNumber()).isEqualTo("EMP001");
-                    assertThat(employee.getName()).isEqualTo("田中太郎");
+                    assertThat(employee.getName()).isEqualTo("Tanaka Taro");
                 })
                 .verifyComplete();
     }
@@ -127,12 +127,12 @@ class EmployeeRepositoryTest {
         employeeRepository.save(testEmployee2).block();
 
         // When
-        Flux<Employee> result = employeeRepository.findByNameContaining("%田中%");
+        Flux<Employee> result = employeeRepository.findByNameContaining("%Tanaka%");
 
         // Then
         StepVerifier.create(result)
                 .assertNext(employee -> {
-                    assertThat(employee.getName()).contains("田中");
+                    assertThat(employee.getName()).contains("Tanaka");
                     assertThat(employee.getEmployeeNumber()).isEqualTo("EMP001");
                 })
                 .verifyComplete();
@@ -144,7 +144,7 @@ class EmployeeRepositoryTest {
         employeeRepository.save(testEmployee1).block();
 
         // When
-        Flux<Employee> result = employeeRepository.findByNameContaining("山田");
+        Flux<Employee> result = employeeRepository.findByNameContaining("Yamada");
 
         // Then
         StepVerifier.create(result)
@@ -158,12 +158,12 @@ class EmployeeRepositoryTest {
         employeeRepository.save(testEmployee2).block();
 
         // When
-        Flux<Employee> result = employeeRepository.findByFuriganaContaining("%タナカ%");
+        Flux<Employee> result = employeeRepository.findByFuriganaContaining("%tanaka%");
 
         // Then
         StepVerifier.create(result)
                 .assertNext(employee -> {
-                    assertThat(employee.getFurigana()).contains("タナカ");
+                    assertThat(employee.getFurigana()).contains("tanaka");
                     assertThat(employee.getEmployeeNumber()).isEqualTo("EMP001");
                 })
                 .verifyComplete();
@@ -175,7 +175,7 @@ class EmployeeRepositoryTest {
         employeeRepository.save(testEmployee1).block();
 
         // When
-        Flux<Employee> result = employeeRepository.findByFuriganaContaining("%ヤマダ%");
+        Flux<Employee> result = employeeRepository.findByFuriganaContaining("%yamada%");
 
         // Then
         StepVerifier.create(result)
@@ -304,8 +304,8 @@ class EmployeeRepositoryTest {
     void updateEmployee_ShouldUpdateEmployee() {
         // Given
         Employee savedEmployee = employeeRepository.save(testEmployee1).block();
-        savedEmployee.setName("田中太郎（更新）");
-        savedEmployee.setFurigana("タナカタロウ（コウシン）");
+        savedEmployee.setName("Tanaka Taro (Updated)");
+        savedEmployee.setFurigana("tanaka taro (updated)");
 
         // When
         Mono<Employee> result = employeeRepository.save(savedEmployee);
@@ -313,8 +313,8 @@ class EmployeeRepositoryTest {
         // Then
         StepVerifier.create(result)
                 .assertNext(employee -> {
-                    assertThat(employee.getName()).isEqualTo("田中太郎（更新）");
-                    assertThat(employee.getFurigana()).isEqualTo("タナカタロウ（コウシン）");
+                    assertThat(employee.getName()).isEqualTo("Tanaka Taro (Updated)");
+                    assertThat(employee.getFurigana()).isEqualTo("tanaka taro (updated)");
                     assertThat(employee.getEmployeeId()).isEqualTo(savedEmployee.getEmployeeId());
                 })
                 .verifyComplete();

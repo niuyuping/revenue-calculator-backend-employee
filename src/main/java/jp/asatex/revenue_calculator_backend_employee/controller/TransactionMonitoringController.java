@@ -12,24 +12,24 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 /**
- * 事务监控控制器
- * 提供事务统计信息的API端点
+ * Transaction monitoring controller
+ * Provides API endpoints for transaction statistics
  */
 @RestController
 @RequestMapping("/api/v1/monitoring")
-@Tag(name = "事务监控", description = "事务监控和统计信息API")
+@Tag(name = "Transaction Monitoring", description = "Transaction monitoring and statistics API")
 public class TransactionMonitoringController {
 
     @Autowired
     private TransactionMonitoringService transactionMonitoringService;
 
     /**
-     * 获取事务统计信息
-     * @return 事务统计信息
+     * Get transaction statistics
+     * @return Transaction statistics information
      */
     @GetMapping(value = "/transaction/stats", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "获取事务统计信息", description = "返回当前系统的事务统计信息，包括开始、提交、回滚和错误次数")
+    @Operation(summary = "Get transaction statistics", description = "Returns current system transaction statistics including start, commit, rollback and error counts")
     public Mono<TransactionMonitoringService.TransactionStats> getTransactionStats() {
         return Mono.just(transactionMonitoringService.getTransactionStats());
     }

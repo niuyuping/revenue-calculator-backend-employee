@@ -8,40 +8,40 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- * Employeeデータ転送オブジェクト
- * APIリクエストとレスポンスに使用
+ * Employee data transfer object
+ * Used for API requests and responses
  */
-@Schema(description = "従業員情報")
+@Schema(description = "Employee information")
 public class EmployeeDto {
     
-    @Schema(description = "従業員ID", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "Employee ID", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private Long employeeId;
     
-    @Schema(description = "従業員番号", example = "EMP001", required = true)
-    @NotBlank(message = "従業員番号は空にできません")
-    @Size(min = 1, max = 20, message = "従業員番号の長さは1-20文字の間である必要があります")
-    @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "従業員番号は英字、数字、アンダースコア、ハイフンのみを含むことができます")
+    @Schema(description = "Employee number", example = "EMP001", required = true)
+    @NotBlank(message = "Employee number cannot be empty")
+    @Size(min = 1, max = 20, message = "Employee number length must be between 1-20 characters")
+    @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "Employee number can only contain letters, numbers, underscores, and hyphens")
     private String employeeNumber;
     
-    @Schema(description = "姓名", example = "田中太郎", required = true)
-    @NotBlank(message = "姓名は空にできません")
-    @Size(min = 1, max = 100, message = "姓名の長さは1-100文字の間である必要があります")
+    @Schema(description = "Name", example = "Tanaka Taro", required = true)
+    @NotBlank(message = "Name cannot be empty")
+    @Size(min = 1, max = 100, message = "Name length must be between 1-100 characters")
     private String name;
     
-    @Schema(description = "ふりがな", example = "たなかたろう")
-    @Size(max = 200, message = "ふりがなの長さは200文字を超えることはできません")
-    @Pattern(regexp = "^[\\p{IsHiragana}\\p{IsKatakana}ー\\p{IsLatin}\\s（）]*$", message = "ふりがなはひらがな、カタカナ、ラテン文字、スペース、括弧のみを含むことができます")
+    @Schema(description = "Furigana", example = "tanaka taro")
+    @Size(max = 200, message = "Furigana length cannot exceed 200 characters")
+    @Pattern(regexp = "^[\\p{IsHiragana}\\p{IsKatakana}ー\\p{IsLatin}\\s（）()]*$", message = "Furigana can only contain hiragana, katakana, Latin characters, spaces, and parentheses")
     private String furigana;
     
-    @Schema(description = "生年月日", example = "1990-01-01", type = "string", format = "date")
+    @Schema(description = "Birthday", example = "1990-01-01", type = "string", format = "date")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Past(message = "生年月日は過去の日付である必要があります")
+    @Past(message = "Birthday must be a past date")
     private LocalDate birthday;
     
-    // デフォルトコンストラクタ
+    // Default constructor
     public EmployeeDto() {}
     
-    // 全パラメータコンストラクタ
+    // All parameters constructor
     public EmployeeDto(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday) {
         this.employeeId = employeeId;
         this.employeeNumber = employeeNumber;
@@ -50,7 +50,7 @@ public class EmployeeDto {
         this.birthday = birthday;
     }
     
-    // GetterとSetterメソッド
+    // Getter and Setter methods
     public Long getEmployeeId() {
         return employeeId;
     }

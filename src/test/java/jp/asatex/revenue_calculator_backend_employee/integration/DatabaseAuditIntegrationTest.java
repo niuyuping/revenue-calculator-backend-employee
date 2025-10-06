@@ -3,11 +3,9 @@ package jp.asatex.revenue_calculator_backend_employee.integration;
 import jp.asatex.revenue_calculator_backend_employee.config.TestConfig;
 import jp.asatex.revenue_calculator_backend_employee.dto.EmployeeDto;
 import jp.asatex.revenue_calculator_backend_employee.entity.DatabaseAuditLog;
-import jp.asatex.revenue_calculator_backend_employee.entity.Employee;
 import jp.asatex.revenue_calculator_backend_employee.repository.DatabaseAuditLogRepository;
 import jp.asatex.revenue_calculator_backend_employee.repository.EmployeeRepository;
 import jp.asatex.revenue_calculator_backend_employee.service.DatabaseAuditService;
-import jp.asatex.revenue_calculator_backend_employee.service.EmployeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,12 +25,12 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * 数据库审计功能集成测试
+ * Database audit functionality integration test
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import({TestConfig.class, jp.asatex.revenue_calculator_backend_employee.config.TestContainersConfig.class})
-@DisplayName("数据库审计功能集成测试")
+@DisplayName("Database Audit Integration Test")
 class DatabaseAuditIntegrationTest {
 
     @Autowired
@@ -41,8 +39,6 @@ class DatabaseAuditIntegrationTest {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    @Autowired
-    private EmployeeService employeeService;
 
     @Autowired
     private DatabaseAuditLogRepository databaseAuditLogRepository;
@@ -52,19 +48,19 @@ class DatabaseAuditIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // 清理数据库
+        // Clean up database
         employeeRepository.deleteAll().block();
         databaseAuditLogRepository.deleteAll().block();
     }
 
     @Test
-    @DisplayName("创建员工时应该记录数据库审计日志")
+    @DisplayName("Should record database audit log when creating employee")
     void testCreateEmployeeAuditLog() {
         // Given
         EmployeeDto newEmployee = new EmployeeDto();
         newEmployee.setEmployeeNumber("AUDIT001");
-        newEmployee.setName("审计测试员工");
-        newEmployee.setFurigana("オーディットテストユウイン"); // 使用符合验证规则的片假名
+        newEmployee.setName("Audit Test Employee");
+        newEmployee.setFurigana("audit test employee"); // Using katakana that conforms to validation rules
         newEmployee.setBirthday(LocalDate.of(1990, 1, 1));
 
         // When
@@ -80,16 +76,18 @@ class DatabaseAuditIntegrationTest {
 
         // Then
         assertThat(createdEmployee).isNotNull();
-        assertThat(createdEmployee.getEmployeeId()).isNotNull();
+        if (createdEmployee != null) {
+            assertThat(createdEmployee.getEmployeeId()).isNotNull();
+        }
 
-        // 等待审计日志记录
+        // Wait for audit log recording
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
-        // 验证审计日志
+        // Verify audit log
         Mono<DatabaseAuditLog> auditLogMono = databaseAuditLogRepository.findByTableName("employees")
                 .filter(log -> "INSERT".equals(log.getOperationType()))
                 .next();
@@ -105,13 +103,13 @@ class DatabaseAuditIntegrationTest {
     }
 
     @Test
-    @DisplayName("更新员工时应该记录数据库审计日志")
+    @DisplayName("Should record database audit log when updating employee")
     void testUpdateEmployeeAuditLog() {
-        // Given - 先创建一个员工
+        // Given - First create an employee
         EmployeeDto newEmployee = new EmployeeDto();
         newEmployee.setEmployeeNumber("AUDIT002");
-        newEmployee.setName("原始员工");
-        newEmployee.setFurigana("ゲンシユウイン");
+        newEmployee.setName("Original Employee");
+        newEmployee.setFurigana("original employee");
         newEmployee.setBirthday(LocalDate.of(1991, 2, 2));
 
         EmployeeDto createdEmployee = webTestClient.post()
@@ -126,22 +124,22 @@ class DatabaseAuditIntegrationTest {
 
         assertThat(createdEmployee).isNotNull();
 
-        // 等待审计日志记录
+        // Wait for audit log recording
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
-        // When - 更新员工
+        // When - Update employee
         EmployeeDto updatedEmployeeDto = new EmployeeDto();
         updatedEmployeeDto.setEmployeeNumber("AUDIT002");
-        updatedEmployeeDto.setName("更新后的员工");
-        updatedEmployeeDto.setFurigana("コウシンゴノユウイン");
+        updatedEmployeeDto.setName("Updated Employee");
+        updatedEmployeeDto.setFurigana("updated employee");
         updatedEmployeeDto.setBirthday(LocalDate.of(1991, 2, 2));
 
         EmployeeDto updatedEmployee = webTestClient.put()
-                .uri("/api/v1/employee/{id}", createdEmployee.getEmployeeId())
+                .uri("/api/v1/employee/{id}", createdEmployee != null ? createdEmployee.getEmployeeId() : null)
                 .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updatedEmployeeDto))
                 .exchange()
@@ -152,16 +150,18 @@ class DatabaseAuditIntegrationTest {
 
         // Then
         assertThat(updatedEmployee).isNotNull();
-        assertThat(updatedEmployee.getName()).isEqualTo("更新后的员工");
+        if (updatedEmployee != null) {
+            assertThat(updatedEmployee.getName()).isEqualTo("Updated Employee");
+        }
 
-        // 等待审计日志记录
+        // Wait for audit log recording
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
-        // 验证审计日志
+        // Verify audit log
         Mono<DatabaseAuditLog> auditLogMono = databaseAuditLogRepository.findByTableName("employees")
                 .filter(log -> "UPDATE".equals(log.getOperationType()))
                 .next();
@@ -178,13 +178,13 @@ class DatabaseAuditIntegrationTest {
     }
 
     @Test
-    @DisplayName("删除员工时应该记录数据库审计日志")
+    @DisplayName("Should record database audit log when deleting employee")
     void testDeleteEmployeeAuditLog() {
-        // Given - 先创建一个员工
+        // Given - First create an employee
         EmployeeDto newEmployee = new EmployeeDto();
         newEmployee.setEmployeeNumber("AUDIT003");
-        newEmployee.setName("待删除员工");
-        newEmployee.setFurigana("サクジョマチユウイン");
+        newEmployee.setName("Employee To Delete");
+        newEmployee.setFurigana("employee to delete");
         newEmployee.setBirthday(LocalDate.of(1992, 3, 3));
 
         EmployeeDto createdEmployee = webTestClient.post()
@@ -199,27 +199,27 @@ class DatabaseAuditIntegrationTest {
 
         assertThat(createdEmployee).isNotNull();
 
-        // 等待审计日志记录
+        // Wait for audit log recording
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
-        // When - 删除员工
+        // When - Delete employee
         webTestClient.delete()
-                .uri("/api/v1/employee/{id}", createdEmployee.getEmployeeId())
+                .uri("/api/v1/employee/{id}", createdEmployee != null ? createdEmployee.getEmployeeId() : null)
                 .exchange()
                 .expectStatus().isNoContent();
 
-        // 等待审计日志记录
+        // Wait for audit log recording
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
-        // Then - 验证审计日志
+        // Then - Verify audit log
         Mono<DatabaseAuditLog> auditLogMono = databaseAuditLogRepository.findByTableName("employees")
                 .filter(log -> "DELETE".equals(log.getOperationType()))
                 .next();
@@ -235,13 +235,13 @@ class DatabaseAuditIntegrationTest {
     }
 
     @Test
-    @DisplayName("查询员工时应该记录数据库审计日志")
+    @DisplayName("Should record database audit log when querying employee")
     void testGetEmployeeAuditLog() {
-        // Given - 先创建一个员工
+        // Given - First create an employee
         EmployeeDto newEmployee = new EmployeeDto();
         newEmployee.setEmployeeNumber("AUDIT004");
-        newEmployee.setName("查询测试员工");
-        newEmployee.setFurigana("クエリテストユウイン");
+        newEmployee.setName("Query Test Employee");
+        newEmployee.setFurigana("query test employee");
         newEmployee.setBirthday(LocalDate.of(1993, 4, 4));
 
         EmployeeDto createdEmployee = webTestClient.post()
@@ -256,16 +256,16 @@ class DatabaseAuditIntegrationTest {
 
         assertThat(createdEmployee).isNotNull();
 
-        // 等待审计日志记录
+        // Wait for audit log recording
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
-        // When - 查询员工
+        // When - Query employee
         EmployeeDto retrievedEmployee = webTestClient.get()
-                .uri("/api/v1/employee/{id}", createdEmployee.getEmployeeId())
+                .uri("/api/v1/employee/{id}", createdEmployee != null ? createdEmployee.getEmployeeId() : null)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(EmployeeDto.class)
@@ -274,16 +274,18 @@ class DatabaseAuditIntegrationTest {
 
         // Then
         assertThat(retrievedEmployee).isNotNull();
-        assertThat(retrievedEmployee.getName()).isEqualTo("查询测试员工");
+        if (retrievedEmployee != null) {
+            assertThat(retrievedEmployee.getName()).isEqualTo("Query Test Employee");
+        }
 
-        // 等待审计日志记录
+        // Wait for audit log recording
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
-        // 验证审计日志
+        // Verify audit log
         Mono<DatabaseAuditLog> auditLogMono = databaseAuditLogRepository.findByTableName("employees")
                 .filter(log -> "SELECT".equals(log.getOperationType()))
                 .next();
@@ -298,18 +300,19 @@ class DatabaseAuditIntegrationTest {
     }
 
     @Test
-    @DisplayName("获取数据库审计统计信息应该正确工作")
+    @DisplayName("Getting database audit statistics should work correctly")
     void testGetDatabaseAuditStatistics() {
-        // Given - 创建一些审计日志
+        // Given - Create some audit logs
         databaseAuditService.logInsertOperation("employees", "1", 
-                Map.of("name", "测试员工1"), "INSERT INTO employees...", 100L, 1).block();
+                Map.of("name", "Test Employee 1"), "INSERT INTO employees...", 100L, 1).block();
         databaseAuditService.logUpdateOperation("employees", "1", 
-                Map.of("name", "旧名称"), Map.of("name", "新名称"), 
+                Map.of("name", "Old Name"), Map.of("name", "New Name"), 
                 "UPDATE employees...", 80L, 1).block();
         databaseAuditService.logDeleteOperation("employees", "1", 
-                Map.of("name", "被删除员工"), "DELETE FROM employees...", 60L, 1).block();
+                Map.of("name", "Deleted Employee"), "DELETE FROM employees...", 60L, 1).block();
 
         // When
+        @SuppressWarnings("unchecked")
         Map<String, Object> stats = webTestClient.get()
                 .uri("/api/v1/audit/database/stats")
                 .exchange()
@@ -320,20 +323,22 @@ class DatabaseAuditIntegrationTest {
 
         // Then
         assertThat(stats).isNotNull();
-        assertThat(stats.get("totalInserts")).isEqualTo(1);
-        assertThat(stats.get("totalUpdates")).isEqualTo(1);
-        assertThat(stats.get("totalDeletes")).isEqualTo(1);
-        assertThat(stats.get("totalSuccess")).isEqualTo(3);
+        if (stats != null) {
+            assertThat(stats.get("totalInserts")).isEqualTo(1);
+            assertThat(stats.get("totalUpdates")).isEqualTo(1);
+            assertThat(stats.get("totalDeletes")).isEqualTo(1);
+            assertThat(stats.get("totalSuccess")).isEqualTo(3);
+        }
     }
 
     @Test
-    @DisplayName("根据操作类型查询审计日志应该正确工作")
+    @DisplayName("Querying audit logs by operation type should work correctly")
     void testGetAuditLogsByOperationType() {
-        // Given - 创建一些审计日志
+        // Given - Create some audit logs
         databaseAuditService.logInsertOperation("employees", "1", 
-                Map.of("name", "测试员工"), "INSERT INTO employees...", 100L, 1).block();
+                Map.of("name", "Test Employee"), "INSERT INTO employees...", 100L, 1).block();
         databaseAuditService.logUpdateOperation("employees", "1", 
-                Map.of("name", "旧名称"), Map.of("name", "新名称"), 
+                Map.of("name", "Old Name"), Map.of("name", "New Name"), 
                 "UPDATE employees...", 80L, 1).block();
 
         // When
@@ -347,11 +352,11 @@ class DatabaseAuditIntegrationTest {
     }
 
     @Test
-    @DisplayName("根据表名查询审计日志应该正确工作")
+    @DisplayName("Querying audit logs by table name should work correctly")
     void testGetAuditLogsByTableName() {
-        // Given - 创建一些审计日志
+        // Given - Create some audit logs
         databaseAuditService.logInsertOperation("employees", "1", 
-                Map.of("name", "测试员工"), "INSERT INTO employees...", 100L, 1).block();
+                Map.of("name", "Test Employee"), "INSERT INTO employees...", 100L, 1).block();
 
         // When
         webTestClient.get()
@@ -363,14 +368,14 @@ class DatabaseAuditIntegrationTest {
     }
 
     @Test
-    @DisplayName("根据时间范围查询审计日志应该正确工作")
+    @DisplayName("Querying audit logs by time range should work correctly")
     void testGetAuditLogsByTimeRange() {
         // Given
         LocalDateTime startTime = LocalDateTime.now().minusHours(1);
         LocalDateTime endTime = LocalDateTime.now().plusHours(1);
 
         databaseAuditService.logInsertOperation("employees", "1", 
-                Map.of("name", "测试员工"), "INSERT INTO employees...", 100L, 1).block();
+                Map.of("name", "Test Employee"), "INSERT INTO employees...", 100L, 1).block();
 
         // When
         webTestClient.get()
@@ -386,13 +391,13 @@ class DatabaseAuditIntegrationTest {
     }
 
     @Test
-    @DisplayName("查询最近的审计日志应该正确工作")
+    @DisplayName("Querying recent audit logs should work correctly")
     void testGetRecentAuditLogs() {
-        // Given - 创建一些审计日志
+        // Given - Create some audit logs
         databaseAuditService.logInsertOperation("employees", "1", 
-                Map.of("name", "测试员工1"), "INSERT INTO employees...", 100L, 1).block();
+                Map.of("name", "Test Employee 1"), "INSERT INTO employees...", 100L, 1).block();
         databaseAuditService.logInsertOperation("employees", "2", 
-                Map.of("name", "测试员工2"), "INSERT INTO employees...", 100L, 1).block();
+                Map.of("name", "Test Employee 2"), "INSERT INTO employees...", 100L, 1).block();
 
         // When
         webTestClient.get()
@@ -405,11 +410,11 @@ class DatabaseAuditIntegrationTest {
     }
 
     @Test
-    @DisplayName("清理过期审计日志应该正确工作")
+    @DisplayName("Cleaning up expired audit logs should work correctly")
     void testCleanupOldAuditLogs() {
-        // Given - 创建一些审计日志
+        // Given - Create some audit logs
         databaseAuditService.logInsertOperation("employees", "1", 
-                Map.of("name", "测试员工"), "INSERT INTO employees...", 100L, 1).block();
+                Map.of("name", "Test Employee"), "INSERT INTO employees...", 100L, 1).block();
 
         // When
         webTestClient.delete()
@@ -417,7 +422,7 @@ class DatabaseAuditIntegrationTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.message").isEqualTo("审计日志清理完成")
+                .jsonPath("$.message").isEqualTo("Audit log cleanup completed")
                 .jsonPath("$.deletedCount").isNumber();
     }
 }

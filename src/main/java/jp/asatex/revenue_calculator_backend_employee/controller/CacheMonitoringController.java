@@ -11,50 +11,50 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 /**
- * 缓存监控控制器
- * 提供缓存统计信息和管理的API端点
+ * Cache monitoring controller
+ * Provides API endpoints for cache statistics and management
  */
 @RestController
 @RequestMapping("/api/v1/monitoring")
-@Tag(name = "缓存监控", description = "缓存监控和管理API")
+@Tag(name = "Cache Monitoring", description = "Cache monitoring and management API")
 public class CacheMonitoringController {
 
     @Autowired
     private CacheMonitoringService cacheMonitoringService;
 
     /**
-     * 获取缓存统计信息
-     * @return 缓存统计信息
+     * Get cache statistics
+     * @return Cache statistics information
      */
     @GetMapping(value = "/cache/stats", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "获取缓存统计信息", description = "返回当前系统的缓存统计信息，包括命中率、操作次数等")
+    @Operation(summary = "Get cache statistics", description = "Returns current system cache statistics including hit rates, operation counts, etc.")
     public Mono<CacheMonitoringService.CacheStats> getCacheStats() {
         return Mono.just(cacheMonitoringService.getCacheStats());
     }
 
     /**
-     * 清除所有缓存
-     * @return 操作结果
+     * Clear all caches
+     * @return Operation result
      */
     @DeleteMapping(value = "/cache/clear", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "清除所有缓存", description = "清除系统中所有的缓存数据")
+    @Operation(summary = "Clear all caches", description = "Clear all cache data in the system")
     public Mono<ResponseEntity<String>> clearAllCaches() {
         return Mono.fromRunnable(() -> cacheMonitoringService.clearAllCaches())
-                .then(Mono.just(ResponseEntity.ok("所有缓存已清除")));
+                .then(Mono.just(ResponseEntity.ok("All caches have been cleared")));
     }
 
     /**
-     * 清除指定缓存
-     * @param cacheName 缓存名称
-     * @return 操作结果
+     * Clear specified cache
+     * @param cacheName Cache name
+     * @return Operation result
      */
     @DeleteMapping(value = "/cache/clear/{cacheName}", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "清除指定缓存", description = "清除指定名称的缓存数据")
+    @Operation(summary = "Clear specified cache", description = "Clear cache data for the specified cache name")
     public Mono<ResponseEntity<String>> clearCache(@PathVariable String cacheName) {
         return Mono.fromRunnable(() -> cacheMonitoringService.clearCache(cacheName))
-                .then(Mono.just(ResponseEntity.ok("缓存 " + cacheName + " 已清除")));
+                .then(Mono.just(ResponseEntity.ok("Cache " + cacheName + " has been cleared")));
     }
 }

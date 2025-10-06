@@ -22,8 +22,8 @@ import java.util.Objects;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Employee統合テスト
- * エンドツーエンドの完全なフローをテスト
+ * Employee integration test
+ * Tests complete end-to-end flow
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
@@ -40,17 +40,17 @@ class EmployeeIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // テストデータのクリーンアップ
+        // Clean up test data
         employeeRepository.deleteAll().block();
     }
 
     @Test
     void testCompleteEmployeeLifecycle() {
-        // 1. 従業員の作成
+        // 1. Create employee
         EmployeeDto newEmployee = new EmployeeDto();
         newEmployee.setEmployeeNumber("EMP001");
-        newEmployee.setName("田中太郎");
-        newEmployee.setFurigana("タナカタロウ");
+        newEmployee.setName("Tanaka Taro");
+        newEmployee.setFurigana("tanaka taro");
         newEmployee.setBirthday(LocalDate.of(1990, 5, 15));
 
         EmployeeDto createdEmployee = webTestClient.post()
@@ -65,17 +65,17 @@ class EmployeeIntegrationTest {
                 .getResponseBody();
 
         assertThat(createdEmployee).isNotNull();
-        // Objects.requireNonNullを使用してオブジェクトがnullでないことを保証し、コンパイラ警告を解消
+        // Use Objects.requireNonNull to ensure object is not null and resolve compiler warnings
         EmployeeDto nonNullCreatedEmployee = Objects.requireNonNull(createdEmployee);
         assertThat(nonNullCreatedEmployee.getEmployeeId()).isNotNull();
         assertThat(nonNullCreatedEmployee.getEmployeeNumber()).isEqualTo("EMP001");
-        assertThat(nonNullCreatedEmployee.getName()).isEqualTo("田中太郎");
+        assertThat(nonNullCreatedEmployee.getName()).isEqualTo("Tanaka Taro");
 
-        // 従業員IDの取得
+        // Get employee ID
         Long employeeId = nonNullCreatedEmployee.getEmployeeId();
         assertThat(employeeId).isNotNull();
 
-        // 2. IDによる従業員の取得
+        // 2. Get employee by ID
         EmployeeDto retrievedEmployee = webTestClient.get()
                 .uri("/api/v1/employee/{id}", employeeId)
                 .accept(MediaType.APPLICATION_JSON)
@@ -87,12 +87,12 @@ class EmployeeIntegrationTest {
                 .getResponseBody();
 
         assertThat(retrievedEmployee).isNotNull();
-        // Objects.requireNonNullを使用してオブジェクトがnullでないことを保証し、コンパイラ警告を解消
+        // Use Objects.requireNonNull to ensure object is not null and resolve compiler warnings
         EmployeeDto nonNullRetrievedEmployee = Objects.requireNonNull(retrievedEmployee);
         assertThat(nonNullRetrievedEmployee.getEmployeeId()).isEqualTo(employeeId);
         assertThat(nonNullRetrievedEmployee.getEmployeeNumber()).isEqualTo("EMP001");
 
-        // 3. 従業員番号による従業員の取得
+        // 3. Get employee by employee number
         EmployeeDto retrievedByNumber = webTestClient.get()
                 .uri("/api/v1/employee/number/{employeeNumber}", "EMP001")
                 .accept(MediaType.APPLICATION_JSON)
@@ -104,15 +104,15 @@ class EmployeeIntegrationTest {
                 .getResponseBody();
 
         assertThat(retrievedByNumber).isNotNull();
-        // Objects.requireNonNullを使用してオブジェクトがnullでないことを保証し、コンパイラ警告を解消
+        // Use Objects.requireNonNull to ensure object is not null and resolve compiler warnings
         EmployeeDto nonNullRetrievedByNumber = Objects.requireNonNull(retrievedByNumber);
         assertThat(nonNullRetrievedByNumber.getEmployeeId()).isEqualTo(employeeId);
 
-        // 4. 従業員の更新
+        // 4. Update employee
         EmployeeDto updatedEmployee = new EmployeeDto();
         updatedEmployee.setEmployeeNumber("EMP001");
-        updatedEmployee.setName("田中太郎（更新）");
-        updatedEmployee.setFurigana("タナカタロウ（コウシン）");
+        updatedEmployee.setName("Tanaka Taro (Updated)");
+        updatedEmployee.setFurigana("tanaka taro (updated)");
         updatedEmployee.setBirthday(LocalDate.of(1990, 5, 15));
 
         EmployeeDto resultEmployee = webTestClient.put()
@@ -127,12 +127,12 @@ class EmployeeIntegrationTest {
                 .getResponseBody();
 
         assertThat(resultEmployee).isNotNull();
-        // Objects.requireNonNullを使用してオブジェクトがnullでないことを保証し、コンパイラ警告を解消
+        // Use Objects.requireNonNull to ensure object is not null and resolve compiler warnings
         EmployeeDto nonNullResultEmployee = Objects.requireNonNull(resultEmployee);
-        assertThat(nonNullResultEmployee.getName()).isEqualTo("田中太郎（更新）");
-        assertThat(nonNullResultEmployee.getFurigana()).isEqualTo("タナカタロウ（コウシン）");
+        assertThat(nonNullResultEmployee.getName()).isEqualTo("Tanaka Taro (Updated)");
+        assertThat(nonNullResultEmployee.getFurigana()).isEqualTo("tanaka taro (updated)");
 
-        // 5. 全従業員の取得
+        // 5. Get all employees
         List<EmployeeDto> allEmployees = webTestClient.get()
                 .uri("/api/v1/employee")
                 .accept(MediaType.APPLICATION_JSON)
@@ -144,13 +144,13 @@ class EmployeeIntegrationTest {
                 .getResponseBody();
 
         assertThat(allEmployees).hasSize(1);
-        // Objects.requireNonNullを使用してオブジェクトがnullでないことを保証し、コンパイラ警告を解消
+        // Use Objects.requireNonNull to ensure object is not null and resolve compiler warnings
         List<EmployeeDto> nonNullAllEmployees = Objects.requireNonNull(allEmployees);
-        assertThat(nonNullAllEmployees.get(0).getName()).isEqualTo("田中太郎（更新）");
+        assertThat(nonNullAllEmployees.get(0).getName()).isEqualTo("Tanaka Taro (Updated)");
 
-        // 6. 姓名による従業員検索
+        // 6. Search employees by name
         List<EmployeeDto> searchResults = webTestClient.get()
-                .uri("/api/v1/employee/search/name?name=田中")
+                .uri("/api/v1/employee/search/name?name=Tanaka")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -160,13 +160,13 @@ class EmployeeIntegrationTest {
                 .getResponseBody();
 
         assertThat(searchResults).hasSize(1);
-        // Objects.requireNonNullを使用してオブジェクトがnullでないことを保証し、コンパイラ警告を解消
+        // Use Objects.requireNonNull to ensure object is not null and resolve compiler warnings
         List<EmployeeDto> nonNullSearchResults = Objects.requireNonNull(searchResults);
-        assertThat(nonNullSearchResults.get(0).getName()).contains("田中");
+        assertThat(nonNullSearchResults.get(0).getName()).contains("Tanaka");
 
-        // 7. ふりがなによる従業員検索
+        // 7. Search employees by furigana
         List<EmployeeDto> furiganaResults = webTestClient.get()
-                .uri("/api/v1/employee/search/furigana?furigana=タナカ")
+                .uri("/api/v1/employee/search/furigana?furigana=tanaka")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -176,17 +176,17 @@ class EmployeeIntegrationTest {
                 .getResponseBody();
 
         assertThat(furiganaResults).hasSize(1);
-        // Objects.requireNonNullを使用してオブジェクトがnullでないことを保証し、コンパイラ警告を解消
+        // Use Objects.requireNonNull to ensure object is not null and resolve compiler warnings
         List<EmployeeDto> nonNullFuriganaResults = Objects.requireNonNull(furiganaResults);
-        assertThat(nonNullFuriganaResults.get(0).getFurigana()).contains("タナカ");
+        assertThat(nonNullFuriganaResults.get(0).getFurigana()).contains("tanaka");
 
-        // 8. 従業員の削除
+        // 8. Delete employee
         webTestClient.delete()
                 .uri("/api/v1/employee/{id}", employeeId)
                 .exchange()
                 .expectStatus().isNoContent();
 
-        // 9. 従業員が削除されたことを確認
+        // 9. Verify employee has been deleted
         webTestClient.get()
                 .uri("/api/v1/employee/{id}", employeeId)
                 .accept(MediaType.APPLICATION_JSON)
@@ -196,26 +196,26 @@ class EmployeeIntegrationTest {
 
     @Test
     void testCreateMultipleEmployees() {
-        // 複数の従業員の作成
+        // Create multiple employees
         EmployeeDto employee1 = new EmployeeDto();
         employee1.setEmployeeNumber("EMP001");
-        employee1.setName("田中太郎");
-        employee1.setFurigana("タナカタロウ");
+        employee1.setName("Tanaka Taro");
+        employee1.setFurigana("tanaka taro");
         employee1.setBirthday(LocalDate.of(1990, 5, 15));
 
         EmployeeDto employee2 = new EmployeeDto();
         employee2.setEmployeeNumber("EMP002");
-        employee2.setName("佐藤花子");
-        employee2.setFurigana("サトウハナコ");
+        employee2.setName("Sato Hanako");
+        employee2.setFurigana("sato hanako");
         employee2.setBirthday(LocalDate.of(1985, 8, 20));
 
         EmployeeDto employee3 = new EmployeeDto();
         employee3.setEmployeeNumber("EMP003");
-        employee3.setName("山田次郎");
-        employee3.setFurigana("ヤマダジロウ");
+        employee3.setName("Yamada Jiro");
+        employee3.setFurigana("yamada jiro");
         employee3.setBirthday(LocalDate.of(1992, 3, 10));
 
-        // 従業員の作成
+        // Create employees
         webTestClient.post()
                 .uri("/api/v1/employee")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -237,7 +237,7 @@ class EmployeeIntegrationTest {
                 .exchange()
                 .expectStatus().isCreated();
 
-        // 全従業員の取得
+        // Get all employees
         List<EmployeeDto> allEmployees = webTestClient.get()
                 .uri("/api/v1/employee")
                 .accept(MediaType.APPLICATION_JSON)
@@ -249,9 +249,9 @@ class EmployeeIntegrationTest {
 
         assertThat(allEmployees).hasSize(3);
 
-        // 検索テスト
+        // Search test
         List<EmployeeDto> tanakaResults = webTestClient.get()
-                .uri("/api/v1/employee/search/name?name=田中")
+                .uri("/api/v1/employee/search/name?name=Tanaka")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -260,12 +260,12 @@ class EmployeeIntegrationTest {
                 .getResponseBody();
 
         assertThat(tanakaResults).hasSize(1);
-        // Objects.requireNonNullを使用してオブジェクトがnullでないことを保証し、コンパイラ警告を解消
+        // Use Objects.requireNonNull to ensure object is not null and resolve compiler warnings
         List<EmployeeDto> nonNullTanakaResults = Objects.requireNonNull(tanakaResults);
-        assertThat(nonNullTanakaResults.get(0).getName()).isEqualTo("田中太郎");
+        assertThat(nonNullTanakaResults.get(0).getName()).isEqualTo("Tanaka Taro");
 
         List<EmployeeDto> yamadaResults = webTestClient.get()
-                .uri("/api/v1/employee/search/name?name=山田")
+                .uri("/api/v1/employee/search/name?name=Yamada")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -274,18 +274,18 @@ class EmployeeIntegrationTest {
                 .getResponseBody();
 
         assertThat(yamadaResults).hasSize(1);
-        // Objects.requireNonNullを使用してオブジェクトがnullでないことを保証し、コンパイラ警告を解消
+        // Use Objects.requireNonNull to ensure object is not null and resolve compiler warnings
         List<EmployeeDto> nonNullYamadaResults = Objects.requireNonNull(yamadaResults);
-        assertThat(nonNullYamadaResults.get(0).getName()).isEqualTo("山田次郎");
+        assertThat(nonNullYamadaResults.get(0).getName()).isEqualTo("Yamada Jiro");
     }
 
     @Test
     void testValidationIntegration() {
-        // 無効な従業員番号フォーマットのテスト
+        // Test invalid employee number format
         EmployeeDto invalidEmployee = new EmployeeDto();
         invalidEmployee.setEmployeeNumber("EMP@001");
-        invalidEmployee.setName("テスト");
-        invalidEmployee.setFurigana("テスト");
+        invalidEmployee.setName("Test");
+        invalidEmployee.setFurigana("test");
 
         webTestClient.post()
                 .uri("/api/v1/employee")
@@ -297,11 +297,11 @@ class EmployeeIntegrationTest {
                 .jsonPath("$.error").exists()
                 .jsonPath("$.details").exists();
 
-        // 空の姓名のテスト
+        // Test empty name
         EmployeeDto emptyNameEmployee = new EmployeeDto();
         emptyNameEmployee.setEmployeeNumber("EMP001");
         emptyNameEmployee.setName("");
-        emptyNameEmployee.setFurigana("テスト");
+        emptyNameEmployee.setFurigana("test");
 
         webTestClient.post()
                 .uri("/api/v1/employee")
@@ -313,11 +313,11 @@ class EmployeeIntegrationTest {
                 .jsonPath("$.error").exists()
                 .jsonPath("$.details").exists();
 
-        // 未来の生年月日のテスト
+        // Test future birthday
         EmployeeDto futureBirthdayEmployee = new EmployeeDto();
         futureBirthdayEmployee.setEmployeeNumber("EMP001");
-        futureBirthdayEmployee.setName("テスト");
-        futureBirthdayEmployee.setFurigana("テスト");
+        futureBirthdayEmployee.setName("Test");
+        futureBirthdayEmployee.setFurigana("test");
         futureBirthdayEmployee.setBirthday(LocalDate.of(2030, 1, 1));
 
         webTestClient.post()
@@ -333,11 +333,11 @@ class EmployeeIntegrationTest {
 
     @Test
     void testDuplicateEmployeeNumber() {
-        // 最初の従業員の作成
+        // Create first employee
         EmployeeDto employee1 = new EmployeeDto();
         employee1.setEmployeeNumber("EMP001");
-        employee1.setName("田中太郎");
-        employee1.setFurigana("タナカタロウ");
+        employee1.setName("Tanaka Taro");
+        employee1.setFurigana("tanaka taro");
         employee1.setBirthday(LocalDate.of(1990, 5, 15));
 
         webTestClient.post()
@@ -347,11 +347,11 @@ class EmployeeIntegrationTest {
                 .exchange()
                 .expectStatus().isCreated();
 
-        // 同じ従業員番号の従業員の作成を試行
+        // Try to create employee with same employee number
         EmployeeDto employee2 = new EmployeeDto();
         employee2.setEmployeeNumber("EMP001");
-        employee2.setName("佐藤花子");
-        employee2.setFurigana("サトウハナコ");
+        employee2.setName("Sato Hanako");
+        employee2.setFurigana("sato hanako");
         employee2.setBirthday(LocalDate.of(1985, 8, 20));
 
         webTestClient.post()
@@ -361,31 +361,31 @@ class EmployeeIntegrationTest {
                 .exchange()
                 .expectStatus().isEqualTo(409)
                 .expectBody()
-                .jsonPath("$.error").isEqualTo("従業員番号重複")
+                .jsonPath("$.error").isEqualTo("Duplicate employee number")
                 .jsonPath("$.message").exists();
     }
 
     @Test
     void testNotFoundScenarios() {
-        // 存在しない従業員IDのテスト
+        // Test non-existent employee ID
         webTestClient.get()
                 .uri("/api/v1/employee/999")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
 
-        // 存在しない従業員番号のテスト
+        // Test non-existent employee number
         webTestClient.get()
                 .uri("/api/v1/employee/number/NOTEXIST")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
 
-        // 存在しない従業員の更新テスト
+        // Test updating non-existent employee
         EmployeeDto updateEmployee = new EmployeeDto();
         updateEmployee.setEmployeeNumber("EMP001");
-        updateEmployee.setName("テスト");
-        updateEmployee.setFurigana("テスト");
+        updateEmployee.setName("Test");
+        updateEmployee.setFurigana("test");
 
         webTestClient.put()
                 .uri("/api/v1/employee/999")
@@ -394,7 +394,7 @@ class EmployeeIntegrationTest {
                 .exchange()
                 .expectStatus().isNotFound();
 
-        // 存在しない従業員の削除テスト
+        // Test deleting non-existent employee
         webTestClient.delete()
                 .uri("/api/v1/employee/999")
                 .exchange()
@@ -413,31 +413,31 @@ class EmployeeIntegrationTest {
 
     @Test
     void testDatabaseConstraints() {
-        // データベース制約のテスト
+        // Test database constraints
         Employee entity = new Employee();
         entity.setEmployeeNumber("EMP001");
-        entity.setName("田中太郎");
-        entity.setFurigana("タナカタロウ");
+        entity.setName("Tanaka Taro");
+        entity.setFurigana("tanaka taro");
         entity.setBirthday(LocalDate.of(1990, 5, 15));
 
-        // データベースに直接保存
+        // Save directly to database
         Mono<Employee> saveResult = employeeRepository.save(entity);
         
         StepVerifier.create(saveResult)
                 .assertNext(savedEmployee -> {
                     assertThat(savedEmployee.getEmployeeId()).isNotNull();
                     assertThat(savedEmployee.getEmployeeNumber()).isEqualTo("EMP001");
-                    assertThat(savedEmployee.getName()).isEqualTo("田中太郎");
+                    assertThat(savedEmployee.getName()).isEqualTo("Tanaka Taro");
                 })
                 .verifyComplete();
 
-        // データが保存されたことを確認
+        // Verify data is saved
         Mono<Employee> findResult = employeeRepository.findByEmployeeNumber("EMP001");
         
         StepVerifier.create(findResult)
                 .assertNext(foundEmployee -> {
                     assertThat(foundEmployee.getEmployeeNumber()).isEqualTo("EMP001");
-                    assertThat(foundEmployee.getName()).isEqualTo("田中太郎");
+                    assertThat(foundEmployee.getName()).isEqualTo("Tanaka Taro");
                 })
                 .verifyComplete();
     }

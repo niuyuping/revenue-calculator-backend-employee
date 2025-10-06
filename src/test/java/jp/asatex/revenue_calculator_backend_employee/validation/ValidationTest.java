@@ -13,7 +13,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * 検証制約テスト
+ * Validation constraint test
  */
 public class ValidationTest {
 
@@ -28,100 +28,100 @@ public class ValidationTest {
     public void testValidEmployeeDto() {
         EmployeeDto employee = new EmployeeDto();
         employee.setEmployeeNumber("EMP001");
-        employee.setName("田中太郎");
-        employee.setFurigana("たなかたろう");
+        employee.setName("Tanaka Taro");
+        employee.setFurigana("tanaka taro");
         employee.setBirthday(LocalDate.of(1990, 1, 1));
 
         Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(employee);
-        assertTrue(violations.isEmpty(), "有効なデータには検証エラーがあってはいけません");
+        assertTrue(violations.isEmpty(), "Valid data should not have validation errors");
     }
 
     @Test
     public void testInvalidEmployeeNumber() {
         EmployeeDto employee = new EmployeeDto();
-        employee.setEmployeeNumber(""); // 空文字列
-        employee.setName("田中太郎");
-        employee.setFurigana("たなかたろう");
+        employee.setEmployeeNumber(""); // Empty string
+        employee.setName("Tanaka Taro");
+        employee.setFurigana("tanaka taro");
         employee.setBirthday(LocalDate.of(1990, 1, 1));
 
         Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(employee);
-        assertFalse(violations.isEmpty(), "無効な従業員番号には検証エラーがあるべきです");
+        assertFalse(violations.isEmpty(), "Invalid employee number should have validation errors");
         
         boolean hasEmployeeNumberError = violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("employeeNumber"));
-        assertTrue(hasEmployeeNumberError, "従業員番号の検証エラーがあるべきです");
+        assertTrue(hasEmployeeNumberError, "Employee number should have validation errors");
     }
 
     @Test
     public void testInvalidName() {
         EmployeeDto employee = new EmployeeDto();
         employee.setEmployeeNumber("EMP001");
-        employee.setName(""); // 空文字列
-        employee.setFurigana("たなかたろう");
+        employee.setName(""); // Empty string
+        employee.setFurigana("tanaka taro");
         employee.setBirthday(LocalDate.of(1990, 1, 1));
 
         Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(employee);
-        assertFalse(violations.isEmpty(), "無効な姓名には検証エラーがあるべきです");
+        assertFalse(violations.isEmpty(), "Invalid name should have validation errors");
         
         boolean hasNameError = violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("name"));
-        assertTrue(hasNameError, "姓名の検証エラーがあるべきです");
+        assertTrue(hasNameError, "Name should have validation errors");
     }
 
     @Test
     public void testInvalidFurigana() {
         EmployeeDto employee = new EmployeeDto();
         employee.setEmployeeNumber("EMP001");
-        employee.setName("田中太郎");
-        employee.setFurigana("田中123"); // 数字を含み、ふりがなフォーマットに適合しない
+        employee.setName("Tanaka Taro");
+        employee.setFurigana("tanaka123"); // Contains numbers, does not match furigana format
         employee.setBirthday(LocalDate.of(1990, 1, 1));
 
         Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(employee);
-        assertFalse(violations.isEmpty(), "無効なふりがなには検証エラーがあるべきです");
+        assertFalse(violations.isEmpty(), "Invalid furigana should have validation errors");
         
         boolean hasFuriganaError = violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("furigana"));
-        assertTrue(hasFuriganaError, "ふりがなの検証エラーがあるべきです");
+        assertTrue(hasFuriganaError, "Furigana should have validation errors");
     }
 
     @Test
     public void testInvalidBirthday() {
         EmployeeDto employee = new EmployeeDto();
         employee.setEmployeeNumber("EMP001");
-        employee.setName("田中太郎");
-        employee.setFurigana("たなかたろう");
-        employee.setBirthday(LocalDate.now().plusDays(1)); // 未来の日付
+        employee.setName("Tanaka Taro");
+        employee.setFurigana("tanaka taro");
+        employee.setBirthday(LocalDate.now().plusDays(1)); // Future date
 
         Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(employee);
-        assertFalse(violations.isEmpty(), "無効な生年月日には検証エラーがあるべきです");
+        assertFalse(violations.isEmpty(), "Invalid birthday should have validation errors");
         
         boolean hasBirthdayError = violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("birthday"));
-        assertTrue(hasBirthdayError, "生年月日の検証エラーがあるべきです");
+        assertTrue(hasBirthdayError, "Birthday should have validation errors");
     }
 
     @Test
     public void testValidFurigana() {
         EmployeeDto employee = new EmployeeDto();
         employee.setEmployeeNumber("EMP001");
-        employee.setName("田中太郎");
-        employee.setFurigana("たなかたろう"); // 有効なひらがな
+        employee.setName("Tanaka Taro");
+        employee.setFurigana("tanaka taro"); // Valid hiragana
         employee.setBirthday(LocalDate.of(1990, 1, 1));
 
         Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(employee);
-        assertTrue(violations.isEmpty(), "有効なふりがなには検証エラーがあってはいけません");
+        assertTrue(violations.isEmpty(), "Valid furigana should not have validation errors");
     }
 
     @Test
     public void testValidKatakanaFurigana() {
         EmployeeDto employee = new EmployeeDto();
         employee.setEmployeeNumber("EMP001");
-        employee.setName("田中太郎");
-        employee.setFurigana("タナカタロウ"); // 有効なカタカナ
+        employee.setName("Tanaka Taro");
+        employee.setFurigana("tanaka taro"); // Valid katakana
         employee.setBirthday(LocalDate.of(1990, 1, 1));
 
         Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(employee);
-        assertTrue(violations.isEmpty(), "有効なカタカナには検証エラーがあってはいけません");
+        assertTrue(violations.isEmpty(), "Valid katakana should not have validation errors");
     }
 }
 

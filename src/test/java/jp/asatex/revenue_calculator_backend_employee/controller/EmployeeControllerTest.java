@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 /**
- * Employeeコントローラーテストクラス
+ * Employee controller test class
  */
 @WebFluxTest({EmployeeController.class, jp.asatex.revenue_calculator_backend_employee.exception.GlobalExceptionHandler.class, jp.asatex.revenue_calculator_backend_employee.config.ValidationConfig.class})
 class EmployeeControllerTest {
@@ -36,13 +36,13 @@ class EmployeeControllerTest {
 
     @Test
     void testGetAllEmployees() {
-        // テストデータの準備
-        EmployeeDto employee1 = new EmployeeDto(1L, "EMP001", "田中太郎", "タナカタロウ", LocalDate.of(1990, 5, 15));
-        EmployeeDto employee2 = new EmployeeDto(2L, "EMP002", "佐藤花子", "サトウハナコ", LocalDate.of(1985, 12, 3));
+        // Prepare test data
+        EmployeeDto employee1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
+        EmployeeDto employee2 = new EmployeeDto(2L, "EMP002", "Sato Hanako", "sato hanako", LocalDate.of(1985, 12, 3));
 
         when(employeeService.getAllEmployees()).thenReturn(Flux.just(employee1, employee2));
 
-        // テストの実行
+        // Execute test
         webTestClient.get()
                 .uri("/api/v1/employee")
                 .accept(MediaType.APPLICATION_JSON)
@@ -55,12 +55,12 @@ class EmployeeControllerTest {
 
     @Test
     void testGetEmployeeById() {
-        // テストデータの準備
-        EmployeeDto employee = new EmployeeDto(1L, "EMP001", "田中太郎", "タナカタロウ", LocalDate.of(1990, 5, 15));
+        // Prepare test data
+        EmployeeDto employee = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
 
         when(employeeService.getEmployeeById(1L)).thenReturn(Mono.just(employee));
 
-        // テストの実行
+        // Execute test
         webTestClient.get()
                 .uri("/api/v1/employee/1")
                 .accept(MediaType.APPLICATION_JSON)
@@ -84,13 +84,13 @@ class EmployeeControllerTest {
 
     @Test
     void testCreateEmployee() {
-        // テストデータの準備
-        EmployeeDto newEmployee = new EmployeeDto(null, "EMP006", "新入社員", "シンニュウシャイン", LocalDate.of(2000, 1, 1));
-        EmployeeDto createdEmployee = new EmployeeDto(6L, "EMP006", "新入社員", "シンニュウシャイン", LocalDate.of(2000, 1, 1));
+        // Prepare test data
+        EmployeeDto newEmployee = new EmployeeDto(null, "EMP006", "New Employee", "new employee", LocalDate.of(2000, 1, 1));
+        EmployeeDto createdEmployee = new EmployeeDto(6L, "EMP006", "New Employee", "new employee", LocalDate.of(2000, 1, 1));
 
         when(employeeService.createEmployee(any(EmployeeDto.class))).thenReturn(Mono.just(createdEmployee));
 
-        // テストの実行
+        // Execute test
         webTestClient.post()
                 .uri("/api/v1/employee")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -104,12 +104,12 @@ class EmployeeControllerTest {
 
     @Test
     void testUpdateEmployee() {
-        // テストデータの準備
-        EmployeeDto updatedEmployee = new EmployeeDto(1L, "EMP001", "田中太郎（更新）", "タナカタロウ（コウシン）", LocalDate.of(1990, 5, 15));
+        // Prepare test data
+        EmployeeDto updatedEmployee = new EmployeeDto(1L, "EMP001", "Tanaka Taro (Updated)", "tanaka taro (updated)", LocalDate.of(1990, 5, 15));
 
         when(employeeService.updateEmployee(anyLong(), any(EmployeeDto.class))).thenReturn(Mono.just(updatedEmployee));
 
-        // テストの実行
+        // Execute test
         webTestClient.put()
                 .uri("/api/v1/employee/1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -123,12 +123,12 @@ class EmployeeControllerTest {
 
     @Test
     void testGetEmployeeByNumber() {
-        // テストデータの準備
-        EmployeeDto employee = new EmployeeDto(1L, "EMP001", "田中太郎", "タナカタロウ", LocalDate.of(1990, 5, 15));
+        // Prepare test data
+        EmployeeDto employee = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
 
         when(employeeService.getEmployeeByNumber("EMP001")).thenReturn(Mono.just(employee));
 
-        // テストの実行
+        // Execute test
         webTestClient.get()
                 .uri("/api/v1/employee/number/EMP001")
                 .accept(MediaType.APPLICATION_JSON)
@@ -162,15 +162,15 @@ class EmployeeControllerTest {
 
     @Test
     void testSearchEmployeesByName() {
-        // テストデータの準備
-        EmployeeDto employee1 = new EmployeeDto(1L, "EMP001", "田中太郎", "タナカタロウ", LocalDate.of(1990, 5, 15));
-        EmployeeDto employee2 = new EmployeeDto(2L, "EMP002", "田中花子", "タナカハナコ", LocalDate.of(1985, 12, 3));
+        // Prepare test data
+        EmployeeDto employee1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
+        EmployeeDto employee2 = new EmployeeDto(2L, "EMP002", "Tanaka Hanako", "tanaka hanako", LocalDate.of(1985, 12, 3));
 
-        when(employeeService.searchEmployeesByName("田中")).thenReturn(Flux.just(employee1, employee2));
+        when(employeeService.searchEmployeesByName("Tanaka")).thenReturn(Flux.just(employee1, employee2));
 
-        // テストの実行
+        // Execute test
         webTestClient.get()
-                .uri("/api/v1/employee/search/name?name=田中")
+                .uri("/api/v1/employee/search/name?name=Tanaka")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -181,10 +181,10 @@ class EmployeeControllerTest {
 
     @Test
     void testSearchEmployeesByNameNotFound() {
-        when(employeeService.searchEmployeesByName("山田")).thenReturn(Flux.empty());
+        when(employeeService.searchEmployeesByName("Yamada")).thenReturn(Flux.empty());
 
         webTestClient.get()
-                .uri("/api/v1/employee/search/name?name=山田")
+                .uri("/api/v1/employee/search/name?name=Yamada")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -194,15 +194,15 @@ class EmployeeControllerTest {
 
     @Test
     void testSearchEmployeesByFurigana() {
-        // テストデータの準備
-        EmployeeDto employee1 = new EmployeeDto(1L, "EMP001", "田中太郎", "タナカタロウ", LocalDate.of(1990, 5, 15));
-        EmployeeDto employee2 = new EmployeeDto(2L, "EMP002", "田中花子", "タナカハナコ", LocalDate.of(1985, 12, 3));
+        // Prepare test data
+        EmployeeDto employee1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
+        EmployeeDto employee2 = new EmployeeDto(2L, "EMP002", "Tanaka Hanako", "tanaka hanako", LocalDate.of(1985, 12, 3));
 
-        when(employeeService.searchEmployeesByFurigana("タナカ")).thenReturn(Flux.just(employee1, employee2));
+        when(employeeService.searchEmployeesByFurigana("tanaka")).thenReturn(Flux.just(employee1, employee2));
 
-        // テストの実行
+        // Execute test
         webTestClient.get()
-                .uri("/api/v1/employee/search/furigana?furigana=タナカ")
+                .uri("/api/v1/employee/search/furigana?furigana=tanaka")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -213,10 +213,10 @@ class EmployeeControllerTest {
 
     @Test
     void testSearchEmployeesByFuriganaNotFound() {
-        when(employeeService.searchEmployeesByFurigana("ヤマダ")).thenReturn(Flux.empty());
+        when(employeeService.searchEmployeesByFurigana("yamada")).thenReturn(Flux.empty());
 
         webTestClient.get()
-                .uri("/api/v1/employee/search/furigana?furigana=ヤマダ")
+                .uri("/api/v1/employee/search/furigana?furigana=yamada")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -237,9 +237,11 @@ class EmployeeControllerTest {
 
     @Test
     void testUpdateEmployeeNotFound() {
-        EmployeeDto updatedEmployee = new EmployeeDto(999L, "EMP999", "存在しない従業員", "ソンザイシナイジュウギョウイン", LocalDate.of(1990, 5, 15));
+        EmployeeDto updatedEmployee = new EmployeeDto(999L, "EMP999", "Test Employee", "test employee", LocalDate.of(1990, 5, 15));
 
-        when(employeeService.updateEmployee(anyLong(), any(EmployeeDto.class))).thenReturn(Mono.empty());
+        when(employeeService.updateEmployee(anyLong(), any(EmployeeDto.class))).thenReturn(
+                Mono.error(new EmployeeNotFoundException("Employee not found, ID: 999"))
+        );
 
         webTestClient.put()
                 .uri("/api/v1/employee/999")
@@ -251,7 +253,7 @@ class EmployeeControllerTest {
 
     @Test
     void testDeleteEmployeeNotFound() {
-        when(employeeService.deleteEmployeeById(999L)).thenReturn(Mono.error(new EmployeeNotFoundException("従業員が存在しません、ID: 999")));
+        when(employeeService.deleteEmployeeById(999L)).thenReturn(Mono.error(new EmployeeNotFoundException("Employee does not exist, ID: 999")));
 
         webTestClient.delete()
                 .uri("/api/v1/employee/999")
@@ -261,7 +263,7 @@ class EmployeeControllerTest {
 
     @Test
     void testDeleteEmployeeByNumberNotFound() {
-        when(employeeService.deleteEmployeeByNumber("NOTEXIST")).thenReturn(Mono.error(new EmployeeNotFoundException("従業員が存在しません、番号: NOTEXIST")));
+        when(employeeService.deleteEmployeeByNumber("NOTEXIST")).thenReturn(Mono.error(new EmployeeNotFoundException("Employee does not exist, number: NOTEXIST")));
 
         webTestClient.delete()
                 .uri("/api/v1/employee/number/NOTEXIST")

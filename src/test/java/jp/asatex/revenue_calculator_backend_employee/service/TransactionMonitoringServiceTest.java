@@ -16,9 +16,9 @@ import java.time.Instant;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * TransactionMonitoringService 测试类
+ * TransactionMonitoringService test class
  */
-@DisplayName("TransactionMonitoringService テスト")
+@DisplayName("TransactionMonitoringService Test")
 class TransactionMonitoringServiceTest {
 
     private TransactionMonitoringService transactionMonitoringService;
@@ -31,90 +31,90 @@ class TransactionMonitoringServiceTest {
     }
 
     @Test
-    @DisplayName("记录事务开始应该正确工作")
+    @DisplayName("Recording transaction start should work correctly")
     void testRecordTransactionStart() {
-        // 记录事务开始
-        Instant startTime = transactionMonitoringService.recordTransactionStart("TEST_OPERATION", "测试操作");
+        // Record transaction start
+        Instant startTime = transactionMonitoringService.recordTransactionStart("TEST_OPERATION", "Test Operation");
         
         assertThat(startTime).isNotNull();
         
-        // 验证计数器增加
+        // Verify counter increment
         Counter counter = meterRegistry.find("transaction.start").counter();
         assertThat(counter).isNotNull();
         assertThat(counter.count()).isEqualTo(1.0);
     }
 
     @Test
-    @DisplayName("记录事务提交应该正确工作")
+    @DisplayName("Recording transaction commit should work correctly")
     void testRecordTransactionCommit() {
         Instant startTime = Instant.now().minus(Duration.ofMillis(100));
         
-        // 记录事务提交
-        transactionMonitoringService.recordTransactionCommit("TEST_OPERATION", startTime, "测试操作");
+        // Record transaction commit
+        transactionMonitoringService.recordTransactionCommit("TEST_OPERATION", startTime, "Test Operation");
         
-        // 验证计数器增加
+        // Verify counter increment
         Counter counter = meterRegistry.find("transaction.commit").counter();
         assertThat(counter).isNotNull();
         assertThat(counter.count()).isEqualTo(1.0);
         
-        // 验证计时器记录
+        // Verify timer recording
         Timer timer = meterRegistry.find("transaction.duration").timer();
         assertThat(timer).isNotNull();
         assertThat(timer.count()).isEqualTo(1);
     }
 
     @Test
-    @DisplayName("记录事务回滚应该正确工作")
+    @DisplayName("Recording transaction rollback should work correctly")
     void testRecordTransactionRollback() {
         Instant startTime = Instant.now().minus(Duration.ofMillis(50));
         
-        // 记录事务回滚
-        transactionMonitoringService.recordTransactionRollback("TEST_OPERATION", startTime, "测试回滚");
+        // Record transaction rollback
+        transactionMonitoringService.recordTransactionRollback("TEST_OPERATION", startTime, "Test Rollback");
         
-        // 验证计数器增加
+        // Verify counter increment
         Counter counter = meterRegistry.find("transaction.rollback").counter();
         assertThat(counter).isNotNull();
         assertThat(counter.count()).isEqualTo(1.0);
         
-        // 验证计时器记录
+        // Verify timer recording
         Timer timer = meterRegistry.find("transaction.duration").timer();
         assertThat(timer).isNotNull();
         assertThat(timer.count()).isEqualTo(1);
     }
 
     @Test
-    @DisplayName("记录事务错误应该正确工作")
+    @DisplayName("Recording transaction errors should work correctly")
     void testRecordTransactionError() {
         Instant startTime = Instant.now().minus(Duration.ofMillis(75));
-        RuntimeException error = new RuntimeException("测试错误");
+        RuntimeException error = new RuntimeException("Test error");
         
-        // 记录事务错误
+        // Record transaction error
         transactionMonitoringService.recordTransactionError("TEST_OPERATION", startTime, error);
         
-        // 验证计数器增加
+        // Verify counter increment
         Counter counter = meterRegistry.find("transaction.error").counter();
         assertThat(counter).isNotNull();
         assertThat(counter.count()).isEqualTo(1.0);
         
-        // 验证计时器记录
+        // Verify timer recording
         Timer timer = meterRegistry.find("transaction.duration").timer();
         assertThat(timer).isNotNull();
         assertThat(timer.count()).isEqualTo(1);
     }
 
     @Test
-    @DisplayName("监控事务操作应该正确工作")
+    @DisplayName("Monitoring transaction operations should work correctly")
     void testMonitorTransaction() {
-        // 测试成功的事务
+        // Test successful transaction
         StepVerifier.create(transactionMonitoringService.monitorTransaction(
                 "TEST_OPERATION", 
-                "测试操作", 
-                Mono.just("成功结果")
+                "Test Operation", 
+                Mono.just("Success Result")
         ))
-                .expectNext("成功结果")
+                .expectNext("Success Result")
                 .verifyComplete();
         
-        // 验证计数器
+        // Verify counter
         Counter startCounter = meterRegistry.find("transaction.start").counter();
         Counter commitCounter = meterRegistry.find("transaction.commit").counter();
         
@@ -123,20 +123,20 @@ class TransactionMonitoringServiceTest {
     }
 
     @Test
-    @DisplayName("监控事务操作错误应该正确工作")
+    @DisplayName("Monitoring transaction operation errors should work correctly")
     void testMonitorTransactionError() {
-        RuntimeException error = new RuntimeException("测试错误");
+        RuntimeException error = new RuntimeException("Test error");
         
-        // 测试失败的事务
+        // Test failed transaction
         StepVerifier.create(transactionMonitoringService.monitorTransaction(
                 "TEST_OPERATION", 
-                "测试操作", 
+                "Test Operation", 
                 Mono.error(error)
         ))
                 .expectError(RuntimeException.class)
                 .verify();
         
-        // 验证计数器
+        // Verify counter
         Counter startCounter = meterRegistry.find("transaction.start").counter();
         Counter errorCounter = meterRegistry.find("transaction.error").counter();
         
@@ -145,15 +145,15 @@ class TransactionMonitoringServiceTest {
     }
 
     @Test
-    @DisplayName("获取事务统计信息应该正确工作")
+    @DisplayName("Getting transaction statistics should work correctly")
     void testGetTransactionStats() {
-        // 执行一些操作
-        transactionMonitoringService.recordTransactionStart("OP1", "操作1");
-        transactionMonitoringService.recordTransactionStart("OP2", "操作2");
-        transactionMonitoringService.recordTransactionCommit("OP1", Instant.now(), "操作1");
-        transactionMonitoringService.recordTransactionRollback("OP2", Instant.now(), "操作2");
+        // Execute some operations
+        transactionMonitoringService.recordTransactionStart("OP1", "Operation 1");
+        transactionMonitoringService.recordTransactionStart("OP2", "Operation 2");
+        transactionMonitoringService.recordTransactionCommit("OP1", Instant.now(), "Operation 1");
+        transactionMonitoringService.recordTransactionRollback("OP2", Instant.now(), "Operation 2");
         
-        // 获取统计信息
+        // Get statistics
         TransactionMonitoringService.TransactionStats stats = transactionMonitoringService.getTransactionStats();
         
         assertThat(stats).isNotNull();
@@ -164,7 +164,7 @@ class TransactionMonitoringServiceTest {
     }
 
     @Test
-    @DisplayName("事务统计信息toString应该正确格式化")
+    @DisplayName("Transaction statistics toString should format correctly")
     void testTransactionStatsToString() {
         TransactionMonitoringService.TransactionStats stats = new TransactionMonitoringService.TransactionStats(
                 10, 8, 1, 1, 150.5

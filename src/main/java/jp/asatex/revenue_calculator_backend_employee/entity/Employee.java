@@ -9,8 +9,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Employeeエンティティクラス
- * 従業員の基本情報を含む：従業員番号、姓名、ふりがな、生年月日
+ * Employee entity class
+ * Contains basic employee information: employee number, name, furigana, birthday
  */
 @Table("employees")
 public class Employee {
@@ -19,23 +19,23 @@ public class Employee {
     @Column("employee_id")
     private Long employeeId;
     
-    @NotBlank(message = "従業員番号は空にできません")
-    @Size(min = 1, max = 20, message = "従業員番号の長さは1-20文字の間である必要があります")
-    @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "従業員番号は英字、数字、アンダースコア、ハイフンのみを含むことができます")
+    @NotBlank(message = "Employee number cannot be empty")
+    @Size(min = 1, max = 20, message = "Employee number length must be between 1-20 characters")
+    @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "Employee number can only contain letters, numbers, underscores, and hyphens")
     @Column("employee_number")
     private String employeeNumber;
     
-    @NotBlank(message = "姓名は空にできません")
-    @Size(min = 1, max = 100, message = "姓名の長さは1-100文字の間である必要があります")
+    @NotBlank(message = "Name cannot be empty")
+    @Size(min = 1, max = 100, message = "Name length must be between 1-100 characters")
     @Column("name")
     private String name;
     
-    @Size(max = 200, message = "ふりがなの長さは200文字を超えることはできません")
-    @Pattern(regexp = "^[\\p{IsHiragana}\\p{IsKatakana}\\p{IsLatin}\\s（）]*$", message = "ふりがなはひらがな、カタカナ、ラテン文字、スペース、括弧のみを含むことができます")
+    @Size(max = 200, message = "Furigana length cannot exceed 200 characters")
+    @Pattern(regexp = "^[\\p{IsHiragana}\\p{IsKatakana}\\p{IsLatin}\\s（）]*$", message = "Furigana can only contain hiragana, katakana, Latin characters, spaces, and parentheses")
     @Column("furigana")
     private String furigana;
     
-    @Past(message = "生年月日は過去の日付である必要があります")
+    @Past(message = "Birthday must be a past date")
     @Column("birthday")
     private LocalDate birthday;
     
@@ -54,10 +54,10 @@ public class Employee {
     @Column("is_deleted")
     private Boolean deleted = false;
     
-    // デフォルトコンストラクタ
+    // Default constructor
     public Employee() {}
     
-    // 全パラメータコンストラクタ
+    // All parameters constructor
     public Employee(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday) {
         this.employeeId = employeeId;
         this.employeeNumber = employeeNumber;
@@ -66,7 +66,7 @@ public class Employee {
         this.birthday = birthday;
     }
     
-    // GetterとSetterメソッド
+    // Getter and Setter methods
     public Long getEmployeeId() {
         return employeeId;
     }

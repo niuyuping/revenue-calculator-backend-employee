@@ -13,26 +13,26 @@ import org.springframework.context.annotation.Import;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * RateLimitConfig 测试类
+ * RateLimitConfig test class
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
                 properties = {"spring.flyway.enabled=false"})
 @ActiveProfiles("test")
 @Import(jp.asatex.revenue_calculator_backend_employee.config.TestConfig.class)
-@DisplayName("RateLimitConfig テスト")
+@DisplayName("RateLimitConfig Test")
 class RateLimitConfigTest {
 
     @Autowired
     private RateLimiterRegistry rateLimiterRegistry;
 
     @Test
-    @DisplayName("限流器注册表应该正确配置")
+    @DisplayName("Rate limiter registry should be configured correctly")
     void testRateLimiterRegistryConfiguration() {
         assertThat(rateLimiterRegistry).isNotNull();
     }
 
     @Test
-    @DisplayName("员工API限流器应该正确配置")
+    @DisplayName("Employee API rate limiter should be configured correctly")
     void testEmployeeApiRateLimiterConfiguration() {
         RateLimiter rateLimiter = rateLimiterRegistry.rateLimiter("employee-api");
         assertThat(rateLimiter).isNotNull();
@@ -43,7 +43,7 @@ class RateLimitConfigTest {
     }
 
     @Test
-    @DisplayName("员工搜索API限流器应该正确配置")
+    @DisplayName("Employee search API rate limiter should be configured correctly")
     void testEmployeeSearchRateLimiterConfiguration() {
         RateLimiter rateLimiter = rateLimiterRegistry.rateLimiter("employee-search");
         assertThat(rateLimiter).isNotNull();
@@ -54,7 +54,7 @@ class RateLimitConfigTest {
     }
 
     @Test
-    @DisplayName("员工创建API限流器应该正确配置")
+    @DisplayName("Employee creation API rate limiter should be configured correctly")
     void testEmployeeCreateRateLimiterConfiguration() {
         RateLimiter rateLimiter = rateLimiterRegistry.rateLimiter("employee-create");
         assertThat(rateLimiter).isNotNull();
@@ -65,7 +65,7 @@ class RateLimitConfigTest {
     }
 
     @Test
-    @DisplayName("员工更新API限流器应该正确配置")
+    @DisplayName("Employee update API rate limiter should be configured correctly")
     void testEmployeeUpdateRateLimiterConfiguration() {
         RateLimiter rateLimiter = rateLimiterRegistry.rateLimiter("employee-update");
         assertThat(rateLimiter).isNotNull();
@@ -76,7 +76,7 @@ class RateLimitConfigTest {
     }
 
     @Test
-    @DisplayName("员工删除API限流器应该正确配置")
+    @DisplayName("Employee deletion API rate limiter should be configured correctly")
     void testEmployeeDeleteRateLimiterConfiguration() {
         RateLimiter rateLimiter = rateLimiterRegistry.rateLimiter("employee-delete");
         assertThat(rateLimiter).isNotNull();
@@ -87,7 +87,7 @@ class RateLimitConfigTest {
     }
 
     @Test
-    @DisplayName("分页查询API限流器应该正确配置")
+    @DisplayName("Pagination query API rate limiter should be configured correctly")
     void testEmployeePaginationRateLimiterConfiguration() {
         RateLimiter rateLimiter = rateLimiterRegistry.rateLimiter("employee-pagination");
         assertThat(rateLimiter).isNotNull();
@@ -98,7 +98,7 @@ class RateLimitConfigTest {
     }
 
     @Test
-    @DisplayName("监控API限流器应该正确配置")
+    @DisplayName("Monitoring API rate limiter should be configured correctly")
     void testMonitoringApiRateLimiterConfiguration() {
         RateLimiter rateLimiter = rateLimiterRegistry.rateLimiter("monitoring-api");
         assertThat(rateLimiter).isNotNull();
@@ -109,7 +109,7 @@ class RateLimitConfigTest {
     }
 
     @Test
-    @DisplayName("全局API限流器应该正确配置")
+    @DisplayName("Global API rate limiter should be configured correctly")
     void testGlobalApiRateLimiterConfiguration() {
         RateLimiter rateLimiter = rateLimiterRegistry.rateLimiter("global-api");
         assertThat(rateLimiter).isNotNull();
@@ -120,7 +120,7 @@ class RateLimitConfigTest {
     }
 
     @Test
-    @DisplayName("所有限流器都应该在注册表中")
+    @DisplayName("All rate limiters should be in the registry")
     void testAllRateLimitersInRegistry() {
         assertThat(rateLimiterRegistry.rateLimiter("employee-api")).isNotNull();
         assertThat(rateLimiterRegistry.rateLimiter("employee-search")).isNotNull();

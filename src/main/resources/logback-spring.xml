@@ -2,11 +2,11 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     
-    <!-- 定义属性 -->
+    <!-- Define properties -->
     <property name="LOG_PATH" value="logs"/>
     <property name="APP_NAME" value="revenue-calculator-employee"/>
     
-    <!-- 控制台输出配置 -->
+    <!-- Console output configuration -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
@@ -29,7 +29,7 @@
         </encoder>
     </appender>
     
-    <!-- 应用日志文件 -->
+    <!-- Application log file -->
     <appender name="APPLICATION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${APP_NAME}.log</file>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
@@ -59,7 +59,7 @@
         </rollingPolicy>
     </appender>
     
-    <!-- 审计日志文件 -->
+    <!-- Audit log file -->
     <appender name="AUDIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${APP_NAME}-audit.log</file>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
@@ -89,7 +89,7 @@
         </rollingPolicy>
     </appender>
     
-    <!-- 安全日志文件 -->
+    <!-- Security log file -->
     <appender name="SECURITY_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${APP_NAME}-security.log</file>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
@@ -119,7 +119,7 @@
         </rollingPolicy>
     </appender>
     
-    <!-- 性能日志文件 -->
+    <!-- Performance log file -->
     <appender name="PERFORMANCE_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${APP_NAME}-performance.log</file>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
@@ -149,7 +149,7 @@
         </rollingPolicy>
     </appender>
     
-    <!-- 错误日志文件 -->
+    <!-- Error log file -->
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${APP_NAME}-error.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -185,51 +185,51 @@
         </rollingPolicy>
     </appender>
     
-    <!-- 审计日志记录器 -->
+    <!-- Audit logger -->
     <logger name="AUDIT" level="INFO" additivity="false">
         <appender-ref ref="AUDIT_FILE"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
     
-    <!-- 安全日志记录器 -->
+    <!-- Security logger -->
     <logger name="SECURITY" level="INFO" additivity="false">
         <appender-ref ref="SECURITY_FILE"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
     
-    <!-- 性能日志记录器 -->
+    <!-- Performance logger -->
     <logger name="PERFORMANCE" level="INFO" additivity="false">
         <appender-ref ref="PERFORMANCE_FILE"/>
     </logger>
     
-    <!-- 应用日志记录器 -->
+    <!-- Application logger -->
     <logger name="jp.asatex.revenue_calculator_backend_employee" level="INFO" additivity="false">
         <appender-ref ref="APPLICATION_FILE"/>
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="ERROR_FILE"/>
     </logger>
     
-    <!-- 根日志记录器 -->
+    <!-- Root logger -->
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="ERROR_FILE"/>
     </root>
     
-    <!-- 开发环境配置 -->
+    <!-- Development environment configuration -->
     <springProfile name="dev">
         <logger name="jp.asatex.revenue_calculator_backend_employee" level="DEBUG"/>
         <logger name="org.springframework.web.reactive" level="DEBUG"/>
         <logger name="org.springframework.r2dbc" level="DEBUG"/>
     </springProfile>
     
-    <!-- 测试环境配置 -->
+    <!-- Test environment configuration -->
     <springProfile name="test">
         <logger name="jp.asatex.revenue_calculator_backend_employee" level="INFO"/>
         <logger name="org.springframework.web.reactive" level="WARN"/>
         <logger name="org.springframework.r2dbc" level="WARN"/>
     </springProfile>
     
-    <!-- 生产环境配置 -->
+    <!-- Production environment configuration -->
     <springProfile name="prod">
         <logger name="jp.asatex.revenue_calculator_backend_employee" level="INFO"/>
         <logger name="org.springframework.web.reactive" level="WARN"/>

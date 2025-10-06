@@ -12,23 +12,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * 事务功能集成测试
+ * Transaction functionality integration test
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(jp.asatex.revenue_calculator_backend_employee.config.TestConfig.class)
-@DisplayName("事务功能集成测试")
+@DisplayName("Transaction Functionality Integration Test")
 class TransactionIntegrationTest {
 
     @Autowired
@@ -44,21 +40,21 @@ class TransactionIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // 清理测试数据
+        // Clean up test data
         employeeRepository.deleteAll().block();
         
-        // 创建测试员工数据
+        // Create test employee data
         testEmployee = new EmployeeDto();
         testEmployee.setEmployeeNumber("TEST001");
-        testEmployee.setName("测试员工");
-        testEmployee.setFurigana("テストユウイン");
+        testEmployee.setName("Test Employee");
+        testEmployee.setFurigana("test employee");
         testEmployee.setBirthday(LocalDate.of(1990, 1, 1));
     }
 
     @Test
-    @DisplayName("创建员工事务应该成功提交")
+    @DisplayName("Creating employee transaction should commit successfully")
     void testCreateEmployeeTransactionCommit() {
-        // 创建员工
+        // Create employee
         EmployeeDto createdEmployee = webTestClient.post()
                 .uri("/api/v1/employee")
                 .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
@@ -70,27 +66,28 @@ class TransactionIntegrationTest {
                 .getResponseBody();
 
         assertThat(createdEmployee).isNotNull();
-        assertThat(createdEmployee.getEmployeeId()).isNotNull();
-        assertThat(createdEmployee.getEmployeeNumber()).isEqualTo("TEST001");
+        if (createdEmployee != null) {
+            assertThat(createdEmployee.getEmployeeId()).isNotNull();
+            assertThat(createdEmployee.getEmployeeNumber()).isEqualTo("TEST001");
+        }
 
-        // 验证员工确实被保存到数据库
-        assertThat(createdEmployee).isNotNull();
+        // Verify employee is actually saved to database
         Employee savedEmployee = employeeRepository.findByEmployeeNumber("TEST001").block();
         assertThat(savedEmployee).isNotNull();
-        assertThat(savedEmployee.getName()).isEqualTo("测试员工");
+        assertThat(savedEmployee.getName()).isEqualTo("Test Employee");
     }
 
     @Test
-    @DisplayName("创建重复员工号应该回滚事务")
+    @DisplayName("Creating duplicate employee number should rollback transaction")
     void testCreateDuplicateEmployeeTransactionRollback() {
-        // 先创建一个员工
+        // First create an employee
         employeeService.createEmployee(testEmployee).block();
 
-        // 尝试创建重复员工号的员工
+        // Try to create employee with duplicate employee number
         EmployeeDto duplicateEmployee = new EmployeeDto();
-        duplicateEmployee.setEmployeeNumber("TEST001"); // 重复的员工号
-        duplicateEmployee.setName("重复员工");
-        duplicateEmployee.setFurigana("ジュウフクユウイン");
+        duplicateEmployee.setEmployeeNumber("TEST001"); // Duplicate employee number
+        duplicateEmployee.setName("Duplicate Employee");
+        duplicateEmployee.setFurigana("duplicate employee");
         duplicateEmployee.setBirthday(LocalDate.of(1990, 1, 1));
 
         webTestClient.post()
@@ -100,21 +97,21 @@ class TransactionIntegrationTest {
                 .exchange()
                 .expectStatus().isEqualTo(409);
 
-        // 验证只有一个员工被保存
+        // Verify only one employee is saved
         Long count = employeeRepository.count().block();
         assertThat(count).isEqualTo(1);
     }
 
     @Test
-    @DisplayName("更新员工事务应该成功提交")
+    @DisplayName("Update employee transaction should commit successfully")
     void testUpdateEmployeeTransactionCommit() {
-        // 先创建员工
+        // First create employee
         EmployeeDto createdEmployee = employeeService.createEmployee(testEmployee).block();
         assertThat(createdEmployee).isNotNull();
 
-        // 更新员工信息
-        createdEmployee.setName("更新后的员工");
-        createdEmployee.setFurigana("コウシンゴノユウイン");
+        // Update employee information
+        createdEmployee.setName("Updated Employee");
+        createdEmployee.setFurigana("updated employee");
 
         EmployeeDto updatedEmployee = webTestClient.put()
                 .uri("/api/v1/employee/{id}", createdEmployee.getEmployeeId())
@@ -127,52 +124,53 @@ class TransactionIntegrationTest {
                 .getResponseBody();
 
         assertThat(updatedEmployee).isNotNull();
-        assertThat(updatedEmployee.getName()).isEqualTo("更新后的员工");
-        assertThat(updatedEmployee.getFurigana()).isEqualTo("コウシンゴノユウイン");
+        if (updatedEmployee != null) {
+            assertThat(updatedEmployee.getName()).isEqualTo("Updated Employee");
+            assertThat(updatedEmployee.getFurigana()).isEqualTo("updated employee");
+        }
 
-        // 验证数据库中的更新
-        assertThat(createdEmployee).isNotNull();
+        // Verify update in database
         Employee savedEmployee = employeeRepository.findById(createdEmployee.getEmployeeId()).block();
         assertThat(savedEmployee).isNotNull();
-        assertThat(savedEmployee.getName()).isEqualTo("更新后的员工");
+        assertThat(savedEmployee.getName()).isEqualTo("Updated Employee");
     }
 
     @Test
-    @DisplayName("删除员工事务应该成功提交")
+    @DisplayName("Delete employee transaction should commit successfully")
     void testDeleteEmployeeTransactionCommit() {
-        // 先创建员工
+        // First create employee
         EmployeeDto createdEmployee = employeeService.createEmployee(testEmployee).block();
         assertThat(createdEmployee).isNotNull();
 
-        // 删除员工
+        // Delete employee
         webTestClient.delete()
                 .uri("/api/v1/employee/{id}", createdEmployee.getEmployeeId())
                 .exchange()
                 .expectStatus().isNoContent();
 
-        // 验证员工已被删除
+        // Verify employee has been deleted
         Employee deletedEmployee = employeeRepository.findById(createdEmployee.getEmployeeId()).block();
         assertThat(deletedEmployee).isNull();
     }
 
     @Test
-    @DisplayName("删除不存在的员工应该回滚事务")
+    @DisplayName("Deleting non-existent employee should rollback transaction")
     void testDeleteNonExistentEmployeeTransactionRollback() {
-        // 尝试删除不存在的员工
+        // Try to delete non-existent employee
         webTestClient.delete()
                 .uri("/api/v1/employee/{id}", 99999L)
                 .exchange()
                 .expectStatus().isNotFound();
 
-        // 验证数据库状态没有改变
+        // Verify database state has not changed
         Long count = employeeRepository.count().block();
         assertThat(count).isEqualTo(0);
     }
 
     @Test
-    @DisplayName("服务层事务注解应该正确工作")
+    @DisplayName("Service layer transaction annotations should work correctly")
     void testServiceLayerTransactionAnnotations() {
-        // 测试创建员工的事务
+        // Test employee creation transaction
         StepVerifier.create(employeeService.createEmployee(testEmployee))
                 .assertNext(employee -> {
                     assertThat(employee).isNotNull();
@@ -180,17 +178,17 @@ class TransactionIntegrationTest {
                 })
                 .verifyComplete();
 
-        // 验证员工被保存
+        // Verify employee is saved
         Employee savedEmployee = employeeRepository.findByEmployeeNumber("TEST001").block();
         assertThat(savedEmployee).isNotNull();
     }
 
     @Test
-    @DisplayName("事务异常应该被正确处理")
+    @DisplayName("Transaction exceptions should be handled correctly")
     void testTransactionExceptionHandling() {
-        // 创建一个无效的员工数据来触发异常
+        // Create invalid employee data to trigger exception
         EmployeeDto invalidEmployee = new EmployeeDto();
-        // 不设置必填字段，应该触发验证异常
+        // Do not set required fields, should trigger validation exception
 
         webTestClient.post()
                 .uri("/api/v1/employee")
@@ -199,7 +197,7 @@ class TransactionIntegrationTest {
                 .exchange()
                 .expectStatus().isBadRequest();
 
-        // 验证没有数据被保存
+        // Verify no data is saved
         Long count = employeeRepository.count().block();
         assertThat(count).isEqualTo(0);
     }

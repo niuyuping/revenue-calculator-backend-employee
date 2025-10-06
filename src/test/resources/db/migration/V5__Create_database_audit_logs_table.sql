@@ -1,4 +1,4 @@
--- 创建数据库审计日志表
+-- Create database audit logs table
 CREATE TABLE IF NOT EXISTS database_audit_logs (
     id BIGSERIAL PRIMARY KEY,
     operation_type VARCHAR(20) NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS database_audit_logs (
     created_by VARCHAR(100)
 );
 
--- 创建索引以提高查询性能
+-- Create indexes to improve query performance
 CREATE INDEX IF NOT EXISTS idx_database_audit_logs_operation_type ON database_audit_logs(operation_type);
 CREATE INDEX IF NOT EXISTS idx_database_audit_logs_table_name ON database_audit_logs(table_name);
 CREATE INDEX IF NOT EXISTS idx_database_audit_logs_user_id ON database_audit_logs(user_id);
@@ -32,23 +32,23 @@ CREATE INDEX IF NOT EXISTS idx_database_audit_logs_created_at ON database_audit_
 CREATE INDEX IF NOT EXISTS idx_database_audit_logs_table_record ON database_audit_logs(table_name, record_id);
 CREATE INDEX IF NOT EXISTS idx_database_audit_logs_user_created ON database_audit_logs(user_id, created_at);
 
--- 添加表注释
-COMMENT ON TABLE database_audit_logs IS '数据库审计日志表，记录所有数据库操作的详细信息';
-COMMENT ON COLUMN database_audit_logs.id IS '主键ID';
-COMMENT ON COLUMN database_audit_logs.operation_type IS '操作类型：INSERT, UPDATE, DELETE, SELECT';
-COMMENT ON COLUMN database_audit_logs.table_name IS '表名';
-COMMENT ON COLUMN database_audit_logs.record_id IS '记录ID';
-COMMENT ON COLUMN database_audit_logs.user_id IS '用户ID';
-COMMENT ON COLUMN database_audit_logs.session_id IS '会话ID';
-COMMENT ON COLUMN database_audit_logs.request_id IS '请求ID';
-COMMENT ON COLUMN database_audit_logs.ip_address IS 'IP地址';
-COMMENT ON COLUMN database_audit_logs.user_agent IS '用户代理';
-COMMENT ON COLUMN database_audit_logs.old_values IS '旧值（JSON格式）';
-COMMENT ON COLUMN database_audit_logs.new_values IS '新值（JSON格式）';
-COMMENT ON COLUMN database_audit_logs.sql_statement IS 'SQL语句';
-COMMENT ON COLUMN database_audit_logs.execution_time_ms IS '执行时间（毫秒）';
-COMMENT ON COLUMN database_audit_logs.affected_rows IS '影响行数';
-COMMENT ON COLUMN database_audit_logs.error_message IS '错误消息';
-COMMENT ON COLUMN database_audit_logs.operation_status IS '操作状态：SUCCESS, FAILURE, ROLLBACK';
-COMMENT ON COLUMN database_audit_logs.created_at IS '创建时间';
-COMMENT ON COLUMN database_audit_logs.created_by IS '创建者';
+-- Add table comments
+COMMENT ON TABLE database_audit_logs IS 'Database audit logs table, records detailed information of all database operations';
+COMMENT ON COLUMN database_audit_logs.id IS 'Primary key ID';
+COMMENT ON COLUMN database_audit_logs.operation_type IS 'Operation type: INSERT, UPDATE, DELETE, SELECT';
+COMMENT ON COLUMN database_audit_logs.table_name IS 'Table name';
+COMMENT ON COLUMN database_audit_logs.record_id IS 'Record ID';
+COMMENT ON COLUMN database_audit_logs.user_id IS 'User ID';
+COMMENT ON COLUMN database_audit_logs.session_id IS 'Session ID';
+COMMENT ON COLUMN database_audit_logs.request_id IS 'Request ID';
+COMMENT ON COLUMN database_audit_logs.ip_address IS 'IP address';
+COMMENT ON COLUMN database_audit_logs.user_agent IS 'User agent';
+COMMENT ON COLUMN database_audit_logs.old_values IS 'Old values (JSON format)';
+COMMENT ON COLUMN database_audit_logs.new_values IS 'New values (JSON format)';
+COMMENT ON COLUMN database_audit_logs.sql_statement IS 'SQL statement';
+COMMENT ON COLUMN database_audit_logs.execution_time_ms IS 'Execution time (milliseconds)';
+COMMENT ON COLUMN database_audit_logs.affected_rows IS 'Affected rows';
+COMMENT ON COLUMN database_audit_logs.error_message IS 'Error message';
+COMMENT ON COLUMN database_audit_logs.operation_status IS 'Operation status: SUCCESS, FAILURE, ROLLBACK';
+COMMENT ON COLUMN database_audit_logs.created_at IS 'Created time';
+COMMENT ON COLUMN database_audit_logs.created_by IS 'Created by';

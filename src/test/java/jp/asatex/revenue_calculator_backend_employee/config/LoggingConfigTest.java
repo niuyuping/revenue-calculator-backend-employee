@@ -9,8 +9,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
- * 日志配置测试
- * 验证日志配置和请求日志功能
+ * Logging configuration test
+ * Verifies logging configuration and request logging functionality
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
                 properties = {"spring.flyway.enabled=false"})
@@ -24,7 +24,7 @@ class LoggingConfigTest {
 
     @Test
     void testRequestLoggingFilter() {
-        // 测试请求日志过滤器是否正常工作
+        // Test if request logging filter works correctly
         webTestClient.get()
                 .uri("/api/v1/employee/health")
                 .exchange()
@@ -34,7 +34,7 @@ class LoggingConfigTest {
 
     @Test
     void testEmployeeApiLogging() {
-        // 测试员工API的日志记录
+        // Test employee API logging
         webTestClient.get()
                 .uri("/api/v1/employee")
                 .exchange()
@@ -43,7 +43,7 @@ class LoggingConfigTest {
 
     @Test
     void testErrorLogging() {
-        // 测试错误日志记录 - 使用一个不存在的员工ID
+        // Test error logging - using a non-existent employee ID
         webTestClient.get()
                 .uri("/api/v1/employee/999999")
                 .exchange()

@@ -1,7 +1,7 @@
 package jp.asatex.revenue_calculator_backend_employee.dto;
 
 /**
- * 排序方向枚举
+ * Sort direction enumeration
  */
 public enum SortDirection {
     ASC("ASC"),
@@ -23,9 +23,9 @@ public enum SortDirection {
     }
     
     /**
-     * 从字符串创建排序方向
-     * @param direction 排序方向字符串
-     * @return 排序方向枚举
+     * Create sort direction from string
+     * @param direction Sort direction string
+     * @return Sort direction enumeration
      */
     public static SortDirection fromString(String direction) {
         if (direction == null) {
@@ -39,6 +39,6 @@ public enum SortDirection {
             }
         }
         
-        return ASC; // 默认升序
+        return ASC; // Default ascending order
     }
 }

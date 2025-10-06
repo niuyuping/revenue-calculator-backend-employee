@@ -3,7 +3,6 @@ package jp.asatex.revenue_calculator_backend_employee.service;
 import jp.asatex.revenue_calculator_backend_employee.dto.EmployeeDto;
 import jp.asatex.revenue_calculator_backend_employee.dto.PageRequest;
 import jp.asatex.revenue_calculator_backend_employee.dto.PageResponse;
-import jp.asatex.revenue_calculator_backend_employee.dto.SortDirection;
 import jp.asatex.revenue_calculator_backend_employee.entity.Employee;
 import jp.asatex.revenue_calculator_backend_employee.exception.DuplicateEmployeeNumberException;
 import jp.asatex.revenue_calculator_backend_employee.exception.EmployeeNotFoundException;
@@ -25,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Employeeサービス層
- * 従業員ビジネスロジック処理を提供
+ * Employee service layer
+ * Provides employee business logic processing
  */
 @Service
 public class EmployeeService {
@@ -67,7 +66,7 @@ public class EmployeeService {
     private Timer databaseOperationTimer;
     
     /**
-     * 全従業員の取得
+     * Get all employees
      * @return Flux<EmployeeDto>
      */
     public Flux<EmployeeDto> getAllEmployees() {
@@ -85,32 +84,36 @@ public class EmployeeService {
     }
     
     /**
-     * IDによる従業員の取得
-     * @param id 従業員ID
+     * Get employee by ID
+     * @param id Employee ID
      * @return Mono<EmployeeDto>
      */
     @Cacheable(value = "employees", key = "#id", unless = "#result == null")
     public Mono<EmployeeDto> getEmployeeById(Long id) {
+        long startTime = System.currentTimeMillis();
         employeeQueryCounter.increment();
         return employeeRepository.findById(id)
                 .map(this::convertToDto)
                 .doOnSuccess(employee -> {
                     if (employee != null) {
-                        // 记录数据库审计日志
+                        long executionTime = System.currentTimeMillis() - startTime;
+                        // Log database audit
+                        // SELECT operation affected rows is the number of records returned by query
+                        int affectedRows = employee != null ? 1 : 0;
                         databaseAuditService.logSelectOperation(
                                 "employees",
                                 employee.getEmployeeId().toString(),
                                 "SELECT * FROM employees WHERE id = ?",
-                                25L, // 执行时间
-                                1     // 影响行数
+                                executionTime, // Dynamic execution time
+                                affectedRows   // Dynamic affected rows
                         ).subscribe();
                     }
                 });
     }
     
     /**
-     * 従業員番号による従業員の取得
-     * @param employeeNumber 従業員番号
+     * Get employee by employee number
+     * @param employeeNumber Employee number
      * @return Mono<EmployeeDto>
      */
     @Cacheable(value = "employees", key = "'number:' + #employeeNumber", unless = "#result == null")
@@ -120,8 +123,8 @@ public class EmployeeService {
     }
     
     /**
-     * 姓名による従業員検索
-     * @param name 姓名キーワード
+     * Search employees by name
+     * @param name Name keyword
      * @return Flux<EmployeeDto>
      */
     public Flux<EmployeeDto> searchEmployeesByName(String name) {
@@ -130,8 +133,8 @@ public class EmployeeService {
     }
     
     /**
-     * ふりがなによる従業員検索
-     * @param furigana ふりがなキーワード
+     * Search employees by furigana
+     * @param furigana Furigana keyword
      * @return Flux<EmployeeDto>
      */
     public Flux<EmployeeDto> searchEmployeesByFurigana(String furigana) {
@@ -140,8 +143,8 @@ public class EmployeeService {
     }
     
     /**
-     * 新従業員の作成
-     * @param employeeDto 従業員情報
+     * Create new employee
+     * @param employeeDto Employee information
      * @return Mono<EmployeeDto>
      */
     @Transactional
@@ -152,17 +155,19 @@ public class EmployeeService {
         employeeOperationCounter.increment();
         employeeCreateCounter.increment();
         
-        // 使用事务监控包装操作
+        long startTime = System.currentTimeMillis();
+        
+        // Use transaction monitoring to wrap operation
         return transactionMonitoringService.monitorTransaction(
                 "CREATE_EMPLOYEE", 
                 "Employee number: " + employeeDto.getEmployeeNumber(),
-                // 従業員番号が既に存在するかチェック
+                // Check if employee number already exists
                 employeeRepository.existsByEmployeeNumber(employeeDto.getEmployeeNumber())
                         .flatMap(exists -> {
                             if (exists) {
                                 logger.warn("Duplicate employee number detected: {}", employeeDto.getEmployeeNumber());
                                 LoggingUtil.logSecurity("DUPLICATE_EMPLOYEE_NUMBER", "Attempted to create employee with existing number: " + employeeDto.getEmployeeNumber());
-                                return Mono.error(new DuplicateEmployeeNumberException("従業員番号が既に存在します: " + employeeDto.getEmployeeNumber()));
+                                return Mono.error(new DuplicateEmployeeNumberException("Employee number already exists: " + employeeDto.getEmployeeNumber()));
                             }
                             return Mono.just(convertToEntity(employeeDto));
                         })
@@ -174,11 +179,12 @@ public class EmployeeService {
                         })
                         .map(this::convertToDto)
                         .doOnSuccess(createdEmployee -> {
+                            long executionTime = System.currentTimeMillis() - startTime;
                             logger.info("Successfully created employee: {} with ID: {}", 
                                     createdEmployee.getEmployeeNumber(), createdEmployee.getEmployeeId());
                             LoggingUtil.logDataAccess("INSERT", "employees", createdEmployee.getEmployeeId());
                             
-                            // 记录审计日志
+                            // Log audit
                             Map<String, Object> details = new HashMap<>();
                             details.put("employeeNumber", createdEmployee.getEmployeeNumber());
                             details.put("name", createdEmployee.getName());
@@ -193,21 +199,24 @@ public class EmployeeService {
                                     createdEmployee.getEmployeeId().toString(), 
                                     "system", "SUCCESS", details);
                             
-                            // 记录数据库审计日志
+                            // Log database audit - using dynamically calculated execution time and affected rows
+                            // INSERT operation usually affects 1 row (newly inserted record)
+                            int affectedRows = createdEmployee.getEmployeeId() != null ? 1 : 0;
                             databaseAuditService.logInsertOperation(
                                     "employees", 
                                     createdEmployee.getEmployeeId().toString(),
                                     details,
                                     "INSERT INTO employees (employee_number, name, furigana, birthday, deleted) VALUES (?, ?, ?, ?, ?)",
-                                    100L, // 执行时间
-                                    1     // 影响行数
+                                    executionTime, // Dynamic execution time
+                                    affectedRows   // Dynamic affected rows
                             ).subscribe();
                         })
                         .doOnError(error -> {
+                            long executionTime = System.currentTimeMillis() - startTime;
                             logger.error("Failed to create employee: {}", employeeDto.getEmployeeNumber(), error);
                             LoggingUtil.logError("CREATE_EMPLOYEE", error, "Employee number: " + employeeDto.getEmployeeNumber());
                             
-                            // 记录错误审计日志
+                            // Log error audit
                             Map<String, Object> errorDetails = new HashMap<>();
                             errorDetails.put("employeeNumber", employeeDto.getEmployeeNumber());
                             errorDetails.put("errorMessage", error.getMessage());
@@ -216,14 +225,24 @@ public class EmployeeService {
                             auditLogService.logError("CREATE_EMPLOYEE_FAILED", "EmployeeService", 
                                     "Failed to create employee: " + employeeDto.getEmployeeNumber(), 
                                     "system", errorDetails);
+                            
+                            // Log failed database operation
+                            databaseAuditService.logFailedOperation(
+                                    "INSERT",
+                                    "employees",
+                                    employeeDto.getEmployeeNumber(),
+                                    "INSERT INTO employees (employee_number, name, furigana, birthday, deleted) VALUES (?, ?, ?, ?, ?)",
+                                    executionTime,
+                                    error.getMessage()
+                            ).subscribe();
                         })
         );
     }
     
     /**
-     * 従業員情報の更新
-     * @param id 従業員ID
-     * @param employeeDto 従業員情報
+     * Update employee information
+     * @param id Employee ID
+     * @param employeeDto Employee information
      * @return Mono<EmployeeDto>
      */
     @Transactional
@@ -234,14 +253,16 @@ public class EmployeeService {
         employeeOperationCounter.increment();
         employeeUpdateCounter.increment();
         
+        long startTime = System.currentTimeMillis();
+        
         return employeeRepository.findById(id)
-                .switchIfEmpty(Mono.error(new EmployeeNotFoundException("従業員が存在しません、ID: " + id)))
+                .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found, ID: " + id)))
                 .flatMap(existingEmployee -> {
-                    // 従業員番号が変更された場合、新しい番号が既に存在するかチェック
+                    // If employee number is changed, check if new number already exists
                     if (!existingEmployee.getEmployeeNumber().equals(employeeDto.getEmployeeNumber())) {
                         return employeeRepository.existsByEmployeeNumber(employeeDto.getEmployeeNumber())
                                 .flatMap(exists -> exists 
-                                    ? Mono.error(new DuplicateEmployeeNumberException("従業員番号が既に存在します: " + employeeDto.getEmployeeNumber()))
+                                    ? Mono.error(new DuplicateEmployeeNumberException("Employee number already exists: " + employeeDto.getEmployeeNumber()))
                                     : Mono.just(existingEmployee));
                     }
                     return Mono.just(existingEmployee);
@@ -254,11 +275,12 @@ public class EmployeeService {
                 .flatMap(employeeRepository::save)
                 .map(this::convertToDto)
                 .doOnSuccess(updatedEmployee -> {
+                    long executionTime = System.currentTimeMillis() - startTime;
                     logger.info("Successfully updated employee: {} with ID: {}", 
                             updatedEmployee.getEmployeeNumber(), updatedEmployee.getEmployeeId());
                     LoggingUtil.logDataAccess("UPDATE", "employees", updatedEmployee.getEmployeeId());
                     
-                    // 记录数据库审计日志
+                    // Log database audit
                     Map<String, Object> oldValues = new HashMap<>();
                     oldValues.put("employeeNumber", employeeDto.getEmployeeNumber());
                     oldValues.put("name", employeeDto.getName());
@@ -271,25 +293,38 @@ public class EmployeeService {
                     newValues.put("furigana", updatedEmployee.getFurigana());
                     newValues.put("birthday", updatedEmployee.getBirthday());
                     
+                    // UPDATE operation usually affects 1 row (updated record)
+                    int affectedRows = updatedEmployee.getEmployeeId() != null ? 1 : 0;
                     databaseAuditService.logUpdateOperation(
                             "employees",
                             updatedEmployee.getEmployeeId().toString(),
                             oldValues,
                             newValues,
                             "UPDATE employees SET employee_number = ?, name = ?, furigana = ?, birthday = ? WHERE id = ?",
-                            75L, // 执行时间
-                            1     // 影响行数
+                            executionTime, // Dynamic execution time
+                            affectedRows   // Dynamic affected rows
                     ).subscribe();
                 })
                 .doOnError(error -> {
+                    long executionTime = System.currentTimeMillis() - startTime;
                     logger.error("Failed to update employee with ID: {}", id, error);
                     LoggingUtil.logError("UPDATE_EMPLOYEE", error, "Employee ID: " + id);
+                    
+                    // Log failed database operation
+                    databaseAuditService.logFailedOperation(
+                            "UPDATE",
+                            "employees",
+                            id.toString(),
+                            "UPDATE employees SET employee_number = ?, name = ?, furigana = ?, birthday = ? WHERE id = ?",
+                            executionTime,
+                            error.getMessage()
+                    ).subscribe();
                 });
     }
     
     /**
-     * IDによる従業員の削除
-     * @param id 従業員ID
+     * Delete employee by ID
+     * @param id Employee ID
      * @return Mono<Void>
      */
     @Transactional
@@ -300,36 +335,52 @@ public class EmployeeService {
         employeeOperationCounter.increment();
         employeeDeleteCounter.increment();
         
+        long startTime = System.currentTimeMillis();
+        
         return employeeRepository.existsById(id)
                 .flatMap(exists -> exists 
                     ? employeeRepository.deleteById(id)
                             .doOnSuccess(unused -> {
+                                long executionTime = System.currentTimeMillis() - startTime;
                                 logger.info("Successfully deleted employee with ID: {}", id);
                                 LoggingUtil.logDataAccess("DELETE", "employees", id);
                                 
-                                // 记录数据库审计日志
+                                // Log database audit
                                 Map<String, Object> details = new HashMap<>();
                                 details.put("employeeId", id);
                                 
+                                // DELETE operation usually affects 1 row (deleted record)
+                                int affectedRows = 1; // Delete operation affects 1 row when successful
                                 databaseAuditService.logDeleteOperation(
                                         "employees",
                                         id.toString(),
                                         details,
                                         "DELETE FROM employees WHERE id = ?",
-                                        50L, // 执行时间
-                                        1    // 影响行数
+                                        executionTime, // Dynamic execution time
+                                        affectedRows   // Dynamic affected rows
                                 ).subscribe();
                             })
                             .doOnError(error -> {
+                                long executionTime = System.currentTimeMillis() - startTime;
                                 logger.error("Failed to delete employee with ID: {}", id, error);
                                 LoggingUtil.logError("DELETE_EMPLOYEE", error, "Employee ID: " + id);
+                                
+                                // Log failed database operation
+                                databaseAuditService.logFailedOperation(
+                                        "DELETE",
+                                        "employees",
+                                        id.toString(),
+                                        "DELETE FROM employees WHERE id = ?",
+                                        executionTime,
+                                        error.getMessage()
+                                ).subscribe();
                             })
-                    : Mono.error(new EmployeeNotFoundException("従業員が存在しません、ID: " + id)));
+                    : Mono.error(new EmployeeNotFoundException("Employee not found, ID: " + id)));
     }
     
     /**
-     * 従業員番号による従業員の削除
-     * @param employeeNumber 従業員番号
+     * Delete employee by employee number
+     * @param employeeNumber Employee number
      * @return Mono<Void>
      */
     @Transactional
@@ -340,36 +391,52 @@ public class EmployeeService {
         employeeOperationCounter.increment();
         employeeDeleteCounter.increment();
         
+        long startTime = System.currentTimeMillis();
+        
         return employeeRepository.existsByEmployeeNumber(employeeNumber)
                 .flatMap(exists -> exists 
                     ? employeeRepository.deleteByEmployeeNumber(employeeNumber)
                             .doOnSuccess(unused -> {
+                                long executionTime = System.currentTimeMillis() - startTime;
                                 logger.info("Successfully deleted employee with number: {}", employeeNumber);
                                 LoggingUtil.logDataAccess("DELETE", "employees", employeeNumber);
                                 
-                                // 记录数据库审计日志
+                                // Log database audit
                                 Map<String, Object> details = new HashMap<>();
                                 details.put("employeeNumber", employeeNumber);
                                 
+                                // DELETE operation usually affects 1 row (deleted record)
+                                int affectedRows = 1; // Delete operation affects 1 row when successful
                                 databaseAuditService.logDeleteOperation(
                                         "employees",
                                         employeeNumber,
                                         details,
                                         "DELETE FROM employees WHERE employee_number = ?",
-                                        50L, // 执行时间
-                                        1    // 影响行数
+                                        executionTime, // Dynamic execution time
+                                        affectedRows   // Dynamic affected rows
                                 ).subscribe();
                             })
                             .doOnError(error -> {
+                                long executionTime = System.currentTimeMillis() - startTime;
                                 logger.error("Failed to delete employee with number: {}", employeeNumber, error);
                                 LoggingUtil.logError("DELETE_EMPLOYEE", error, "Employee number: " + employeeNumber);
+                                
+                                // Log failed database operation
+                                databaseAuditService.logFailedOperation(
+                                        "DELETE",
+                                        "employees",
+                                        employeeNumber,
+                                        "DELETE FROM employees WHERE employee_number = ?",
+                                        executionTime,
+                                        error.getMessage()
+                                ).subscribe();
                             })
-                    : Mono.error(new EmployeeNotFoundException("従業員が存在しません、番号: " + employeeNumber)));
+                    : Mono.error(new EmployeeNotFoundException("Employee not found, number: " + employeeNumber)));
     }
     
     /**
-     * EntityをDTOに変換
-     * @param employee Employeeエンティティ
+     * Convert Entity to DTO
+     * @param employee Employee entity
      * @return EmployeeDto
      */
     EmployeeDto convertToDto(Employee employee) {
@@ -383,7 +450,7 @@ public class EmployeeService {
     }
     
     /**
-     * DTOをEntityに変換
+     * Convert DTO to Entity
      * @param employeeDto EmployeeDto
      * @return Employee
      */
@@ -398,8 +465,8 @@ public class EmployeeService {
     }
     
     /**
-     * 分页获取所有员工
-     * @param pageRequest 分页请求参数
+     * Get all employees with pagination
+     * @param pageRequest Pagination request parameters
      * @return Mono<PageResponse<EmployeeDto>>
      */
     @Cacheable(value = "employeePagination", key = "#pageRequest.page + '_' + #pageRequest.size + '_' + #pageRequest.sortBy + '_' + #pageRequest.sortDirection", unless = "#result == null")
@@ -429,9 +496,9 @@ public class EmployeeService {
     }
     
     /**
-     * 分页搜索员工（按姓名）
-     * @param name 姓名关键词
-     * @param pageRequest 分页请求参数
+     * Search employees with pagination (by name)
+     * @param name Name keyword
+     * @param pageRequest Pagination request parameters
      * @return Mono<PageResponse<EmployeeDto>>
      */
     @Cacheable(value = "employeeSearch", key = "'name:' + #name + '_' + #pageRequest.page + '_' + #pageRequest.size + '_' + #pageRequest.sortBy + '_' + #pageRequest.sortDirection", unless = "#result == null")
@@ -462,9 +529,9 @@ public class EmployeeService {
     }
     
     /**
-     * 分页搜索员工（按ふりがな）
-     * @param furigana ふりがな关键词
-     * @param pageRequest 分页请求参数
+     * Search employees with pagination (by furigana)
+     * @param furigana Furigana keyword
+     * @param pageRequest Pagination request parameters
      * @return Mono<PageResponse<EmployeeDto>>
      */
     @Cacheable(value = "employeeSearch", key = "'furigana:' + #furigana + '_' + #pageRequest.page + '_' + #pageRequest.size + '_' + #pageRequest.sortBy + '_' + #pageRequest.sortDirection", unless = "#result == null")
@@ -495,11 +562,11 @@ public class EmployeeService {
     }
     
     /**
-     * 根据排序字段和方向获取员工数据流
-     * @param sortBy 排序字段
-     * @param sortDirection 排序方向
-     * @param offset 偏移量
-     * @param limit 限制数量
+     * Get employee data stream based on sort field and direction
+     * @param sortBy Sort field
+     * @param sortDirection Sort direction
+     * @param offset Offset
+     * @param limit Limit
      * @return Flux<Employee>
      */
     private Flux<Employee> getEmployeeFluxForSorting(String sortBy, String sortDirection, int offset, int limit) {
@@ -516,7 +583,7 @@ public class EmployeeService {
                 ? employeeRepository.findAllWithPaginationByNameAsc(offset, limit)
                 : employeeRepository.findAllWithPaginationByNameDesc(offset, limit);
         } else {
-            // 默认按员工ID排序
+            // Default sort by employee ID
             return "ASC".equals(sortDirection)
                 ? employeeRepository.findAllWithPaginationByIdAsc(offset, limit)
                 : employeeRepository.findAllWithPaginationByIdDesc(offset, limit);
@@ -524,12 +591,12 @@ public class EmployeeService {
     }
     
     /**
-     * 根据排序字段和方向获取按姓名搜索的员工数据流
-     * @param name 姓名关键词
-     * @param sortBy 排序字段
-     * @param sortDirection 排序方向
-     * @param offset 偏移量
-     * @param limit 限制数量
+     * Get employee data stream for name search based on sort field and direction
+     * @param name Name keyword
+     * @param sortBy Sort field
+     * @param sortDirection Sort direction
+     * @param offset Offset
+     * @param limit Limit
      * @return Flux<Employee>
      */
     private Flux<Employee> getEmployeeFluxForNameSearch(String name, String sortBy, String sortDirection, int offset, int limit) {
@@ -542,7 +609,7 @@ public class EmployeeService {
                 ? employeeRepository.findByNameContainingWithPaginationByNameAsc(name, offset, limit)
                 : employeeRepository.findByNameContainingWithPaginationByNameDesc(name, offset, limit);
         } else {
-            // 默认按员工ID排序
+            // Default sort by employee ID
             return "ASC".equals(sortDirection)
                 ? employeeRepository.findByNameContainingWithPaginationByIdAsc(name, offset, limit)
                 : employeeRepository.findByNameContainingWithPaginationByIdDesc(name, offset, limit);
@@ -550,12 +617,12 @@ public class EmployeeService {
     }
     
     /**
-     * 根据排序字段和方向获取按ふりがな搜索的员工数据流
-     * @param furigana ふりがな关键词
-     * @param sortBy 排序字段
-     * @param sortDirection 排序方向
-     * @param offset 偏移量
-     * @param limit 限制数量
+     * Get employee data stream for furigana search based on sort field and direction
+     * @param furigana Furigana keyword
+     * @param sortBy Sort field
+     * @param sortDirection Sort direction
+     * @param offset Offset
+     * @param limit Limit
      * @return Flux<Employee>
      */
     private Flux<Employee> getEmployeeFluxForFuriganaSearch(String furigana, String sortBy, String sortDirection, int offset, int limit) {
@@ -568,7 +635,7 @@ public class EmployeeService {
                 ? employeeRepository.findByFuriganaContainingWithPaginationByNameAsc(furigana, offset, limit)
                 : employeeRepository.findByFuriganaContainingWithPaginationByNameDesc(furigana, offset, limit);
         } else {
-            // 默认按员工ID排序
+            // Default sort by employee ID
             return "ASC".equals(sortDirection)
                 ? employeeRepository.findByFuriganaContainingWithPaginationByIdAsc(furigana, offset, limit)
                 : employeeRepository.findByFuriganaContainingWithPaginationByIdDesc(furigana, offset, limit);
@@ -576,30 +643,30 @@ public class EmployeeService {
     }
     
     /**
-     * 验证和规范化排序字段
-     * @param sortBy 排序字段
-     * @return 规范化的排序字段
+     * Validate and normalize sort field
+     * @param sortBy Sort field
+     * @return Normalized sort field
      */
     private String validateAndNormalizeSortField(String sortBy) {
         if (sortBy == null || sortBy.trim().isEmpty()) {
             return "employee_id";
         }
         
-        // 允许的排序字段
+        // Allowed sort fields
         String[] allowedFields = {
             "employee_id", "employee_number", "name", "furigana", "birthday", "created_at", "updated_at"
         };
         
         String normalizedField = sortBy.toLowerCase().trim();
         
-        // 检查字段是否在允许列表中
+        // Check if field is in allowed list
         for (String field : allowedFields) {
             if (field.equals(normalizedField)) {
                 return field;
             }
         }
         
-        // 如果字段不在允许列表中，返回默认字段
+        // If field is not in allowed list, return default field
         logger.warn("Invalid sort field '{}', using default 'employee_id'", sortBy);
         return "employee_id";
     }

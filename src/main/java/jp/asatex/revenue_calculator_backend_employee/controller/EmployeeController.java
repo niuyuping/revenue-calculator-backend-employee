@@ -29,28 +29,28 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 
 /**
- * Employeeコントローラー
- * 従業員管理のREST APIエンドポイントを提供
+ * Employee controller
+ * Provides REST API endpoints for employee management
  */
 @RestController
 @RequestMapping("/api/v1/employee")
 @CrossOrigin(origins = "*")
-@Tag(name = "Employee Management", description = "従業員管理API")
+@Tag(name = "Employee Management", description = "Employee Management API")
 public class EmployeeController {
     
     @Autowired
     private EmployeeService employeeService;
     
     /**
-     * 全従業員の取得
+     * Get all employees
      * GET /api/v1/employee
      * @return Flux<EmployeeDto>
      */
-    @Operation(summary = "全従業員の取得", description = "システムに登録されている全ての従業員情報を取得します")
+    @Operation(summary = "Get all employees", description = "Retrieve all employee information registered in the system")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "成功", 
+            @ApiResponse(responseCode = "200", description = "Success", 
                     content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
-            @ApiResponse(responseCode = "500", description = "サーバーエラー")
+            @ApiResponse(responseCode = "500", description = "Server error")
     })
     @GetMapping
     @RateLimiter(name = "employee-pagination")
@@ -59,118 +59,118 @@ public class EmployeeController {
     }
     
     /**
-     * IDによる従業員の取得
+     * Get employee by ID
      * GET /api/v1/employee/{id}
-     * @param id 従業員ID
+     * @param id Employee ID
      * @return Mono<ResponseEntity<EmployeeDto>>
      */
-    @Operation(summary = "IDによる従業員の取得", description = "指定されたIDの従業員情報を取得します")
+    @Operation(summary = "Get employee by ID", description = "Retrieve employee information by specified ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "成功", 
+            @ApiResponse(responseCode = "200", description = "Success", 
                     content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
-            @ApiResponse(responseCode = "404", description = "従業員が見つかりません"),
-            @ApiResponse(responseCode = "400", description = "無効なID"),
-            @ApiResponse(responseCode = "500", description = "サーバーエラー")
+            @ApiResponse(responseCode = "404", description = "Employee not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid ID"),
+            @ApiResponse(responseCode = "500", description = "Server error")
     })
     @GetMapping("/{id}")
     public Mono<ResponseEntity<EmployeeDto>> getEmployeeById(
-            @Parameter(description = "従業員ID", required = true, example = "1")
-            @PathVariable @NotNull @Positive(message = "従業員IDは正数である必要があります") Long id) {
+            @Parameter(description = "Employee ID", required = true, example = "1")
+            @PathVariable @NotNull @Positive(message = "Employee ID must be positive") Long id) {
         return employeeService.getEmployeeById(id)
                 .map(employee -> ResponseEntity.ok(employee))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
     
     /**
-     * 従業員番号による従業員の取得
+     * Get employee by employee number
      * GET /api/v1/employee/number/{employeeNumber}
-     * @param employeeNumber 従業員番号
+     * @param employeeNumber Employee number
      * @return Mono<ResponseEntity<EmployeeDto>>
      */
-    @Operation(summary = "従業員番号による従業員の取得", description = "指定された従業員番号の従業員情報を取得します")
+    @Operation(summary = "Get employee by employee number", description = "Retrieve employee information by specified employee number")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "成功", 
+            @ApiResponse(responseCode = "200", description = "Success", 
                     content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
-            @ApiResponse(responseCode = "404", description = "従業員が見つかりません"),
-            @ApiResponse(responseCode = "400", description = "無効な従業員番号"),
-            @ApiResponse(responseCode = "500", description = "サーバーエラー")
+            @ApiResponse(responseCode = "404", description = "Employee not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid employee number"),
+            @ApiResponse(responseCode = "500", description = "Server error")
     })
     @GetMapping("/number/{employeeNumber}")
     public Mono<ResponseEntity<EmployeeDto>> getEmployeeByNumber(
-            @Parameter(description = "従業員番号", required = true, example = "EMP001")
-            @PathVariable @NotBlank(message = "従業員番号は空にできません") @Size(min = 1, max = 20, message = "従業員番号の長さは1-20文字の間である必要があります") @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "従業員番号は英字、数字、アンダースコア、ハイフンのみを含むことができます") String employeeNumber) {
+            @Parameter(description = "Employee number", required = true, example = "EMP001")
+            @PathVariable @NotBlank(message = "Employee numbercannot be empty") @Size(min = 1, max = 20, message = "Employee numberlength must be between 1-20 characters") @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "Employee numbercan only contain letters, numbers, underscores, and hyphens") String employeeNumber) {
         return employeeService.getEmployeeByNumber(employeeNumber)
                 .map(employee -> ResponseEntity.ok(employee))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
     
     /**
-     * 姓名による従業員検索
+     * Search employees by name
      * GET /api/v1/employee/search/name?q={name}
-     * @param name 姓名キーワード
+     * @param name Name keyword
      * @return Flux<EmployeeDto>
      */
-    @Operation(summary = "姓名による従業員検索", description = "姓名にキーワードを含む従業員を検索します")
+    @Operation(summary = "Search employees by name", description = "Search for employees whose name contains the keyword")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "成功", 
+            @ApiResponse(responseCode = "200", description = "Success", 
                     content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
-            @ApiResponse(responseCode = "400", description = "無効な検索キーワード"),
-            @ApiResponse(responseCode = "500", description = "サーバーエラー")
+            @ApiResponse(responseCode = "400", description = "Invalid search keyword"),
+            @ApiResponse(responseCode = "500", description = "Server error")
     })
     @GetMapping("/search/name")
     @RateLimiter(name = "employee-search")
     public Flux<EmployeeDto> searchEmployeesByName(
-            @Parameter(description = "検索キーワード", required = true, example = "田中")
-            @RequestParam @NotBlank(message = "検索キーワードは空にできません") @Size(min = 1, max = 100, message = "検索キーワードの長さは1-100文字の間である必要があります") String name) {
+            @Parameter(description = "Search keyword", required = true, example = "Tanaka")
+            @RequestParam @NotBlank(message = "Search keyword cannot be empty") @Size(min = 1, max = 100, message = "Search keyword length must be between 1-100 characters") String name) {
         return employeeService.searchEmployeesByName(name);
     }
     
     /**
-     * ふりがなによる従業員検索
+     * Search employees by furigana
      * GET /api/v1/employee/search/furigana?q={furigana}
-     * @param furigana ふりがなキーワード
+     * @param furigana Furigana keyword
      * @return Flux<EmployeeDto>
      */
-    @Operation(summary = "ふりがなによる従業員検索", description = "ふりがなにキーワードを含む従業員を検索します")
+    @Operation(summary = "Search employees by furigana", description = "Search for employees whose furigana contains the keyword")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "成功", 
+            @ApiResponse(responseCode = "200", description = "Success", 
                     content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
-            @ApiResponse(responseCode = "400", description = "無効な検索キーワード"),
-            @ApiResponse(responseCode = "500", description = "サーバーエラー")
+            @ApiResponse(responseCode = "400", description = "Invalid search keyword"),
+            @ApiResponse(responseCode = "500", description = "Server error")
     })
     @GetMapping("/search/furigana")
     public Flux<EmployeeDto> searchEmployeesByFurigana(
-            @Parameter(description = "ふりがな検索キーワード", required = true, example = "たなか")
-            @RequestParam @NotBlank(message = "検索キーワードは空にできません") @Size(min = 1, max = 200, message = "検索キーワードの長さは1-200文字の間である必要があります") String furigana) {
+            @Parameter(description = "Furigana search keyword", required = true, example = "tanaka")
+            @RequestParam @NotBlank(message = "Search keyword cannot be empty") @Size(min = 1, max = 200, message = "Search keyword length must be between 1-200 characters") String furigana) {
         return employeeService.searchEmployeesByFurigana(furigana);
     }
     
     /**
-     * 分页获取所有员工
+     * Get all employees with pagination
      * GET /api/v1/employee/paged
-     * @param page 页码（从0开始）
-     * @param size 每页大小
-     * @param sortBy 排序字段
-     * @param sortDirection 排序方向
+     * @param page Page number (starts from 0)
+     * @param size Page size
+     * @param sortBy Sort field
+     * @param sortDirection Sort direction
      * @return Mono<PageResponse<EmployeeDto>>
      */
-    @Operation(summary = "分页获取所有员工", description = "支持分页和排序的员工列表查询")
+    @Operation(summary = "Get all employees with pagination", description = "Query employee list with pagination and sorting support")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "成功", 
+            @ApiResponse(responseCode = "200", description = "Success", 
                     content = @Content(schema = @Schema(implementation = PageResponse.class))),
-            @ApiResponse(responseCode = "400", description = "无效的分页参数"),
-            @ApiResponse(responseCode = "500", description = "服务器错误")
+            @ApiResponse(responseCode = "400", description = "Invalid pagination parameters"),
+            @ApiResponse(responseCode = "500", description = "Server error")
     })
     @GetMapping("/paged")
     @RateLimiter(name = "employee-pagination")
     public Mono<PageResponse<EmployeeDto>> getAllEmployeesWithPagination(
-            @Parameter(description = "页码，从0开始", example = "0")
+            @Parameter(description = "Page number, starting from 0", example = "0")
             @RequestParam(defaultValue = "0") @Min(0) int page,
-            @Parameter(description = "每页大小", example = "10")
+            @Parameter(description = "Page size", example = "10")
             @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
-            @Parameter(description = "排序字段", example = "name")
+            @Parameter(description = "Sort field", example = "name")
             @RequestParam(defaultValue = "employeeId") String sortBy,
-            @Parameter(description = "排序方向", example = "ASC")
+            @Parameter(description = "Sort direction", example = "ASC")
             @RequestParam(defaultValue = "ASC") String sortDirection) {
         
         PageRequest pageRequest = new PageRequest(page, size, sortBy, SortDirection.fromString(sortDirection));
@@ -178,34 +178,34 @@ public class EmployeeController {
     }
     
     /**
-     * 分页搜索员工（按姓名）
+     * Search employees with pagination (by name)
      * GET /api/v1/employee/search/name/paged
-     * @param name 姓名关键词
-     * @param page 页码（从0开始）
-     * @param size 每页大小
-     * @param sortBy 排序字段
-     * @param sortDirection 排序方向
+     * @param name Name keyword
+     * @param page Page number (starts from 0)
+     * @param size Page size
+     * @param sortBy Sort field
+     * @param sortDirection Sort direction
      * @return Mono<PageResponse<EmployeeDto>>
      */
-    @Operation(summary = "分页搜索员工（按姓名）", description = "支持分页和排序的姓名搜索")
+    @Operation(summary = "Search employees with pagination (by name)", description = "Name search with pagination and sorting support")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "成功", 
+            @ApiResponse(responseCode = "200", description = "Success", 
                     content = @Content(schema = @Schema(implementation = PageResponse.class))),
-            @ApiResponse(responseCode = "400", description = "无效的搜索参数"),
-            @ApiResponse(responseCode = "500", description = "服务器错误")
+            @ApiResponse(responseCode = "400", description = "Invalid search parameters"),
+            @ApiResponse(responseCode = "500", description = "Server error")
     })
     @GetMapping("/search/name/paged")
     @RateLimiter(name = "employee-search")
     public Mono<PageResponse<EmployeeDto>> searchEmployeesByNameWithPagination(
-            @Parameter(description = "姓名搜索关键词", required = true, example = "田中")
-            @RequestParam @NotBlank(message = "搜索关键词不能为空") @Size(min = 1, max = 100, message = "搜索关键词长度必须在1-100字符之间") String name,
-            @Parameter(description = "页码，从0开始", example = "0")
+            @Parameter(description = "Name search keyword", required = true, example = "Tanaka")
+            @RequestParam @NotBlank(message = "Search keyword cannot be empty") @Size(min = 1, max = 100, message = "Search keyword length must be between 1-100 characters") String name,
+            @Parameter(description = "Page number, starting from 0", example = "0")
             @RequestParam(defaultValue = "0") @Min(0) int page,
-            @Parameter(description = "每页大小", example = "10")
+            @Parameter(description = "Page size", example = "10")
             @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
-            @Parameter(description = "排序字段", example = "name")
+            @Parameter(description = "Sort field", example = "name")
             @RequestParam(defaultValue = "employeeId") String sortBy,
-            @Parameter(description = "排序方向", example = "ASC")
+            @Parameter(description = "Sort direction", example = "ASC")
             @RequestParam(defaultValue = "ASC") String sortDirection) {
         
         PageRequest pageRequest = new PageRequest(page, size, sortBy, SortDirection.fromString(sortDirection));
@@ -213,34 +213,34 @@ public class EmployeeController {
     }
     
     /**
-     * 分页搜索员工（按ふりがな）
+     * Search employees with pagination (by furigana)
      * GET /api/v1/employee/search/furigana/paged
-     * @param furigana ふりがな关键词
-     * @param page 页码（从0开始）
-     * @param size 每页大小
-     * @param sortBy 排序字段
-     * @param sortDirection 排序方向
+     * @param furigana Furigana keyword
+     * @param page Page number (starts from 0)
+     * @param size Page size
+     * @param sortBy Sort field
+     * @param sortDirection Sort direction
      * @return Mono<PageResponse<EmployeeDto>>
      */
-    @Operation(summary = "分页搜索员工（按ふりがな）", description = "支持分页和排序的ふりがな搜索")
+    @Operation(summary = "Search employees with pagination (by furigana)", description = "Furigana search with pagination and sorting support")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "成功", 
+            @ApiResponse(responseCode = "200", description = "Success", 
                     content = @Content(schema = @Schema(implementation = PageResponse.class))),
-            @ApiResponse(responseCode = "400", description = "无效的搜索参数"),
-            @ApiResponse(responseCode = "500", description = "服务器错误")
+            @ApiResponse(responseCode = "400", description = "Invalid search parameters"),
+            @ApiResponse(responseCode = "500", description = "Server error")
     })
     @GetMapping("/search/furigana/paged")
     @RateLimiter(name = "employee-search")
     public Mono<PageResponse<EmployeeDto>> searchEmployeesByFuriganaWithPagination(
-            @Parameter(description = "ふりがな搜索关键词", required = true, example = "たなか")
-            @RequestParam @NotBlank(message = "搜索关键词不能为空") @Size(min = 1, max = 200, message = "搜索关键词长度必须在1-200字符之间") String furigana,
-            @Parameter(description = "页码，从0开始", example = "0")
+            @Parameter(description = "Furigana search keyword", required = true, example = "tanaka")
+            @RequestParam @NotBlank(message = "Search keyword cannot be empty") @Size(min = 1, max = 200, message = "Search keyword length must be between 1-200 characters") String furigana,
+            @Parameter(description = "Page number, starting from 0", example = "0")
             @RequestParam(defaultValue = "0") @Min(0) int page,
-            @Parameter(description = "每页大小", example = "10")
+            @Parameter(description = "Page size", example = "10")
             @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
-            @Parameter(description = "排序字段", example = "name")
+            @Parameter(description = "Sort field", example = "name")
             @RequestParam(defaultValue = "employeeId") String sortBy,
-            @Parameter(description = "排序方向", example = "ASC")
+            @Parameter(description = "Sort direction", example = "ASC")
             @RequestParam(defaultValue = "ASC") String sortDirection) {
         
         PageRequest pageRequest = new PageRequest(page, size, sortBy, SortDirection.fromString(sortDirection));
@@ -248,49 +248,49 @@ public class EmployeeController {
     }
     
     /**
-     * 新従業員の作成
+     * Create new employee
      * POST /api/v1/employee
-     * @param employeeDto 従業員情報
+     * @param employeeDto Employee information
      * @return Mono<ResponseEntity<EmployeeDto>>
      */
-    @Operation(summary = "新従業員の作成", description = "新しい従業員をシステムに登録します")
+    @Operation(summary = "Create new employee", description = "Register a new employee in the system")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "従業員が正常に作成されました", 
+            @ApiResponse(responseCode = "201", description = "Employee created successfully", 
                     content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
-            @ApiResponse(responseCode = "400", description = "無効なリクエストデータ"),
-            @ApiResponse(responseCode = "409", description = "従業員番号が既に存在します"),
-            @ApiResponse(responseCode = "500", description = "サーバーエラー")
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "409", description = "Employee number already exists"),
+            @ApiResponse(responseCode = "500", description = "Server error")
     })
     @PostMapping
     @RateLimiter(name = "employee-create")
     public Mono<ResponseEntity<EmployeeDto>> createEmployee(
-            @Parameter(description = "従業員情報", required = true)
+            @Parameter(description = "Employee information", required = true)
             @RequestBody @Valid EmployeeDto employeeDto) {
         return employeeService.createEmployee(employeeDto)
                 .map(createdEmployee -> ResponseEntity.status(HttpStatus.CREATED).body(createdEmployee));
     }
     
     /**
-     * 従業員情報の更新
+     * Update employee information
      * PUT /api/v1/employee/{id}
-     * @param id 従業員ID
-     * @param employeeDto 従業員情報
+     * @param id Employee ID
+     * @param employeeDto Employee information
      * @return Mono<ResponseEntity<EmployeeDto>>
      */
-    @Operation(summary = "従業員情報の更新", description = "指定されたIDの従業員情報を更新します")
+    @Operation(summary = "Update employee information", description = "Update employee information for the specified ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "従業員情報が正常に更新されました", 
+            @ApiResponse(responseCode = "200", description = "Employee information updated successfully", 
                     content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
-            @ApiResponse(responseCode = "400", description = "無効なリクエストデータ"),
-            @ApiResponse(responseCode = "404", description = "従業員が見つかりません"),
-            @ApiResponse(responseCode = "500", description = "サーバーエラー")
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "404", description = "Employee not found"),
+            @ApiResponse(responseCode = "500", description = "Server error")
     })
     @PutMapping("/{id}")
     @RateLimiter(name = "employee-update")
     public Mono<ResponseEntity<EmployeeDto>> updateEmployee(
-            @Parameter(description = "従業員ID", required = true, example = "1")
-            @PathVariable @NotNull @Positive(message = "従業員IDは正数である必要があります") Long id, 
-            @Parameter(description = "更新する従業員情報", required = true)
+            @Parameter(description = "Employee ID", required = true, example = "1")
+            @PathVariable @NotNull @Positive(message = "Employee ID must be positive") Long id, 
+            @Parameter(description = "Employee information to update", required = true)
             @RequestBody @Valid EmployeeDto employeeDto) {
         return employeeService.updateEmployee(id, employeeDto)
                 .map(updatedEmployee -> ResponseEntity.ok(updatedEmployee))
@@ -298,58 +298,58 @@ public class EmployeeController {
     }
     
     /**
-     * IDによる従業員の削除
+     * Delete employee by ID
      * DELETE /api/v1/employee/{id}
-     * @param id 従業員ID
+     * @param id Employee ID
      * @return Mono<ResponseEntity<Void>>
      */
-    @Operation(summary = "IDによる従業員の削除", description = "指定されたIDの従業員を削除します")
+    @Operation(summary = "Delete employee by ID", description = "Delete employee for the specified ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "従業員が正常に削除されました"),
-            @ApiResponse(responseCode = "400", description = "無効なID"),
-            @ApiResponse(responseCode = "404", description = "従業員が見つかりません"),
-            @ApiResponse(responseCode = "500", description = "サーバーエラー")
+            @ApiResponse(responseCode = "204", description = "Employee deleted successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid ID"),
+            @ApiResponse(responseCode = "404", description = "Employee not found"),
+            @ApiResponse(responseCode = "500", description = "Server error")
     })
     @DeleteMapping("/{id}")
     @RateLimiter(name = "employee-delete")
     public Mono<ResponseEntity<Void>> deleteEmployeeById(
-            @Parameter(description = "従業員ID", required = true, example = "1")
-            @PathVariable @NotNull @Positive(message = "従業員IDは正数である必要があります") Long id) {
+            @Parameter(description = "Employee ID", required = true, example = "1")
+            @PathVariable @NotNull @Positive(message = "Employee ID must be positive") Long id) {
         return employeeService.deleteEmployeeById(id)
                 .then(Mono.just(ResponseEntity.noContent().<Void>build()));
     }
     
     /**
-     * 従業員番号による従業員の削除
+     * Delete employee by employee number
      * DELETE /api/v1/employee/number/{employeeNumber}
-     * @param employeeNumber 従業員番号
+     * @param employeeNumber Employee number
      * @return Mono<ResponseEntity<Void>>
      */
-    @Operation(summary = "従業員番号による従業員の削除", description = "指定された従業員番号の従業員を削除します")
+    @Operation(summary = "Delete employee by employee number", description = "Delete employee for the specified employee number")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "従業員が正常に削除されました"),
-            @ApiResponse(responseCode = "400", description = "無効な従業員番号"),
-            @ApiResponse(responseCode = "404", description = "従業員が見つかりません"),
-            @ApiResponse(responseCode = "500", description = "サーバーエラー")
+            @ApiResponse(responseCode = "204", description = "Employee deleted successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid employee number"),
+            @ApiResponse(responseCode = "404", description = "Employee not found"),
+            @ApiResponse(responseCode = "500", description = "Server error")
     })
     @DeleteMapping("/number/{employeeNumber}")
     @RateLimiter(name = "employee-delete")
     public Mono<ResponseEntity<Void>> deleteEmployeeByNumber(
-            @Parameter(description = "従業員番号", required = true, example = "EMP001")
-            @PathVariable @NotBlank(message = "従業員番号は空にできません") @Size(min = 1, max = 20, message = "従業員番号の長さは1-20文字の間である必要があります") @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "従業員番号は英字、数字、アンダースコア、ハイフンのみを含むことができます") String employeeNumber) {
+            @Parameter(description = "Employee number", required = true, example = "EMP001")
+            @PathVariable @NotBlank(message = "Employee numbercannot be empty") @Size(min = 1, max = 20, message = "Employee numberlength must be between 1-20 characters") @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "Employee numbercan only contain letters, numbers, underscores, and hyphens") String employeeNumber) {
         return employeeService.deleteEmployeeByNumber(employeeNumber)
                 .then(Mono.just(ResponseEntity.noContent().<Void>build()));
     }
     
     /**
-     * ヘルスチェックエンドポイント
+     * Health check endpoint
      * GET /api/v1/employee/health
      * @return Mono<ResponseEntity<String>>
      */
-    @Operation(summary = "ヘルスチェック", description = "APIの稼働状況を確認します")
+    @Operation(summary = "Health check", description = "Check API operational status")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "APIが正常に稼働中"),
-            @ApiResponse(responseCode = "500", description = "サーバーエラー")
+            @ApiResponse(responseCode = "200", description = "API is running normally"),
+            @ApiResponse(responseCode = "500", description = "Server error")
     })
     @GetMapping("/health")
     public Mono<ResponseEntity<String>> healthCheck() {
