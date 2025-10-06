@@ -1,0 +1,60 @@
+# Gradle
+.gradle/
+build/
+!build/libs/
+!build/resources/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+README*.md
+DEPLOYMENT.md
+*.md
+
+# Logs
+logs/
+*.log
+
+# Test files
+src/test/
+test-results/
+
+# Temporary files
+tmp/
+temp/
+
+# Environment files
+.env*
+env.*
+
+# Deployment files
+cloud-*.yaml
+iam-config.yaml
+secrets.yaml
+deploy.sh
+
+# GitHub
+.github/
+
+# Scripts
+scripts/
+
+# Other
+*.pid
+*.seed
+*.pid.lock
