@@ -34,21 +34,25 @@ WORKDIR /app
 COPY --from=builder /app/build/libs/ ./libs/
 RUN find ./libs/ -name "*.jar" -not -name "*-plain.jar" | head -1 | xargs -I {} cp {} app.jar
 
-# 暴露端口（Cloud Run会动态设置PORT环境变量）
-EXPOSE $PORT
+# 暴露端口
+EXPOSE 8080
 
-# 健康检查（使用动态端口）
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-9001}/actuator/health || exit 1
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
+    CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # 启动应用
 ENTRYPOINT ["java", \
     "-Djava.security.egd=file:/dev/./urandom", \
     "-Dspring.profiles.active=prod", \
-    "-Xmx512m", \
-    "-Xms256m", \
+    "-Xmx1g", \
+    "-Xms512m", \
     "-XX:+UseG1GC", \
     "-XX:+UseContainerSupport", \
     "-XX:MaxRAMPercentage=75.0", \
+    "-XX:+TieredCompilation", \
+    "-XX:TieredStopAtLevel=1", \
+    "-Dspring.jmx.enabled=false", \
+    "-Dspring.main.lazy-initialization=true", \
     "-jar", \
     "app.jar"]
