@@ -1,4 +1,4 @@
-# 使用多阶段构建优化镜像大小
+# 使用Spring Boot官方镜像
 FROM gradle:8.5-jdk21-alpine AS builder
 
 # 设置工作目录
@@ -18,8 +18,8 @@ COPY src/ src/
 # 构建应用
 RUN ./gradlew build -x test --no-daemon
 
-# 生产阶段
-FROM openjdk:21-jre-slim
+# 生产阶段 - 使用Spring Boot官方镜像
+FROM openjdk:21-jdk-slim
 
 # 安装必要的工具
 RUN apt-get update && \
@@ -27,28 +27,18 @@ RUN apt-get update && \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# 创建应用用户
-RUN groupadd -r appuser && useradd -r -g appuser appuser
-
 # 设置工作目录
 WORKDIR /app
 
 # 从构建阶段复制jar文件
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-# 创建日志目录
-RUN mkdir -p /var/log/revenue-calculator && \
-    chown -R appuser:appuser /var/log/revenue-calculator
+# 暴露端口（Cloud Run会动态设置PORT环境变量）
+EXPOSE $PORT
 
-# 切换到应用用户
-USER appuser
-
-# 暴露端口
-EXPOSE 9001
-
-# 健康检查
+# 健康检查（使用动态端口）
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:9001/actuator/health || exit 1
+    CMD curl -f http://localhost:${PORT:-9001}/actuator/health || exit 1
 
 # 启动应用
 ENTRYPOINT ["java", \
