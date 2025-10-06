@@ -45,14 +45,17 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
 ENTRYPOINT ["java", \
     "-Djava.security.egd=file:/dev/./urandom", \
     "-Dspring.profiles.active=prod", \
-    "-Xmx1g", \
-    "-Xms512m", \
-    "-XX:+UseG1GC", \
     "-XX:+UseContainerSupport", \
-    "-XX:MaxRAMPercentage=75.0", \
+    "-XX:MaxRAMPercentage=70.0", \
+    "-XX:+UseG1GC", \
     "-XX:+TieredCompilation", \
     "-XX:TieredStopAtLevel=1", \
+    "-XX:+UseStringDeduplication", \
+    "-XX:+OptimizeStringConcat", \
     "-Dspring.jmx.enabled=false", \
     "-Dspring.main.lazy-initialization=true", \
+    "-Dspring.jpa.open-in-view=false", \
+    "-Dspring.devtools.restart.enabled=false", \
+    "-Dspring.devtools.livereload.enabled=false", \
     "-jar", \
     "app.jar"]
