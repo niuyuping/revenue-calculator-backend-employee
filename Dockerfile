@@ -31,7 +31,8 @@ RUN apt-get update && \
 WORKDIR /app
 
 # 从构建阶段复制jar文件
-COPY --from=builder /app/build/libs/*.jar app.jar
+COPY --from=builder /app/build/libs/ ./libs/
+RUN find ./libs/ -name "*.jar" -not -name "*-plain.jar" | head -1 | xargs -I {} cp {} app.jar
 
 # 暴露端口（Cloud Run会动态设置PORT环境变量）
 EXPOSE $PORT
