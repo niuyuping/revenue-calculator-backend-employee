@@ -56,7 +56,7 @@ CPU: 2
 
 ```
 SPRING_PROFILES_ACTIVE: prod
-DB_URL: r2dbc:postgresql://localhost:5432/asatex-revenue
+DB_URL: r2dbc:postgresql:///asatex-revenue?unixSocketPath=/cloudsql/gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database
 DB_USERNAME: db_user
 REDIS_HOST: 10.13.121.67
 REDIS_PORT: 6379
