@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.util.List;
 
@@ -52,14 +53,16 @@ public class SwaggerConfig {
                 "- Advanced search functionality (by name and furigana)\n" +
                 "- Reactive programming with Spring WebFlux\n" +
                 "- Redis caching for performance optimization\n" +
-                "- Rate limiting for API protection\n" +
-                "- Comprehensive monitoring and audit logging\n\n" +
+                "- Rate limiting for API protection\n\n" +
                 "## Authentication\n" +
                 "Currently no authentication required. All endpoints are publicly accessible.\n\n" +
                 "## Rate Limiting\n" +
                 "- General API calls: 100 requests per minute\n" +
                 "- Search operations: 50 requests per minute\n" +
-                "- Write operations: 20 requests per minute";
+                "- Write operations: 20 requests per minute\n\n" +
+                "## API Groups\n" +
+                "- **Employee Management**: Core business operations\n" +
+                "- **System Monitoring**: Internal monitoring endpoints (hidden by default)";
     }
 
     @Bean
@@ -67,6 +70,27 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("Employee Management")
                 .pathsToMatch("/api/v1/employee/**")
+                .displayName("Employee Management API")
+                .build();
+    }
+
+    @Bean
+    @Profile("!prod")
+    public GroupedOpenApi monitoringApi() {
+        return GroupedOpenApi.builder()
+                .group("System Monitoring")
+                .pathsToMatch("/api/v1/monitoring/**", "/api/v1/audit/**")
+                .displayName("System Monitoring API")
+                .build();
+    }
+
+    @Bean
+    @Profile("!prod")
+    public GroupedOpenApi allApis() {
+        return GroupedOpenApi.builder()
+                .group("All APIs")
+                .pathsToMatch("/api/**")
+                .displayName("All APIs")
                 .build();
     }
 

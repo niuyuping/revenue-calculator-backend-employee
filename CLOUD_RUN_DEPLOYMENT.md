@@ -146,8 +146,30 @@ gcloud run services describe revenue-calculator-employee --region=asia-northeast
 - **项目ID**: `gen-lang-client-0889947961`
 - **区域**: `asia-northeast1`
 - **服务名称**: `revenue-calculator-employee`
-- **端口**: `9001`
-- **内存**: `2 GiB`
+- **端口**: `8080`
+- **内存**: `1 GiB (推荐) 或 2 GiB (如果仍有内存问题)`
 - **CPU**: `2`
 - **Redis**: `10.13.121.67:6379`
 - **数据库**: Cloud SQL (IAM身份验证)
+
+## 📚 **API文档访问**
+
+### **Swagger UI**
+```bash
+# 生产环境 (只显示员工管理API)
+https://your-service-url/swagger-ui.html
+
+# 开发环境 (显示所有API)
+http://localhost:9001/swagger-ui.html
+```
+
+### **OpenAPI JSON**
+```bash
+# 生产环境
+https://your-service-url/v3/api-docs
+
+# 开发环境
+http://localhost:9001/v3/api-docs
+```
+
+**注意**: 生产环境中，监控和审计端点已从Swagger文档中隐藏，只显示核心的员工管理API，提高安全性和用户体验。
