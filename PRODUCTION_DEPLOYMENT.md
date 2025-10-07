@@ -8,7 +8,7 @@
 - **区域**: `asia-northeast1`
 - **服务名称**: `revenue-calculator-employee`
 - **端口**: `8080`
-- **认证方式**: 传统用户名密码认证
+- **认证方式**: IAM身份验证
 
 ## 🚀 **部署方式一：Cloud Run控制台部署**
 
@@ -65,8 +65,7 @@ CPU: 2
 ```
 SPRING_PROFILES_ACTIVE: prod
 DB_URL: r2dbc:postgresql:///asatex-revenue?unixSocketPath=/cloudsql/gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database
-DB_USER: your_database_username
-DB_PASSWORD: your_database_password
+DB_USERNAME: your-service-account@your-project.iam.gserviceaccount.com
 REDIS_HOST: 10.13.121.67
 REDIS_PORT: 6379
 REDIS_DATABASE: 0
@@ -114,8 +113,7 @@ gcloud run deploy revenue-calculator-employee \
   --region asia-northeast1 \
   --set-env-vars SPRING_PROFILES_ACTIVE="prod" \
   --set-env-vars DB_URL="r2dbc:postgresql:///asatex-revenue?unixSocketPath=/cloudsql/gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database" \
-  --set-env-vars DB_USER="your_database_username" \
-  --set-env-vars DB_PASSWORD="your_database_password" \
+  --set-env-vars DB_USERNAME="your-service-account@your-project.iam.gserviceaccount.com" \
   --set-env-vars REDIS_HOST="10.13.121.67" \
   --set-env-vars REDIS_PORT="6379" \
   --set-env-vars REDIS_DATABASE="0" \
@@ -140,10 +138,9 @@ gcloud run deploy revenue-calculator-employee \
 # 应用配置
 SPRING_PROFILES_ACTIVE=prod
 
-# 数据库配置（传统用户名密码认证）
+# 数据库配置（IAM身份验证）
 DB_URL=r2dbc:postgresql:///asatex-revenue?unixSocketPath=/cloudsql/gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database
-DB_USER=your_database_username
-DB_PASSWORD=your_database_password
+DB_USERNAME=your-service-account@your-project.iam.gserviceaccount.com
 
 # Redis配置
 REDIS_HOST=10.13.121.67
@@ -163,24 +160,33 @@ DB_POOL_MAX_LIFE_TIME=PT15M
 
 ## 🗄️ **数据库配置**
 
-### 数据库用户权限设置
+### IAM身份验证配置
 
-确保数据库用户具有以下权限：
+使用IAM身份验证时，需要确保：
 
-```sql
--- 创建用户（如果不存在）
-CREATE USER your_database_username WITH PASSWORD 'your_database_password';
+1. **服务账户权限**：
+   - 服务账户需要具有Cloud SQL Client角色
+   - 服务账户需要具有Cloud SQL Instance User角色
 
--- 授予必要权限
-GRANT CONNECT ON DATABASE asatex_revenue TO your_database_username;
-GRANT USAGE ON SCHEMA public TO your_database_username;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO your_database_username;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO your_database_username;
+2. **Cloud SQL IAM配置**：
+   ```bash
+   # 为服务账户添加Cloud SQL Client角色
+   gcloud projects add-iam-policy-binding gen-lang-client-0889947961 \
+     --member="serviceAccount:revenue-calculator-sa@gen-lang-client-0889947961.iam.gserviceaccount.com" \
+     --role="roles/cloudsql.client"
+   
+   # 为服务账户添加Cloud SQL Instance User角色
+   gcloud projects add-iam-policy-binding gen-lang-client-0889947961 \
+     --member="serviceAccount:revenue-calculator-sa@gen-lang-client-0889947961.iam.gserviceaccount.com" \
+     --role="roles/cloudsql.instanceUser"
+   ```
 
--- 对于新创建的表，自动授予权限
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO your_database_username;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO your_database_username;
-```
+3. **数据库用户映射**：
+   ```sql
+   -- 在Cloud SQL中创建IAM用户映射
+   CREATE USER "revenue-calculator-sa@gen-lang-client-0889947961.iam.gserviceaccount.com";
+   GRANT ALL PRIVILEGES ON DATABASE asatex_revenue TO "revenue-calculator-sa@gen-lang-client-0889947961.iam.gserviceaccount.com";
+   ```
 
 ## 🔍 **验证部署**
 
@@ -250,11 +256,12 @@ gcloud builds list --limit=5
 
 ## 🔒 **安全注意事项**
 
-1. **密码安全**：使用强密码，建议包含大小写字母、数字和特殊字符
-2. **环境变量**：在Cloud Run中设置环境变量时，确保密码不会在日志中暴露
+1. **IAM权限**：确保服务账户具有正确的Cloud SQL IAM角色
+2. **环境变量**：在Cloud Run中设置环境变量时，确保敏感信息不会在日志中暴露
 3. **网络访问**：确保Cloud Run服务能够访问Cloud SQL实例
 4. **防火墙规则**：检查Cloud SQL的防火墙规则，确保允许来自Cloud Run的连接
 5. **服务账户权限**：确保服务账户具有必要的Cloud SQL和Redis访问权限
+6. **IAM用户映射**：确保在Cloud SQL中正确配置了IAM用户映射
 
 ## 📚 **API文档访问**
 
