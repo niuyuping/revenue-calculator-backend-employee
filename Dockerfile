@@ -53,8 +53,6 @@ ENTRYPOINT ["java", \
     "-XX:+UseStringDeduplication", \
     "-XX:+OptimizeStringConcat", \
     "-Dspring.jmx.enabled=false", \
-    "-Dspring.main.lazy-initialization=true", \
-    "-Dspring.jpa.open-in-view=false", \
     "-Dspring.devtools.restart.enabled=false", \
     "-Dspring.devtools.livereload.enabled=false", \
     "-jar", \
