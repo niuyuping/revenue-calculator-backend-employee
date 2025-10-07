@@ -1,8 +1,10 @@
 package jp.asatex.revenue_calculator_backend_employee.config;
 
 import io.r2dbc.spi.ConnectionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
 
@@ -21,7 +23,8 @@ public class R2dbcConfig {
      * @return R2dbcEntityTemplate
      */
     @Bean
-    public R2dbcEntityTemplate r2dbcEntityTemplate(ConnectionFactory connectionFactory) {
+    @Primary
+    public R2dbcEntityTemplate r2dbcEntityTemplate(@Autowired ConnectionFactory connectionFactory) {
         return new R2dbcEntityTemplate(connectionFactory);
     }
 
@@ -31,7 +34,8 @@ public class R2dbcConfig {
      * @return DatabaseClient
      */
     @Bean
-    public DatabaseClient databaseClient(ConnectionFactory connectionFactory) {
+    @Primary
+    public DatabaseClient databaseClient(@Autowired ConnectionFactory connectionFactory) {
         return DatabaseClient.create(connectionFactory);
     }
 }
