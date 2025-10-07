@@ -1,12 +1,8 @@
 package jp.asatex.revenue_calculator_backend_employee.config;
 
-import io.r2dbc.spi.ConnectionFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.r2dbc.config.EnableR2dbcAuditing;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -19,27 +15,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 @EnableR2dbcAuditing
 @EnableScheduling
 public class DatabaseAuditConfig {
-
-    /**
-     * Configure database client
-     * @param connectionFactory Connection factory
-     * @return DatabaseClient
-     */
-    @Bean
-    public DatabaseClient databaseClient(ConnectionFactory connectionFactory) {
-        return DatabaseClient.create(connectionFactory);
-    }
-
-    /**
-     * Configure R2DBC entity template
-     * Required for Spring Data R2DBC repositories
-     * @param connectionFactory Connection factory
-     * @return R2dbcEntityTemplate
-     */
-    @Bean
-    public R2dbcEntityTemplate r2dbcEntityTemplate(ConnectionFactory connectionFactory) {
-        return new R2dbcEntityTemplate(connectionFactory);
-    }
 
     /**
      * Scheduled cleanup of expired audit logs
