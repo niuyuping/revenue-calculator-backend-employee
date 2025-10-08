@@ -84,7 +84,7 @@ DB_POOL_MAX_LIFE_TIME: PT15M
 #### 2.8 配置身份验证
 
 1. 在 **"安全"** 部分
-2. 服务账户：`revenue-calculator-sa@gen-lang-client-0889947961.iam.gserviceaccount.com`
+2. 服务账户：`641240287587-compute@developer.gserviceaccount.com`
 3. 允许未通过身份验证的调用：**是**
 
 #### 2.9 部署服务
@@ -113,7 +113,8 @@ gcloud run deploy revenue-calculator-employee \
   --region asia-northeast1 \
   --set-env-vars SPRING_PROFILES_ACTIVE="prod" \
   --set-env-vars DB_URL="r2dbc:postgresql:///asatex-revenue?unixSocketPath=/cloudsql/gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database" \
-  --set-env-vars DB_USERNAME="your-service-account@your-project.iam.gserviceaccount.com" \
+  --set-env-vars DB_USERNAME="641240287587-compute@developer.gserviceaccount.com" \
+  --set-env-vars INSTANCE_CONNECTION_NAME="gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database" \
   --set-env-vars REDIS_HOST="10.13.121.67" \
   --set-env-vars REDIS_PORT="6379" \
   --set-env-vars REDIS_DATABASE="0" \
@@ -122,7 +123,7 @@ gcloud run deploy revenue-calculator-employee \
   --set-env-vars DB_POOL_MAX_IDLE_TIME="PT5M" \
   --set-env-vars DB_POOL_MAX_LIFE_TIME="PT15M" \
   --add-cloudsql-instances gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database \
-  --service-account revenue-calculator-sa@gen-lang-client-0889947961.iam.gserviceaccount.com \
+  --service-account 641240287587-compute@developer.gserviceaccount.com \
   --allow-unauthenticated \
   --memory 1Gi \
   --cpu 2 \
@@ -138,9 +139,10 @@ gcloud run deploy revenue-calculator-employee \
 # 应用配置
 SPRING_PROFILES_ACTIVE=prod
 
-# 数据库配置（IAM身份验证）
+# 数据库配置（Cloud SQL + IAM身份验证）
 DB_URL=r2dbc:postgresql:///asatex-revenue?unixSocketPath=/cloudsql/gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database
-DB_USERNAME=your-service-account@your-project.iam.gserviceaccount.com
+DB_USERNAME=641240287587-compute@developer.gserviceaccount.com
+INSTANCE_CONNECTION_NAME=gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database
 
 # Redis配置
 REDIS_HOST=10.13.121.67
@@ -171,21 +173,21 @@ DB_POOL_MAX_LIFE_TIME=PT15M
 2. **Cloud SQL IAM配置**：
    ```bash
    # 为服务账户添加Cloud SQL Client角色
-   gcloud projects add-iam-policy-binding gen-lang-client-0889947961 \
-     --member="serviceAccount:revenue-calculator-sa@gen-lang-client-0889947961.iam.gserviceaccount.com" \
+   gcloud projects add-iam-policy-binding 641240287587 \
+     --member="serviceAccount:641240287587-compute@developer.gserviceaccount.com" \
      --role="roles/cloudsql.client"
    
    # 为服务账户添加Cloud SQL Instance User角色
-   gcloud projects add-iam-policy-binding gen-lang-client-0889947961 \
-     --member="serviceAccount:revenue-calculator-sa@gen-lang-client-0889947961.iam.gserviceaccount.com" \
+   gcloud projects add-iam-policy-binding 641240287587 \
+     --member="serviceAccount:641240287587-compute@developer.gserviceaccount.com" \
      --role="roles/cloudsql.instanceUser"
    ```
 
 3. **数据库用户映射**：
    ```sql
    -- 在Cloud SQL中创建IAM用户映射
-   CREATE USER "revenue-calculator-sa@gen-lang-client-0889947961.iam.gserviceaccount.com";
-   GRANT ALL PRIVILEGES ON DATABASE asatex_revenue TO "revenue-calculator-sa@gen-lang-client-0889947961.iam.gserviceaccount.com";
+   CREATE USER "641240287587-compute@developer.gserviceaccount.com";
+   GRANT ALL PRIVILEGES ON DATABASE asatex_revenue TO "641240287587-compute@developer.gserviceaccount.com";
    ```
 
 ## 🔍 **验证部署**
