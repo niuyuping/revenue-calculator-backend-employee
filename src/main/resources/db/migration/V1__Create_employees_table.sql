@@ -1,5 +1,5 @@
--- Create employees table
-CREATE TABLE IF NOT EXISTS employees (
+-- Create employeeInfo table
+CREATE TABLE IF NOT EXISTS employeeInfo (
     employee_id BIGSERIAL PRIMARY KEY,
     employee_number VARCHAR(20) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
@@ -10,6 +10,6 @@ CREATE TABLE IF NOT EXISTS employees (
 );
 
 -- Create indexes
-CREATE INDEX IF NOT EXISTS idx_employees_employee_number ON employees(employee_number);
-CREATE INDEX IF NOT EXISTS idx_employees_name ON employees(name);
-CREATE INDEX IF NOT EXISTS idx_employees_furigana ON employees(furigana);
+CREATE INDEX IF NOT EXISTS idx_employeeInfo_employee_number ON employeeInfo(employee_number);
+CREATE INDEX IF NOT EXISTS idx_employeeInfo_name ON employeeInfo(name);
+CREATE INDEX IF NOT EXISTS idx_employeeInfo_furigana ON employeeInfo(furigana);

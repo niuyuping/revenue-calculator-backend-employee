@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * Employee entity class
  * Contains basic employee information: employee number, name, furigana, birthday
  */
-@Table("employees")
+@Table("employeeInfo")
 public class Employee {
     
     @Id

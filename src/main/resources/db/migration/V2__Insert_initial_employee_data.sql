@@ -1,5 +1,5 @@
 -- Insert sample employee data
-INSERT INTO employees (employee_number, name, furigana, birthday) VALUES
+INSERT INTO employeeInfo (employee_number, name, furigana, birthday) VALUES
 ('EMP001', 'Tanaka Taro', 'tanaka taro', '1990-05-15'),
 ('EMP002', 'Sato Hanako', 'sato hanako', '1985-12-03'),
 ('EMP003', 'Suzuki Ichiro', 'suzuki ichiro', '1992-08-20'),
