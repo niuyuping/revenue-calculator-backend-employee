@@ -23,7 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Import(jp.asatex.revenue_calculator_backend_employee.config.TestConfig.class)
+@Import({jp.asatex.revenue_calculator_backend_employee.config.TestConfig.class, 
+         jp.asatex.revenue_calculator_backend_employee.config.TestContainersConfig.class})
 @DisplayName("Cache and Rate Limiting Integration Test")
 class CacheAndRateLimitIntegrationTest {
 
@@ -169,9 +170,15 @@ class CacheAndRateLimitIntegrationTest {
         // Delete employee
         employeeService.deleteEmployeeById(createdEmployee.getEmployeeId()).block();
 
-        // Verify employee has been deleted
-        EmployeeDto deletedEmployee = employeeService.getEmployeeById(createdEmployee.getEmployeeId()).block();
-        assertThat(deletedEmployee).isNull();
+        // Verify employee has been deleted by checking if exception is thrown
+        try {
+            employeeService.getEmployeeById(createdEmployee.getEmployeeId()).block();
+            // If we reach here, the test should fail because employee should not exist
+            assertThat(false).as("Employee should not exist after deletion").isTrue();
+        } catch (Exception e) {
+            // Expected: EmployeeNotFoundException should be thrown
+            assertThat(e).isInstanceOf(jp.asatex.revenue_calculator_backend_employee.exception.EmployeeNotFoundException.class);
+        }
     }
 
     @Test

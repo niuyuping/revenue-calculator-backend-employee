@@ -23,7 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Import(jp.asatex.revenue_calculator_backend_employee.config.TestConfig.class)
+@Import({jp.asatex.revenue_calculator_backend_employee.config.TestConfig.class, 
+         jp.asatex.revenue_calculator_backend_employee.config.TestContainersConfig.class})
 @DisplayName("Transaction Functionality Integration Test")
 class TransactionIntegrationTest {
 

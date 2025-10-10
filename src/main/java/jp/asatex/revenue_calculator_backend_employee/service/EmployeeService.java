@@ -81,7 +81,11 @@ public class EmployeeService {
         
         return employeeRepository.findById(id)
                 .map(this::convertToDto)
-                .doOnSuccess(employee -> logger.info("Successfully retrieved employee: {}", employee.getEmployeeNumber()))
+                .doOnSuccess(employee -> {
+                    if (employee != null) {
+                        logger.info("Successfully retrieved employee: {}", employee.getEmployeeNumber());
+                    }
+                })
                 .doOnError(error -> logger.error("Failed to retrieve employee with ID: {}", id, error))
                 .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found with ID: " + id)));
     }
@@ -98,7 +102,11 @@ public class EmployeeService {
         
         return employeeRepository.findByEmployeeNumber(employeeNumber)
                 .map(this::convertToDto)
-                .doOnSuccess(employee -> logger.info("Successfully retrieved employee: {}", employee.getEmployeeNumber()))
+                .doOnSuccess(employee -> {
+                    if (employee != null) {
+                        logger.info("Successfully retrieved employee: {}", employee.getEmployeeNumber());
+                    }
+                })
                 .doOnError(error -> logger.error("Failed to retrieve employee with number: {}", employeeNumber, error))
                 .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found with number: " + employeeNumber)));
     }
@@ -240,6 +248,22 @@ public class EmployeeService {
                 .map(this::convertToDto)
                 .doOnComplete(() -> logger.info("Successfully searched employees by name: {}", name))
                 .doOnError(error -> logger.error("Failed to search employees by name: {}", name, error));
+    }
+    
+    /**
+     * Search employees by furigana
+     * @param furigana Employee furigana
+     * @return Flux<EmployeeDto>
+     */
+    @Cacheable(value = "employeeSearch", key = "#furigana")
+    public Flux<EmployeeDto> searchEmployeesByFurigana(String furigana) {
+        logger.debug("Searching employees by furigana: {}", furigana);
+        employeeQueryCounter.increment();
+        
+        return employeeRepository.findByFuriganaContaining("%" + furigana + "%")
+                .map(this::convertToDto)
+                .doOnComplete(() -> logger.info("Successfully searched employees by furigana: {}", furigana))
+                .doOnError(error -> logger.error("Failed to search employees by furigana: {}", furigana, error));
     }
     
     /**

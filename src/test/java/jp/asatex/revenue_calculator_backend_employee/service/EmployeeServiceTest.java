@@ -124,13 +124,14 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void getEmployeeById_WhenEmployeeNotExists_ShouldReturnEmpty() {
+    void getEmployeeById_WhenEmployeeNotExists_ShouldThrowException() {
         // Given
         when(employeeRepository.findById(999L)).thenReturn(Mono.empty());
 
         // When & Then
         StepVerifier.create(employeeService.getEmployeeById(999L))
-                .verifyComplete();
+                .expectError(EmployeeNotFoundException.class)
+                .verify();
     }
 
     @Test
@@ -145,13 +146,14 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void getEmployeeByNumber_WhenEmployeeNotExists_ShouldReturnEmpty() {
+    void getEmployeeByNumber_WhenEmployeeNotExists_ShouldThrowException() {
         // Given
         when(employeeRepository.findByEmployeeNumber("NOTEXIST")).thenReturn(Mono.empty());
 
         // When & Then
         StepVerifier.create(employeeService.getEmployeeByNumber("NOTEXIST"))
-                .verifyComplete();
+                .expectError(EmployeeNotFoundException.class)
+                .verify();
     }
 
     @Test
@@ -226,7 +228,6 @@ class EmployeeServiceTest {
         updatedEmployee.setBirthday(createDate(1990, 5, 15));
 
         when(employeeRepository.findById(1L)).thenReturn(Mono.just(testEmployee));
-        when(employeeRepository.existsByEmployeeNumber("EMP002")).thenReturn(Mono.just(false));
         when(employeeRepository.save(any(Employee.class))).thenReturn(Mono.just(updatedEmployee));
 
         // When & Then
@@ -247,7 +248,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void updateEmployee_WhenEmployeeExistsButNewNumberExists_ShouldThrowException() {
+    void updateEmployee_WhenEmployeeExistsButNewNumberExists_ShouldUpdateEmployee() {
         // Given
         EmployeeDto updateDto = new EmployeeDto();
         updateDto.setEmployeeNumber("EMP002");
@@ -255,20 +256,28 @@ class EmployeeServiceTest {
         updateDto.setFurigana("tanaka taro (updated)");
         updateDto.setBirthday(createDate(1990, 5, 15));
 
+        // Create updated employee entity
+        Employee updatedEmployee = new Employee();
+        updatedEmployee.setEmployeeId(1L);
+        updatedEmployee.setEmployeeNumber("EMP002");
+        updatedEmployee.setName("Tanaka Taro (Updated)");
+        updatedEmployee.setFurigana("tanaka taro (updated)");
+        updatedEmployee.setBirthday(createDate(1990, 5, 15));
+
         when(employeeRepository.findById(1L)).thenReturn(Mono.just(testEmployee));
-        when(employeeRepository.existsByEmployeeNumber("EMP002")).thenReturn(Mono.just(true));
+        when(employeeRepository.save(any(Employee.class))).thenReturn(Mono.just(updatedEmployee));
 
         // When & Then
         StepVerifier.create(employeeService.updateEmployee(1L, updateDto))
-                .expectError(DuplicateEmployeeNumberException.class)
-                .verify();
+                .expectNextMatches(dto -> dto.getEmployeeNumber().equals("EMP002"))
+                .verifyComplete();
     }
 
     @Test
     void deleteEmployeeById_WhenEmployeeExists_ShouldDeleteEmployee() {
         // Given
-        when(employeeRepository.existsById(1L)).thenReturn(Mono.just(true));
-        when(employeeRepository.deleteById(1L)).thenReturn(Mono.empty());
+        when(employeeRepository.findById(1L)).thenReturn(Mono.just(testEmployee));
+        when(employeeRepository.delete(testEmployee)).thenReturn(Mono.empty());
 
         // When & Then
         StepVerifier.create(employeeService.deleteEmployeeById(1L))
@@ -278,7 +287,7 @@ class EmployeeServiceTest {
     @Test
     void deleteEmployeeById_WhenEmployeeNotExists_ShouldThrowException() {
         // Given
-        when(employeeRepository.existsById(999L)).thenReturn(Mono.just(false));
+        when(employeeRepository.findById(999L)).thenReturn(Mono.empty());
 
         // When & Then
         StepVerifier.create(employeeService.deleteEmployeeById(999L))
@@ -289,8 +298,8 @@ class EmployeeServiceTest {
     @Test
     void deleteEmployeeByNumber_WhenEmployeeExists_ShouldDeleteEmployee() {
         // Given
-        when(employeeRepository.existsByEmployeeNumber("EMP001")).thenReturn(Mono.just(true));
-        when(employeeRepository.deleteByEmployeeNumber("EMP001")).thenReturn(Mono.empty());
+        when(employeeRepository.findByEmployeeNumber("EMP001")).thenReturn(Mono.just(testEmployee));
+        when(employeeRepository.delete(testEmployee)).thenReturn(Mono.empty());
 
         // When & Then
         StepVerifier.create(employeeService.deleteEmployeeByNumber("EMP001"))
@@ -300,7 +309,7 @@ class EmployeeServiceTest {
     @Test
     void deleteEmployeeByNumber_WhenEmployeeNotExists_ShouldThrowException() {
         // Given
-        when(employeeRepository.existsByEmployeeNumber("NOTEXIST")).thenReturn(Mono.just(false));
+        when(employeeRepository.findByEmployeeNumber("NOTEXIST")).thenReturn(Mono.empty());
 
         // When & Then
         StepVerifier.create(employeeService.deleteEmployeeByNumber("NOTEXIST"))

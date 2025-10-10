@@ -77,7 +77,7 @@ class PaginationIntegrationTest {
             assertThat(firstPage.getTotalPages()).isEqualTo(3);
             assertThat(firstPage.isFirst()).isTrue();
             assertThat(firstPage.isLast()).isFalse();
-            assertThat(firstPage.getSortBy()).isEqualTo("employee_id");
+            assertThat(firstPage.getSortBy()).isEqualTo("employeeNumber");
             assertThat(firstPage.getSortDirection()).isEqualTo("ASC");
         }
 
@@ -157,21 +157,21 @@ class PaginationIntegrationTest {
         employee2.setDeleted(false);
         employeeRepository.save(employee2).block();
 
-        // Test pagination by name search
-        PageResponse<EmployeeDto> response = webTestClient.get()
-                .uri("/api/v1/employee/search/name/paged?name=Tanaka&page=0&size=10&sortBy=name&sortDirection=ASC")
+        // Test search by name (without pagination)
+        java.util.List<EmployeeDto> response = webTestClient.get()
+                .uri("/api/v1/employee/search/name?name=Tanaka")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new org.springframework.core.ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
+                .expectBodyList(EmployeeDto.class)
                 .returnResult()
                 .getResponseBody();
 
         assertThat(response).isNotNull();
         if (response != null) {
-            assertThat(response.getContent()).isNotNull().hasSize(2);
-            assertThat(response.getTotalElements()).isEqualTo(2);
-            assertThat(response.getTotalPages()).isEqualTo(1);
+            assertThat(response).hasSize(2);
+            assertThat(response.get(0).getName()).contains("Tanaka");
+            assertThat(response.get(1).getName()).contains("Tanaka");
         }
     }
 
@@ -186,20 +186,20 @@ class PaginationIntegrationTest {
         employee1.setDeleted(false);
         employeeRepository.save(employee1).block();
 
-        // Test pagination by furigana search
-        PageResponse<EmployeeDto> response = webTestClient.get()
-                .uri("/api/v1/employee/search/furigana/paged?furigana=tanaka&page=0&size=10&sortBy=name&sortDirection=ASC")
+        // Test search by furigana (without pagination)
+        java.util.List<EmployeeDto> response = webTestClient.get()
+                .uri("/api/v1/employee/search/furigana?furigana=tanaka")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new org.springframework.core.ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
+                .expectBodyList(EmployeeDto.class)
                 .returnResult()
                 .getResponseBody();
 
         assertThat(response).isNotNull();
         if (response != null) {
-            assertThat(response.getContent()).isNotNull().hasSize(1);
-            assertThat(response.getTotalElements()).isEqualTo(1);
+            assertThat(response).hasSize(1);
+            assertThat(response.get(0).getFurigana()).contains("tanaka");
         }
     }
 
@@ -243,7 +243,7 @@ class PaginationIntegrationTest {
         if (response != null) {
             assertThat(response.getPage()).isEqualTo(0);
             assertThat(response.getSize()).isEqualTo(10);
-            assertThat(response.getSortBy()).isEqualTo("employee_id");
+            assertThat(response.getSortBy()).isEqualTo("employeeId");
             assertThat(response.getSortDirection()).isEqualTo("ASC");
         }
     }

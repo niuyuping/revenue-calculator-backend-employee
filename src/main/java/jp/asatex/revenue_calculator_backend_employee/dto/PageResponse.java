@@ -45,7 +45,8 @@ public class PageResponse<T> {
     // All parameters constructor
     public PageResponse(List<T> content, int page, int size, long totalElements, 
                        String sortBy, String sortDirection) {
-        this.content = content;
+        // Convert to ArrayList to avoid serialization issues with SubList
+        this.content = content != null ? new java.util.ArrayList<>(content) : new java.util.ArrayList<>();
         this.page = page;
         this.size = size;
         this.totalElements = totalElements;
@@ -56,7 +57,7 @@ public class PageResponse<T> {
         this.totalPages = (int) Math.ceil((double) totalElements / size);
         this.first = page == 0;
         this.last = page >= totalPages - 1;
-        this.numberOfElements = content != null ? content.size() : 0;
+        this.numberOfElements = this.content.size();
     }
     
     // Getter and Setter methods
@@ -65,7 +66,8 @@ public class PageResponse<T> {
     }
     
     public void setContent(List<T> content) {
-        this.content = content;
+        // Convert to ArrayList to avoid serialization issues with SubList
+        this.content = content != null ? new java.util.ArrayList<>(content) : new java.util.ArrayList<>();
     }
     
     public int getPage() {

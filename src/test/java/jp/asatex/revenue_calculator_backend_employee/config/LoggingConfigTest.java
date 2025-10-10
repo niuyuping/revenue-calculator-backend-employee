@@ -12,11 +12,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
  * Logging configuration test
  * Verifies logging configuration and request logging functionality
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-                properties = {"spring.flyway.enabled=false"})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
-@Import(jp.asatex.revenue_calculator_backend_employee.config.TestConfig.class)
+@Import({jp.asatex.revenue_calculator_backend_employee.config.TestConfig.class, 
+         jp.asatex.revenue_calculator_backend_employee.config.TestContainersConfig.class})
 class LoggingConfigTest {
 
     @Autowired

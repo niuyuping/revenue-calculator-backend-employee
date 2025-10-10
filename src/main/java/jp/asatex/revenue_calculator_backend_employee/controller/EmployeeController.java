@@ -125,6 +125,27 @@ public class EmployeeController {
         return employeeService.searchEmployeesByName(name);
     }
     
+    /**
+     * Search employees by furigana
+     * GET /api/v1/employee/search/furigana?furigana={furigana}
+     * @param furigana Furigana keyword
+     * @return Flux<EmployeeDto>
+     */
+    @Operation(summary = "Search employees by furigana", description = "Search for employees whose furigana contains the keyword")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", 
+                    content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid search keyword"),
+            @ApiResponse(responseCode = "500", description = "Server error")
+    })
+    @GetMapping("/search/furigana")
+    @RateLimiter(name = "employee-search")
+    public Flux<EmployeeDto> searchEmployeesByFurigana(
+            @Parameter(description = "Search keyword", required = true, example = "tanaka")
+            @RequestParam @NotBlank(message = "Search keyword cannot be empty") @Size(min = 1, max = 100, message = "Search keyword length must be between 1-100 characters") String furigana) {
+        return employeeService.searchEmployeesByFurigana(furigana);
+    }
+    
     
     /**
      * Get all employees with pagination
