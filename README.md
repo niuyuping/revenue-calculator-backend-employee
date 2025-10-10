@@ -10,19 +10,19 @@ Choose your preferred language to view the complete documentation:
 
 [**README_ZH.md**](README_ZH.md) - 完整的中文文档
 
-基于 Spring Boot 3.x、R2DBC、WebFlux 的响应式员工管理系统后端服务。支持英、中、日三种语言的API文档，包含完整的CRUD操作、搜索功能、数据验证、缓存支持、限流保护、数据库审计、事务管理、全面日志等企业级特性。
+基于 Spring Boot 3.x、R2DBC、WebFlux 的响应式员工管理系统后端服务。包含完整的CRUD操作、搜索功能、分页查询、数据验证、缓存支持、限流保护、事务管理等企业级特性。
 
 ### 🇺🇸 English Version
 
 [**README_EN.md**](README_EN.md) - Complete English documentation
 
-A reactive employee management system backend service based on Spring Boot 3.x, R2DBC, and WebFlux. Features multi-language API documentation (English, Chinese, Japanese), complete CRUD operations, search functionality, data validation, cache support, rate limiting, database audit, transaction management, comprehensive logging, and more.
+A reactive employee management system backend service based on Spring Boot 3.x, R2DBC, and WebFlux. Features complete CRUD operations, search functionality, pagination support, data validation, cache support, rate limiting, transaction management, and more.
 
 ### 🇯🇵 日本語版 (Japanese)
 
 [**README_JA.md**](README_JA.md) - 完全な日本語文書
 
-Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業員管理システムのバックエンドサービス。多言語API文書（英語、中国語、日本語）、完全なCRUD操作、検索機能、データ検証、キャッシュサポート、レート制限、データベース監査、トランザクション管理、包括的ログなどの機能を提供します。
+Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業員管理システムのバックエンドサービス。完全なCRUD操作、検索機能、ページネーション、データ検証、キャッシュサポート、レート制限、トランザクション管理などの機能を提供します。
 
 ---
 
@@ -30,23 +30,22 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 
 ### Key Features / 主要特性 / 主要機能
 
-- ✅ **Multi-language API Documentation** / **多语言API文档** / **多言語API文書** (EN/CN/JA)
+- ✅ **Complete API Documentation** / **完整API文档** / **完全なAPI文書** (Swagger/OpenAPI 3)
 - ✅ **Reactive Programming** / **响应式编程** / **リアクティブプログラミング** (WebFlux + R2DBC)
 - ✅ **Employee CRUD Operations** / **员工CRUD操作** / **従業員CRUD操作**
-- ✅ **Advanced Search** / **高级搜索** / **高度な検索** (Name & Furigana)
+- ✅ **Advanced Search** / **高级搜索** / **高度な検索** (Name Search)
+- ✅ **Pagination Support** / **分页支持** / **ページネーションサポート** (Sorted & Paginated)
 - ✅ **Data Validation** / **数据验证** / **データ検証** (Jakarta Validation)
 - ✅ **Cache Support** / **缓存支持** / **キャッシュサポート** (Redis)
 - ✅ **Rate Limiting** / **限流保护** / **レート制限** (Resilience4j)
-- ✅ **Database Audit** / **数据库审计** / **データベース監査** (Complete audit trail)
 - ✅ **Transaction Management** / **事务管理** / **トランザクション管理** (ACID compliance)
-- ✅ **Comprehensive Logging** / **全面日志** / **包括的ログ** (Structured logging)
 - ✅ **Monitoring & Metrics** / **监控指标** / **監視・メトリクス** (Actuator + Custom metrics)
 
 ### Technology Stack / 技术栈 / 技術スタック
 
 - **Java 21** + **Spring Boot 3.5.6**
 - **PostgreSQL** + **Redis** + **Flyway**
-- **Swagger/OpenAPI 3** + **Spring Boot i18n**
+- **Swagger/OpenAPI 3**
 - **JUnit 5** + **TestContainers**
 
 ### Quick Start / 快速开始 / クイックスタート
@@ -61,14 +60,42 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
    ```
 
 3. **Access API Documentation / 访问API文档 / API文書アクセス**:
-   - **Swagger UI**: <http://localhost:8080/swagger-ui.html>
-   - **Multi-language docs**: See language-specific README files above
+   - **Swagger UI**: <http://localhost:9001/swagger-ui.html>
+   - **Complete API docs**: See language-specific README files above
 
 4. **Test the API / 测试API / APIテスト**:
 
    ```bash
-   curl http://localhost:8080/api/v1/employee/health
+   curl http://localhost:9001/api/v1/employee/health
    ```
+
+## 🚀 Deployment / 部署 / デプロイ
+
+### Docker Deployment / Docker部署 / Dockerデプロイ
+
+1. **Build and Run / 构建运行 / ビルドと実行**:
+
+   ```bash
+   # Development / 开发环境 / 開発環境 (port 9001)
+   ./gradlew build
+   docker build -t revenue-calculator-employee .
+   docker run -p 9001:8080 -e SPRING_PROFILES_ACTIVE=default revenue-calculator-employee
+   
+   # Production / 生产环境 / 本番環境 (port 8080)
+   docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod revenue-calculator-employee
+   ```
+
+### Production Deployment / 生产环境部署 / 本番環境デプロイ
+
+For detailed production deployment instructions, please refer to the language-specific README files:
+
+**详细的生产环境部署说明，请参考对应语言的README文件：**
+
+**詳細な本番環境デプロイ手順については、対応する言語のREADMEファイルを参照してください：**
+
+- 🇺🇸 [English Deployment Guide](README_EN.md#-production-deployment)
+- 🇨🇳 [中文部署指南](README_ZH.md#-生产环境部署)
+- 🇯🇵 [日本語デプロイガイド](README_JA.md#-本番環境デプロイ)
 
 ---
 

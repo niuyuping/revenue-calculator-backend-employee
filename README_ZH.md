@@ -23,7 +23,6 @@
 - **Spring Boot Actuator** - 应用监控
 - **Resilience4j** - 限流和熔断
 - **Swagger/OpenAPI 3** - API文档
-- **Spring Boot i18n** - 国际化支持
 - **Gradle** - 构建工具
 - **JUnit 5** - 测试框架
 - **Mockito** - Mock测试框架
@@ -34,14 +33,15 @@
 ### 核心功能
 
 - ✅ **员工CRUD操作** - 员工信息的创建、读取、更新、删除
-- ✅ **员工搜索** - 支持按姓名和假名搜索
+- ✅ **员工搜索** - 支持按姓名搜索
+- ✅ **分页查询** - 支持分页和排序的员工列表查询
 - ✅ **数据验证** - 完整的输入数据验证和约束
 - ✅ **异常处理** - 统一的异常处理和错误响应
 - ✅ **响应式编程** - 完全非阻塞响应式架构
 - ✅ **缓存支持** - Redis缓存提升性能
 - ✅ **API限流** - Resilience4j限流保护
 - ✅ **监控指标** - 完整的业务和性能监控
-- ✅ **多语言文档** - 支持英、中、日三种语言的API文档
+- ✅ **API文档** - 完整的Swagger/OpenAPI文档
 
 ### 企业级功能
 
@@ -49,9 +49,8 @@
 
 - **Redis缓存管理器**: 多级缓存策略
 - **缓存策略**:
-  - 员工信息缓存: 1小时TTL
-  - 员工列表缓存: 30分钟TTL
-  - 搜索缓存: 15分钟TTL
+  - 员工信息缓存: 30分钟TTL
+  - 员工搜索缓存: 15分钟TTL
   - 分页缓存: 10分钟TTL
 - **限流保护**: 不同操作类型设置不同限制（20-100请求/分钟）
 
@@ -102,7 +101,10 @@ src/
 │   │   │   ├── EmployeeController.java
 │   │   │   └── TransactionMonitoringController.java
 │   │   ├── dto/             # 数据传输对象
-│   │   │   └── EmployeeDto.java
+│   │   │   ├── EmployeeDto.java
+│   │   │   ├── PageRequest.java
+│   │   │   ├── PageResponse.java
+│   │   │   └── SortDirection.java
 │   │   ├── entity/          # 实体类
 │   │   │   └── Employee.java
 │   │   ├── exception/       # 异常处理
@@ -121,11 +123,7 @@ src/
 │   └── resources/
 │       ├── application.properties
 │       ├── application-prod.properties
-│       ├── messages.properties          # 英文资源文件
-│       ├── messages_zh_CN.properties    # 中文资源文件
-│       ├── messages_ja.properties       # 日文资源文件
-│       ├── static/
-│       │   └── swagger-ui-custom.css    # Swagger UI自定义样式
+│       ├── messages.properties          # 国际化资源文件
 │       └── db/migration/    # 数据库迁移脚本
 │           ├── V1__Create_employees_table.sql
 │           ├── V2__Insert_initial_employee_data.sql
@@ -206,7 +204,7 @@ src/
 6. **验证运行**
 
    ```bash
-   curl http://localhost:8080/api/v1/employee/health
+   curl http://localhost:9001/api/v1/employee/health
    ```
 
 ## 📚 API文档
@@ -215,44 +213,22 @@ src/
 
 启动应用后，可以通过以下链接访问Swagger UI：
 
-- **Swagger UI**: <http://localhost:8080/swagger-ui.html>
-- **OpenAPI JSON**: <http://localhost:8080/v3/api-docs>
-- **Swagger配置**: <http://localhost:8080/v3/api-docs/swagger-config>
+- **Swagger UI**: <http://localhost:9001/swagger-ui.html>
+- **OpenAPI JSON**: <http://localhost:9001/v3/api-docs>
+- **Swagger配置**: <http://localhost:9001/v3/api-docs/swagger-config>
 
-### 🌐 多语言支持
+### 🌐 API文档特性
 
-API文档支持三种语言，可以通过以下方式切换：
-
-#### 语言切换方式
-
-1. **通过Accept-Language头**：
-
-   ```bash
-   # 英文
-   curl -H "Accept-Language: en" http://localhost:8080/v3/api-docs
-   
-   # 中文
-   curl -H "Accept-Language: zh-CN" http://localhost:8080/v3/api-docs
-   
-   # 日文
-   curl -H "Accept-Language: ja" http://localhost:8080/v3/api-docs
-   ```
-
-2. **通过Swagger UI分组**：
-   - **英文文档**: <http://localhost:8080/swagger-ui.html?urls.primaryName=english>
-   - **中文文档**: <http://localhost:8080/swagger-ui.html?urls.primaryName=chinese>
-   - **日文文档**: <http://localhost:8080/swagger-ui.html?urls.primaryName=japanese>
-
-#### 支持的语言
-
-- 🇺🇸 **English** - 默认语言
-- 🇨🇳 **中文 (简体)** - 完整的中文API文档
-- 🇯🇵 **日本語** - 完整的日文API文档
+- **完整的Swagger/OpenAPI 3文档**
+- **交互式API测试界面**
+- **详细的请求/响应示例**
+- **参数验证说明**
+- **错误代码说明**
 
 ### 基础URL
 
 ```text
-http://localhost:8080/api/v1/employee
+http://localhost:9001/api/v1/employee
 ```
 
 ### 端点列表
@@ -307,15 +283,18 @@ GET /api/v1/employee/search/name?name={name}
 
 - `name` (查询参数): 姓名关键词 (1-100字符)
 
-#### 5. 根据假名搜索员工
+#### 5. 分页获取员工列表
 
 ```http
-GET /api/v1/employee/search/furigana?furigana={furigana}
+GET /api/v1/employee/paged?page={page}&size={size}&sortBy={sortBy}&sortDirection={sortDirection}
 ```
 
 **参数:**
 
-- `furigana` (查询参数): 假名关键词 (1-200字符)
+- `page` (查询参数): 页码，从0开始 (默认: 0)
+- `size` (查询参数): 每页大小 (默认: 10, 最大: 100)
+- `sortBy` (查询参数): 排序字段 (默认: employeeId)
+- `sortDirection` (查询参数): 排序方向 (ASC/DESC, 默认: ASC)
 
 #### 6. 创建员工
 
@@ -437,12 +416,13 @@ GET /api/v1/monitoring/transaction/stats
 
 ```properties
 # 服务器配置
-server.port=8080
+# 开发环境使用9001端口，生产环境使用8080端口（通过环境变量PORT设置）
+server.port=9001
 
 # 数据库配置
 spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
-spring.r2dbc.username=${DB_USERNAME:db_user}
-spring.r2dbc.password=${DB_PASSWORD:local}
+spring.r2dbc.username=db_user
+spring.r2dbc.password=${DB_PASSWORD}
 
 # Redis配置
 spring.data.redis.host=localhost
@@ -450,8 +430,8 @@ spring.data.redis.port=6379
 
 # Flyway配置
 spring.flyway.url=jdbc:postgresql://localhost:5432/asatex-revenue
-spring.flyway.user=${DB_USERNAME:db_user}
-spring.flyway.password=${DB_PASSWORD:local}
+spring.flyway.user=db_user
+spring.flyway.password=${DB_PASSWORD}
 spring.flyway.baseline-on-migrate=true
 
 # 缓存配置
@@ -475,8 +455,53 @@ logging.file.name=logs/revenue-calculator-employee.log
 
 ### 环境变量
 
-- `DB_USERNAME` - 数据库用户名 (默认: db_user)
-- `DB_PASSWORD` - 数据库密码 (默认: local)
+**开发环境环境变量:**
+- `DB_PASSWORD` - 数据库密码
+
+**生产环境环境变量:**
+- `PORT` - 服务器端口 (默认: 8080)
+- `DB_URL` - 数据库连接URL
+- `DB_USER` - 数据库用户名
+- `DB_PASSWORD` - 数据库密码
+- `FLYWAY_URL` - Flyway数据库连接URL
+- `REDIS_HOST` - Redis主机地址 (默认: localhost)
+- `REDIS_PORT` - Redis端口 (默认: 6379)
+- `REDIS_DATABASE` - Redis数据库编号 (默认: 0)
+- `REDIS_TIMEOUT` - Redis超时时间 (默认: 2000ms)
+- `CACHE_TTL` - 缓存生存时间 (默认: 1800000ms)
+- `DB_POOL_MAX_SIZE` - 数据库连接池最大大小 (默认: 10)
+- `DB_POOL_MAX_IDLE_TIME` - 连接池最大空闲时间 (默认: PT10M)
+- `DB_POOL_MAX_LIFE_TIME` - 连接池最大生存时间 (默认: PT30M)
+- `DB_POOL_INITIAL_SIZE` - 连接池初始大小 (默认: 2)
+
+### 生产环境配置
+
+生产环境使用 `application-prod.properties` 配置文件：
+
+```properties
+# 生产环境服务器配置
+server.port=${PORT:8080}
+
+# 生产环境数据库配置
+spring.r2dbc.url=${DB_URL}
+spring.r2dbc.username=${DB_USER}
+spring.r2dbc.password=${DB_PASSWORD}
+
+# 生产环境Redis配置
+spring.data.redis.host=${REDIS_HOST:localhost}
+spring.data.redis.port=${REDIS_PORT:6379}
+spring.data.redis.database=${REDIS_DATABASE:0}
+spring.data.redis.timeout=${REDIS_TIMEOUT:2000ms}
+
+# 生产环境缓存配置
+spring.cache.redis.time-to-live=${CACHE_TTL:1800000}
+
+# 生产环境数据库连接池配置
+spring.r2dbc.pool.max-size=${DB_POOL_MAX_SIZE:10}
+spring.r2dbc.pool.max-idle-time=${DB_POOL_MAX_IDLE_TIME:PT10M}
+spring.r2dbc.pool.max-life-time=${DB_POOL_MAX_LIFE_TIME:PT30M}
+spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
+```
 
 ## 📊 监控
 
@@ -569,29 +594,265 @@ CREATE TABLE employees (
 
 ### Docker部署
 
-1. **创建Dockerfile**
-
-   ```dockerfile
-   FROM openjdk:21-jdk-slim
-   COPY build/libs/*.jar app.jar
-   EXPOSE 8080
-   ENTRYPOINT ["java", "-jar", "/app.jar"]
-   ```
-
-2. **构建和运行**
+1. **构建和运行**
 
    ```bash
+   # 开发环境运行（端口9001）
    ./gradlew build
    docker build -t revenue-calculator-employee .
-   docker run -p 8080:8080 revenue-calculator-employee
+   docker run -p 9001:8080 -e SPRING_PROFILES_ACTIVE=default revenue-calculator-employee
+   
+   # 生产环境运行（端口8080）
+   docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod revenue-calculator-employee
    ```
+
+### 生产环境部署
+
+#### Google Cloud Run 部署
+
+本节提供Google Cloud Run的完整生产环境部署说明。
+
+##### 前提条件
+
+- 已启用计费的Google Cloud项目
+- Cloud SQL PostgreSQL实例
+- Redis实例（Cloud Memorystore或外部）
+- 具有适当权限的服务账户
+
+##### 方法一：Cloud Run控制台部署
+
+1. **打开Cloud Run控制台**
+   - 访问 [Google Cloud Console](https://console.cloud.google.com/)
+   - 选择您的项目
+   - 导航到 **Cloud Run**
+
+2. **创建新服务**
+   - 点击 **"创建服务"**
+   - 选择 **"从头开始部署一个容器"**
+
+3. **配置源代码**
+   ```
+   源代码: 从源代码仓库部署
+   仓库类型: GitHub
+   仓库: 选择您的GitHub仓库
+   分支: main
+   构建类型: Dockerfile
+   Dockerfile路径: /Dockerfile
+   ```
+
+4. **配置服务设置**
+   ```
+   服务名称: revenue-calculator-employee
+   区域: your-region
+   CPU分配: CPU仅在有请求时分配
+   最小实例数: 1
+   最大实例数: 10
+   ```
+
+5. **配置容器设置**
+   ```
+   端口: 9001
+   内存: 1 GiB (推荐) 或 2 GiB (如果仍有内存问题)
+   CPU: 2
+   请求超时: 300秒
+   启动超时: 300秒
+   ```
+
+6. **配置环境变量**
+   ```
+   SPRING_PROFILES_ACTIVE: prod
+   DB_URL: r2dbc:postgresql://your-db-host:5432/asatex-revenue
+   DB_USER: your-db-username
+   DB_PASSWORD: your-db-password
+   FLYWAY_URL: jdbc:postgresql://your-db-host:5432/asatex-revenue
+   REDIS_HOST: your-redis-host
+   REDIS_PORT: 6379
+   REDIS_DATABASE: 0
+   CACHE_TTL: 1800000
+   DB_POOL_MAX_SIZE: 5
+   DB_POOL_MAX_IDLE_TIME: PT5M
+   DB_POOL_MAX_LIFE_TIME: PT15M
+   ```
+
+7. **配置VPC连接**
+   - 在 **"连接"** 部分
+   - 点击 **"添加VPC连接器"**
+   - 选择用于Cloud SQL访问的VPC连接器
+
+8. **配置身份验证**
+   - 在 **"安全"** 部分
+   - 服务账户：`your-service-account@your-project.iam.gserviceaccount.com`
+   - 允许未通过身份验证的调用：**是**
+
+9. **部署服务**
+   - 点击 **"创建"**
+   - 等待构建和部署完成（通常需要10-15分钟）
+
+##### 方法二：命令行部署
+
+1. **构建Docker镜像**
+   ```bash
+   # 构建镜像
+   docker build -t gcr.io/your-project-id/revenue-calculator-backend-employee .
+   
+   # 推送镜像到Google Container Registry
+   docker push gcr.io/your-project-id/revenue-calculator-backend-employee
+   ```
+
+2. **部署到Cloud Run**
+   ```bash
+   gcloud run deploy revenue-calculator-employee \
+     --image gcr.io/your-project-id/revenue-calculator-backend-employee \
+     --platform managed \
+     --region your-region \
+     --set-env-vars SPRING_PROFILES_ACTIVE="prod" \
+     --set-env-vars DB_URL="r2dbc:postgresql://your-db-host:5432/asatex-revenue" \
+     --set-env-vars DB_USER="your-db-username" \
+     --set-env-vars DB_PASSWORD="your-db-password" \
+     --set-env-vars FLYWAY_URL="jdbc:postgresql://your-db-host:5432/asatex-revenue" \
+     --set-env-vars REDIS_HOST="your-redis-host" \
+     --set-env-vars REDIS_PORT="6379" \
+     --set-env-vars REDIS_DATABASE="0" \
+     --set-env-vars CACHE_TTL="1800000" \
+     --set-env-vars DB_POOL_MAX_SIZE="5" \
+     --set-env-vars DB_POOL_MAX_IDLE_TIME="PT5M" \
+     --set-env-vars DB_POOL_MAX_LIFE_TIME="PT15M" \
+     --vpc-connector your-vpc-connector \
+     --service-account your-service-account@your-project.iam.gserviceaccount.com \
+     --allow-unauthenticated \
+     --memory 1Gi \
+     --cpu 2 \
+     --timeout 300 \
+     --port 9001
+   ```
+
+##### 环境变量配置
+
+**必需的环境变量：**
+```bash
+# 应用配置
+SPRING_PROFILES_ACTIVE=prod
+
+# 数据库配置（Cloud SQL + VPC连接）
+DB_URL=r2dbc:postgresql://your-db-host:5432/asatex-revenue
+DB_USER=your-db-username
+DB_PASSWORD=your-db-password
+FLYWAY_URL=jdbc:postgresql://your-db-host:5432/asatex-revenue
+
+# Redis配置
+REDIS_HOST=your-redis-host
+REDIS_PORT=6379
+REDIS_DATABASE=0
+CACHE_TTL=1800000
+```
+
+**可选的环境变量：**
+```bash
+# 数据库连接池配置
+DB_POOL_MAX_SIZE=5
+DB_POOL_MAX_IDLE_TIME=PT5M
+DB_POOL_MAX_LIFE_TIME=PT15M
+```
+
+##### 数据库配置
+
+**VPC连接设置：**
+
+1. **创建VPC连接器：**
+   ```bash
+   # 为Cloud Run创建VPC连接器以访问Cloud SQL
+   gcloud compute networks vpc-access connectors create your-vpc-connector \
+     --region=your-region \
+     --subnet=your-subnet \
+     --subnet-project=your-project-id \
+     --min-instances=2 \
+     --max-instances=3
+   ```
+
+2. **数据库用户设置：**
+   ```sql
+   -- 创建带密码认证的数据库用户
+   CREATE USER your-db-username WITH PASSWORD 'your-db-password';
+   GRANT ALL PRIVILEGES ON DATABASE asatex_revenue TO your-db-username;
+   GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO your-db-username;
+   GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO your-db-username;
+   ```
+
+##### 部署验证
+
+1. **检查服务状态**
+   - 在Cloud Run控制台中，确认服务状态为 **"正在运行"**
+
+2. **测试健康检查**
+   ```bash
+   # 获取服务URL
+   SERVICE_URL=$(gcloud run services describe revenue-calculator-employee \
+       --region=your-region \
+       --format="value(status.url)")
+   
+   # 测试健康检查
+   curl $SERVICE_URL/actuator/health
+   
+   # 测试数据库连接
+   curl $SERVICE_URL/actuator/health/db
+   ```
+
+3. **访问API文档**
+   - 打开浏览器：`$SERVICE_URL/swagger-ui.html`
+
+##### 更新部署
+
+1. 在Cloud Run控制台中，点击服务名称
+2. 点击 **"编辑和部署新版本"**
+3. 在 **"源代码"** 部分，点击 **"重新构建"**
+4. 点击 **"部署"**
+
+##### 故障排除
+
+**常见问题：**
+
+1. **构建失败**
+   - 检查Dockerfile语法
+   - 确认所有依赖都已安装
+   - 查看构建日志
+
+2. **部署失败**
+   - 检查Cloud SQL连接配置
+   - 确认服务账户权限
+   - 检查环境变量配置
+
+3. **应用无法启动**
+   - 查看Cloud Run日志
+   - 检查数据库连接
+   - 验证Redis连接
+
+**有用的命令：**
+```bash
+# 查看服务日志
+gcloud run services logs read revenue-calculator-employee --region=your-region
+
+# 查看服务详情
+gcloud run services describe revenue-calculator-employee --region=your-region
+
+# 查看构建日志
+gcloud builds list --limit=5
+```
+
+##### 安全注意事项
+
+1. **VPC安全**：确保VPC连接器配置正确且安全
+2. **环境变量**：在Cloud Run中设置环境变量时，确保敏感信息不会在日志中暴露
+3. **网络访问**：确保Cloud Run服务能够通过VPC访问Cloud SQL实例
+4. **防火墙规则**：检查Cloud SQL的防火墙规则，确保允许来自VPC的连接
+5. **数据库安全**：使用强密码并限制数据库用户权限
+6. **VPC连接器**：确保VPC连接器具有适当的网络访问控制
 
 ### 生产环境配置
 
 ```properties
 # 生产环境配置
 spring.profiles.active=prod
-server.port=8080
+server.port=9001
 
 # 数据库连接池配置
 spring.r2dbc.pool.initial-size=10
@@ -627,9 +888,8 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 
 ### 缓存策略
 
-- **员工信息缓存**: 1小时TTL
-- **员工列表缓存**: 30分钟TTL
-- **搜索缓存**: 15分钟TTL
+- **员工信息缓存**: 30分钟TTL
+- **员工搜索缓存**: 15分钟TTL
 - **分页缓存**: 10分钟TTL
 - **自动缓存失效**: 写操作时清除相关缓存
 

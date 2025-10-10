@@ -23,7 +23,6 @@ A reactive employee management system backend service based on Spring Boot 3.x, 
 - **Spring Boot Actuator** - Application Monitoring
 - **Resilience4j** - Rate Limiting and Circuit Breaker
 - **Swagger/OpenAPI 3** - API Documentation
-- **Spring Boot i18n** - Internationalization Support
 - **Gradle** - Build Tool
 - **JUnit 5** - Testing Framework
 - **Mockito** - Mock Testing Framework
@@ -34,14 +33,15 @@ A reactive employee management system backend service based on Spring Boot 3.x, 
 ### Core Features
 
 - ✅ **Employee CRUD Operations** - Create, read, update, delete employee information
-- ✅ **Employee Search** - Search by name and furigana
+- ✅ **Employee Search** - Search by name
+- ✅ **Pagination Support** - Paginated and sorted employee list queries
 - ✅ **Data Validation** - Complete input data validation and constraints
 - ✅ **Exception Handling** - Unified exception handling and error responses
 - ✅ **Reactive Programming** - Fully non-blocking reactive architecture
 - ✅ **Cache Support** - Redis cache for performance enhancement
 - ✅ **API Rate Limiting** - Resilience4j rate limiting protection
 - ✅ **Monitoring Metrics** - Complete business and performance monitoring
-- ✅ **Multi-language Documentation** - API documentation in English, Chinese, and Japanese
+- ✅ **API Documentation** - Complete Swagger/OpenAPI documentation
 
 ### Enterprise Features
 
@@ -49,9 +49,8 @@ A reactive employee management system backend service based on Spring Boot 3.x, 
 
 - **Redis Cache Manager**: Multi-level caching strategy
 - **Cache Strategies**:
-  - Employee Info Cache: 1 hour TTL
-  - Employee List Cache: 30 minutes TTL
-  - Search Cache: 15 minutes TTL
+  - Employee Info Cache: 30 minutes TTL
+  - Employee Search Cache: 15 minutes TTL
   - Pagination Cache: 10 minutes TTL
 - **Rate Limiting**: Different limits for different operations (20-100 requests/minute)
 
@@ -99,7 +98,10 @@ src/
 │   │   ├── controller/       # REST controllers
 │   │   │   └── EmployeeController.java
 │   │   ├── dto/             # Data Transfer Objects
-│   │   │   └── EmployeeDto.java
+│   │   │   ├── EmployeeDto.java
+│   │   │   ├── PageRequest.java
+│   │   │   ├── PageResponse.java
+│   │   │   └── SortDirection.java
 │   │   ├── entity/          # Entity classes
 │   │   │   ├── Employee.java
 │   │   ├── exception/       # Exception handling
@@ -119,11 +121,7 @@ src/
 │   └── resources/
 │       ├── application.properties
 │       ├── application-prod.properties
-│       ├── messages.properties          # English resource file
-│       ├── messages_zh_CN.properties    # Chinese resource file
-│       ├── messages_ja.properties       # Japanese resource file
-│       ├── static/
-│       │   └── swagger-ui-custom.css    # Swagger UI custom styles
+│       ├── messages.properties          # Internationalization resource file
 │       └── db/migration/    # Database migration scripts
 │           ├── V1__Create_employees_table.sql
 │           ├── V2__Insert_initial_employee_data.sql
@@ -205,7 +203,7 @@ src/
 6. **Verify the application**
 
    ```bash
-   curl http://localhost:8080/api/v1/employee/health
+   curl http://localhost:9001/api/v1/employee/health
    ```
 
 ## 📚 API Documentation
@@ -214,44 +212,22 @@ src/
 
 After starting the application, you can access Swagger UI through the following links:
 
-- **Swagger UI**: <http://localhost:8080/swagger-ui.html>
-- **OpenAPI JSON**: <http://localhost:8080/v3/api-docs>
-- **Swagger Configuration**: <http://localhost:8080/v3/api-docs/swagger-config>
+- **Swagger UI**: <http://localhost:9001/swagger-ui.html>
+- **OpenAPI JSON**: <http://localhost:9001/v3/api-docs>
+- **Swagger Configuration**: <http://localhost:9001/v3/api-docs/swagger-config>
 
-### 🌐 Multi-language Support
+### 🌐 API Documentation Features
 
-The API documentation supports three languages and can be switched in the following ways:
-
-#### Language Switching Methods
-
-1. **Through Accept-Language header**:
-
-   ```bash
-   # English
-   curl -H "Accept-Language: en" http://localhost:8080/v3/api-docs
-   
-   # Chinese
-   curl -H "Accept-Language: zh-CN" http://localhost:8080/v3/api-docs
-   
-   # Japanese
-   curl -H "Accept-Language: ja" http://localhost:8080/v3/api-docs
-   ```
-
-2. **Through Swagger UI groups**:
-   - **English Documentation**: <http://localhost:8080/swagger-ui.html?urls.primaryName=english>
-   - **Chinese Documentation**: <http://localhost:8080/swagger-ui.html?urls.primaryName=chinese>
-   - **Japanese Documentation**: <http://localhost:8080/swagger-ui.html?urls.primaryName=japanese>
-
-#### Supported Languages
-
-- 🇺🇸 **English** - Default language
-- 🇨🇳 **Chinese (Simplified)** - Complete Chinese API documentation
-- 🇯🇵 **Japanese** - Complete Japanese API documentation
+- **Complete Swagger/OpenAPI 3 documentation**
+- **Interactive API testing interface**
+- **Detailed request/response examples**
+- **Parameter validation descriptions**
+- **Error code explanations**
 
 ### Base URL
 
 ```text
-http://localhost:8080/api/v1/employee
+http://localhost:9001/api/v1/employee
 ```
 
 ### Endpoint List
@@ -306,15 +282,18 @@ GET /api/v1/employee/search/name?name={name}
 
 - `name` (query parameter): Name keyword (1-100 characters)
 
-#### 5. Search Employees by Furigana
+#### 5. Get Employees with Pagination
 
 ```http
-GET /api/v1/employee/search/furigana?furigana={furigana}
+GET /api/v1/employee/paged?page={page}&size={size}&sortBy={sortBy}&sortDirection={sortDirection}
 ```
 
 **Parameters:**
 
-- `furigana` (query parameter): Furigana keyword (1-200 characters)
+- `page` (query parameter): Page number, starting from 0 (default: 0)
+- `size` (query parameter): Page size (default: 10, max: 100)
+- `sortBy` (query parameter): Sort field (default: employeeId)
+- `sortDirection` (query parameter): Sort direction (ASC/DESC, default: ASC)
 
 #### 6. Create Employee
 
@@ -454,12 +433,13 @@ The project has comprehensive test coverage:
 
 ```properties
 # Server configuration
-server.port=8080
+# Development environment uses port 9001, production uses port 8080 (via PORT environment variable)
+server.port=9001
 
 # Database configuration
 spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
-spring.r2dbc.username=${DB_USERNAME:db_user}
-spring.r2dbc.password=${DB_PASSWORD:local}
+spring.r2dbc.username=db_user
+spring.r2dbc.password=${DB_PASSWORD}
 
 # Redis configuration
 spring.data.redis.host=localhost
@@ -467,8 +447,8 @@ spring.data.redis.port=6379
 
 # Flyway configuration
 spring.flyway.url=jdbc:postgresql://localhost:5432/asatex-revenue
-spring.flyway.user=${DB_USERNAME:db_user}
-spring.flyway.password=${DB_PASSWORD:local}
+spring.flyway.user=db_user
+spring.flyway.password=${DB_PASSWORD}
 spring.flyway.baseline-on-migrate=true
 
 # Cache configuration
@@ -492,8 +472,53 @@ logging.file.name=logs/revenue-calculator-employee.log
 
 ### Environment Variables
 
-- `DB_USERNAME` - Database username (default: db_user)
-- `DB_PASSWORD` - Database password (default: local)
+**Development Environment Variables:**
+- `DB_PASSWORD` - Database password
+
+**Production Environment Variables:**
+- `PORT` - Server port (default: 8080)
+- `DB_URL` - Database connection URL
+- `DB_USER` - Database username
+- `DB_PASSWORD` - Database password
+- `FLYWAY_URL` - Flyway database connection URL
+- `REDIS_HOST` - Redis host address (default: localhost)
+- `REDIS_PORT` - Redis port (default: 6379)
+- `REDIS_DATABASE` - Redis database number (default: 0)
+- `REDIS_TIMEOUT` - Redis timeout (default: 2000ms)
+- `CACHE_TTL` - Cache time-to-live (default: 1800000ms)
+- `DB_POOL_MAX_SIZE` - Database connection pool max size (default: 10)
+- `DB_POOL_MAX_IDLE_TIME` - Connection pool max idle time (default: PT10M)
+- `DB_POOL_MAX_LIFE_TIME` - Connection pool max life time (default: PT30M)
+- `DB_POOL_INITIAL_SIZE` - Connection pool initial size (default: 2)
+
+### Production Environment Configuration
+
+Production environment uses `application-prod.properties` configuration file:
+
+```properties
+# Production server configuration
+server.port=${PORT:8080}
+
+# Production database configuration
+spring.r2dbc.url=${DB_URL}
+spring.r2dbc.username=${DB_USER}
+spring.r2dbc.password=${DB_PASSWORD}
+
+# Production Redis configuration
+spring.data.redis.host=${REDIS_HOST:localhost}
+spring.data.redis.port=${REDIS_PORT:6379}
+spring.data.redis.database=${REDIS_DATABASE:0}
+spring.data.redis.timeout=${REDIS_TIMEOUT:2000ms}
+
+# Production cache configuration
+spring.cache.redis.time-to-live=${CACHE_TTL:1800000}
+
+# Production database connection pool configuration
+spring.r2dbc.pool.max-size=${DB_POOL_MAX_SIZE:10}
+spring.r2dbc.pool.max-idle-time=${DB_POOL_MAX_IDLE_TIME:PT10M}
+spring.r2dbc.pool.max-life-time=${DB_POOL_MAX_LIFE_TIME:PT30M}
+spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
+```
 
 ## 📊 Monitoring
 
@@ -615,29 +640,265 @@ The project uses Flyway for database version management:
 
 ### Docker Deployment
 
-1. **Create Dockerfile**
-
-   ```dockerfile
-   FROM openjdk:21-jdk-slim
-   COPY build/libs/*.jar app.jar
-   EXPOSE 8080
-   ENTRYPOINT ["java", "-jar", "/app.jar"]
-   ```
-
-2. **Build and Run**
+1. **Build and Run**
 
    ```bash
+   # Development environment (port 9001)
    ./gradlew build
    docker build -t revenue-calculator-employee .
-   docker run -p 8080:8080 revenue-calculator-employee
+   docker run -p 9001:8080 -e SPRING_PROFILES_ACTIVE=default revenue-calculator-employee
+   
+   # Production environment (port 8080)
+   docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod revenue-calculator-employee
    ```
+
+### Production Deployment
+
+#### Google Cloud Run Deployment
+
+This section provides comprehensive production deployment instructions for Google Cloud Run.
+
+##### Prerequisites
+
+- Google Cloud Project with billing enabled
+- Cloud SQL PostgreSQL instance
+- Redis instance (Cloud Memorystore or external)
+- Service account with appropriate permissions
+
+##### Method 1: Cloud Run Console Deployment
+
+1. **Open Cloud Run Console**
+   - Visit [Google Cloud Console](https://console.cloud.google.com/)
+   - Select your project
+   - Navigate to **Cloud Run**
+
+2. **Create New Service**
+   - Click **"Create Service"**
+   - Select **"Deploy one container from source"**
+
+3. **Configure Source Code**
+   ```
+   Source: Deploy from source repository
+   Repository type: GitHub
+   Repository: Select your GitHub repository
+   Branch: main
+   Build type: Dockerfile
+   Dockerfile path: /Dockerfile
+   ```
+
+4. **Configure Service Settings**
+   ```
+   Service name: revenue-calculator-employee
+   Region: your-region
+   CPU allocation: CPU is only allocated during request processing
+   Minimum instances: 1
+   Maximum instances: 10
+   ```
+
+5. **Configure Container Settings**
+   ```
+   Port: 9001
+   Memory: 1 GiB (recommended) or 2 GiB (if memory issues persist)
+   CPU: 2
+   Request timeout: 300 seconds
+   Startup timeout: 300 seconds
+   ```
+
+6. **Configure Environment Variables**
+   ```
+   SPRING_PROFILES_ACTIVE: prod
+   DB_URL: r2dbc:postgresql://your-db-host:5432/asatex-revenue
+   DB_USER: your-db-username
+   DB_PASSWORD: your-db-password
+   FLYWAY_URL: jdbc:postgresql://your-db-host:5432/asatex-revenue
+   REDIS_HOST: your-redis-host
+   REDIS_PORT: 6379
+   REDIS_DATABASE: 0
+   CACHE_TTL: 1800000
+   DB_POOL_MAX_SIZE: 5
+   DB_POOL_MAX_IDLE_TIME: PT5M
+   DB_POOL_MAX_LIFE_TIME: PT15M
+   ```
+
+7. **Configure VPC Connection**
+   - In **"Connections"** section
+   - Click **"Add VPC connector"**
+   - Select your VPC connector for Cloud SQL access
+
+8. **Configure Authentication**
+   - In **"Security"** section
+   - Service account: `your-service-account@your-project.iam.gserviceaccount.com`
+   - Allow unauthenticated invocations: **Yes**
+
+9. **Deploy Service**
+   - Click **"Create"**
+   - Wait for build and deployment to complete (usually 10-15 minutes)
+
+##### Method 2: Command Line Deployment
+
+1. **Build Docker Image**
+   ```bash
+   # Build image
+   docker build -t gcr.io/your-project-id/revenue-calculator-backend-employee .
+   
+   # Push image to Google Container Registry
+   docker push gcr.io/your-project-id/revenue-calculator-backend-employee
+   ```
+
+2. **Deploy to Cloud Run**
+   ```bash
+   gcloud run deploy revenue-calculator-employee \
+     --image gcr.io/your-project-id/revenue-calculator-backend-employee \
+     --platform managed \
+     --region your-region \
+     --set-env-vars SPRING_PROFILES_ACTIVE="prod" \
+     --set-env-vars DB_URL="r2dbc:postgresql://your-db-host:5432/asatex-revenue" \
+     --set-env-vars DB_USER="your-db-username" \
+     --set-env-vars DB_PASSWORD="your-db-password" \
+     --set-env-vars FLYWAY_URL="jdbc:postgresql://your-db-host:5432/asatex-revenue" \
+     --set-env-vars REDIS_HOST="your-redis-host" \
+     --set-env-vars REDIS_PORT="6379" \
+     --set-env-vars REDIS_DATABASE="0" \
+     --set-env-vars CACHE_TTL="1800000" \
+     --set-env-vars DB_POOL_MAX_SIZE="5" \
+     --set-env-vars DB_POOL_MAX_IDLE_TIME="PT5M" \
+     --set-env-vars DB_POOL_MAX_LIFE_TIME="PT15M" \
+     --vpc-connector your-vpc-connector \
+     --service-account your-service-account@your-project.iam.gserviceaccount.com \
+     --allow-unauthenticated \
+     --memory 1Gi \
+     --cpu 2 \
+     --timeout 300 \
+     --port 9001
+   ```
+
+##### Environment Variables Configuration
+
+**Required Environment Variables:**
+```bash
+# Application configuration
+SPRING_PROFILES_ACTIVE=prod
+
+# Database configuration (Cloud SQL + VPC connection)
+DB_URL=r2dbc:postgresql://your-db-host:5432/asatex-revenue
+DB_USER=your-db-username
+DB_PASSWORD=your-db-password
+FLYWAY_URL=jdbc:postgresql://your-db-host:5432/asatex-revenue
+
+# Redis configuration
+REDIS_HOST=your-redis-host
+REDIS_PORT=6379
+REDIS_DATABASE=0
+CACHE_TTL=1800000
+```
+
+**Optional Environment Variables:**
+```bash
+# Database connection pool configuration
+DB_POOL_MAX_SIZE=5
+DB_POOL_MAX_IDLE_TIME=PT5M
+DB_POOL_MAX_LIFE_TIME=PT15M
+```
+
+##### Database Configuration
+
+**VPC Connection Setup:**
+
+1. **Create VPC Connector:**
+   ```bash
+   # Create a VPC connector for Cloud Run to access Cloud SQL
+   gcloud compute networks vpc-access connectors create your-vpc-connector \
+     --region=your-region \
+     --subnet=your-subnet \
+     --subnet-project=your-project-id \
+     --min-instances=2 \
+     --max-instances=3
+   ```
+
+2. **Database User Setup:**
+   ```sql
+   -- Create database user with password authentication
+   CREATE USER your-db-username WITH PASSWORD 'your-db-password';
+   GRANT ALL PRIVILEGES ON DATABASE asatex_revenue TO your-db-username;
+   GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO your-db-username;
+   GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO your-db-username;
+   ```
+
+##### Deployment Verification
+
+1. **Check Service Status**
+   - In Cloud Run console, confirm service status is **"Running"**
+
+2. **Test Health Check**
+   ```bash
+   # Get service URL
+   SERVICE_URL=$(gcloud run services describe revenue-calculator-employee \
+       --region=your-region \
+       --format="value(status.url)")
+   
+   # Test health check
+   curl $SERVICE_URL/actuator/health
+   
+   # Test database connection
+   curl $SERVICE_URL/actuator/health/db
+   ```
+
+3. **Access API Documentation**
+   - Open browser: `$SERVICE_URL/swagger-ui.html`
+
+##### Update Deployment
+
+1. In Cloud Run console, click service name
+2. Click **"Edit and Deploy New Revision"**
+3. In **"Source"** section, click **"Rebuild"**
+4. Click **"Deploy"**
+
+##### Troubleshooting
+
+**Common Issues:**
+
+1. **Build Failure**
+   - Check Dockerfile syntax
+   - Verify all dependencies are installed
+   - Review build logs
+
+2. **Deployment Failure**
+   - Check Cloud SQL connection configuration
+   - Verify service account permissions
+   - Check environment variables configuration
+
+3. **Application Won't Start**
+   - View Cloud Run logs
+   - Check database connection
+   - Verify Redis connection
+
+**Useful Commands:**
+```bash
+# View service logs
+gcloud run services logs read revenue-calculator-employee --region=your-region
+
+# View service details
+gcloud run services describe revenue-calculator-employee --region=your-region
+
+# View build logs
+gcloud builds list --limit=5
+```
+
+##### Security Considerations
+
+1. **VPC Security**: Ensure VPC connector is properly configured and secured
+2. **Environment Variables**: When setting environment variables in Cloud Run, ensure sensitive information is not exposed in logs
+3. **Network Access**: Ensure Cloud Run service can access Cloud SQL instance through VPC
+4. **Firewall Rules**: Check Cloud SQL firewall rules to allow connections from VPC
+5. **Database Security**: Use strong passwords and limit database user permissions
+6. **VPC Connector**: Ensure VPC connector has appropriate network access controls
 
 ### Production Environment Configuration
 
 ```properties
 # Production environment configuration
 spring.profiles.active=prod
-server.port=8080
+server.port=9001
 
 # Database connection pool configuration
 spring.r2dbc.pool.initial-size=10
@@ -673,9 +934,8 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 
 ### Cache Strategy
 
-- **Employee Information Cache**: 1 hour TTL
-- **Employee List Cache**: 30 minutes TTL
-- **Search Cache**: 15 minutes TTL
+- **Employee Information Cache**: 30 minutes TTL
+- **Employee Search Cache**: 15 minutes TTL
 - **Pagination Cache**: 10 minutes TTL
 - **Automatic Cache Invalidation**: Clear related cache on write operations
 

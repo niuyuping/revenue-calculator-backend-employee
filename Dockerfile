@@ -34,12 +34,12 @@ WORKDIR /app
 COPY --from=builder /app/build/libs/ ./libs/
 RUN find ./libs/ -name "*.jar" -not -name "*-plain.jar" | head -1 | xargs -I {} cp {} app.jar
 
-# 暴露端口
+# 暴露端口 - 生产环境使用8080，开发环境使用9001
 EXPOSE 8080
 
-# 健康检查
+# 健康检查 - 使用环境变量PORT，默认8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
-    CMD curl -f http://localhost:8080/actuator/health || exit 1
+    CMD curl -f http://localhost:${PORT:-8080}/actuator/health || exit 1
 
 # 启动应用
 ENTRYPOINT ["java", \

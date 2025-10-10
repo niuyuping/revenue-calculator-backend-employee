@@ -23,7 +23,6 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 - **Spring Boot Actuator** - アプリケーション監視
 - **Resilience4j** - レート制限とサーキットブレーカー
 - **Swagger/OpenAPI 3** - API文書
-- **Spring Boot i18n** - 国際化サポート
 - **Gradle** - ビルドツール
 - **JUnit 5** - テストフレームワーク
 - **Mockito** - モックテストフレームワーク
@@ -34,14 +33,15 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 ### コア機能
 
 - ✅ **従業員CRUD操作** - 従業員情報の作成、読み取り、更新、削除
-- ✅ **従業員検索** - 姓名とふりがなによる検索
+- ✅ **従業員検索** - 姓名による検索
+- ✅ **ページネーション** - ページネーションとソート機能付き従業員リストクエリ
 - ✅ **データ検証** - 完全な入力データ検証と制約
 - ✅ **例外処理** - 統一された例外処理とエラーレスポンス
 - ✅ **リアクティブプログラミング** - 完全非ブロッキングリアクティブアーキテクチャ
 - ✅ **キャッシュサポート** - パフォーマンス向上のためのRedisキャッシュ
 - ✅ **APIレート制限** - Resilience4jレート制限保護
 - ✅ **監視メトリクス** - 完全なビジネスとパフォーマンス監視
-- ✅ **多言語文書** - 英語、中国語、日本語のAPI文書
+- ✅ **API文書** - 完全なSwagger/OpenAPI文書
 
 ### エンタープライズ機能
 
@@ -49,9 +49,8 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 
 - **Redisキャッシュマネージャー**: マルチレベルキャッシュ戦略
 - **キャッシュ戦略**:
-  - 従業員情報キャッシュ: 1時間TTL
-  - 従業員リストキャッシュ: 30分TTL
-  - 検索キャッシュ: 15分TTL
+  - 従業員情報キャッシュ: 30分TTL
+  - 従業員検索キャッシュ: 15分TTL
   - ページネーションキャッシュ: 10分TTL
 - **レート制限**: 異なる操作タイプに異なる制限（20-100リクエスト/分）
 
@@ -112,7 +111,10 @@ src/
 │   │   ├── controller/       # RESTコントローラー
 │   │   │   └── EmployeeController.java
 │   │   ├── dto/             # データ転送オブジェクト
-│   │   │   └── EmployeeDto.java
+│   │   │   ├── EmployeeDto.java
+│   │   │   ├── PageRequest.java
+│   │   │   ├── PageResponse.java
+│   │   │   └── SortDirection.java
 │   │   ├── entity/          # エンティティクラス
 │   │   │   ├── Employee.java
 │   │   ├── exception/       # 例外処理
@@ -132,11 +134,7 @@ src/
 │   └── resources/
 │       ├── application.properties
 │       ├── application-prod.properties
-│       ├── messages.properties          # 英語リソースファイル
-│       ├── messages_zh_CN.properties    # 中国語リソースファイル
-│       ├── messages_ja.properties       # 日本語リソースファイル
-│       ├── static/
-│       │   └── swagger-ui-custom.css    # Swagger UIカスタムスタイル
+│       ├── messages.properties          # 国際化リソースファイル
 │       └── db/migration/    # データベースマイグレーションスクリプト
 │           ├── V1__Create_employees_table.sql
 │           ├── V2__Insert_initial_employee_data.sql
@@ -218,7 +216,7 @@ src/
 6. **動作確認**
 
    ```bash
-   curl http://localhost:8080/api/v1/employee/health
+   curl http://localhost:9001/api/v1/employee/health
    ```
 
 ## 📚 API文書
@@ -227,44 +225,22 @@ src/
 
 アプリケーション起動後、以下のリンクからSwagger UIにアクセスできます：
 
-- **Swagger UI**: <http://localhost:8080/swagger-ui.html>
-- **OpenAPI JSON**: <http://localhost:8080/v3/api-docs>
-- **Swagger設定**: <http://localhost:8080/v3/api-docs/swagger-config>
+- **Swagger UI**: <http://localhost:9001/swagger-ui.html>
+- **OpenAPI JSON**: <http://localhost:9001/v3/api-docs>
+- **Swagger設定**: <http://localhost:9001/v3/api-docs/swagger-config>
 
-### 🌐 多言語サポート
+### 🌐 API文書機能
 
-API文書は3つの言語をサポートし、以下の方法で切り替えできます：
-
-#### 言語切り替え方法
-
-1. **Accept-Languageヘッダーを使用**：
-
-   ```bash
-   # 英語
-   curl -H "Accept-Language: en" http://localhost:8080/v3/api-docs
-   
-   # 中国語
-   curl -H "Accept-Language: zh-CN" http://localhost:8080/v3/api-docs
-   
-   # 日本語
-   curl -H "Accept-Language: ja" http://localhost:8080/v3/api-docs
-   ```
-
-2. **Swagger UIグループを使用**：
-   - **英語文書**: <http://localhost:8080/swagger-ui.html?urls.primaryName=english>
-   - **中国語文書**: <http://localhost:8080/swagger-ui.html?urls.primaryName=chinese>
-   - **日本語文書**: <http://localhost:8080/swagger-ui.html?urls.primaryName=japanese>
-
-#### サポート言語
-
-- 🇺🇸 **English** - デフォルト言語
-- 🇨🇳 **中国語（簡体字）** - 完全な中国語API文書
-- 🇯🇵 **日本語** - 完全な日本語API文書
+- **完全なSwagger/OpenAPI 3文書**
+- **インタラクティブAPIテストインターフェース**
+- **詳細なリクエスト/レスポンス例**
+- **パラメータ検証説明**
+- **エラーコード説明**
 
 ### ベースURL
 
 ```text
-http://localhost:8080/api/v1/employee
+http://localhost:9001/api/v1/employee
 ```
 
 ### エンドポイント一覧
@@ -319,15 +295,18 @@ GET /api/v1/employee/search/name?name={name}
 
 - `name` (クエリパラメータ): 姓名キーワード（1-100文字）
 
-#### 5. ふりがなによる従業員検索
+#### 5. ページネーション付き従業員リスト取得
 
 ```http
-GET /api/v1/employee/search/furigana?furigana={furigana}
+GET /api/v1/employee/paged?page={page}&size={size}&sortBy={sortBy}&sortDirection={sortDirection}
 ```
 
 **パラメータ:**
 
-- `furigana` (クエリパラメータ): ふりがなキーワード（1-200文字）
+- `page` (クエリパラメータ): ページ番号、0から開始（デフォルト: 0）
+- `size` (クエリパラメータ): ページサイズ（デフォルト: 10、最大: 100）
+- `sortBy` (クエリパラメータ): ソートフィールド（デフォルト: employeeId）
+- `sortDirection` (クエリパラメータ): ソート方向（ASC/DESC、デフォルト: ASC）
 
 #### 6. 従業員作成
 
@@ -467,12 +446,13 @@ POST /api/v1/monitoring/logs/reset
 
 ```properties
 # サーバー設定
-server.port=8080
+# 開発環境は9001ポート、本番環境は8080ポート（PORT環境変数で設定）
+server.port=9001
 
 # データベース設定
 spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
-spring.r2dbc.username=${DB_USERNAME:db_user}
-spring.r2dbc.password=${DB_PASSWORD:local}
+spring.r2dbc.username=db_user
+spring.r2dbc.password=${DB_PASSWORD}
 
 # Redis設定
 spring.data.redis.host=localhost
@@ -480,8 +460,8 @@ spring.data.redis.port=6379
 
 # Flyway設定
 spring.flyway.url=jdbc:postgresql://localhost:5432/asatex-revenue
-spring.flyway.user=${DB_USERNAME:db_user}
-spring.flyway.password=${DB_PASSWORD:local}
+spring.flyway.user=db_user
+spring.flyway.password=${DB_PASSWORD}
 spring.flyway.baseline-on-migrate=true
 
 # キャッシュ設定
@@ -505,8 +485,53 @@ logging.file.name=logs/revenue-calculator-employee.log
 
 ### 環境変数
 
-- `DB_USERNAME` - データベースユーザー名（デフォルト: db_user）
-- `DB_PASSWORD` - データベースパスワード（デフォルト: local）
+**開発環境環境変数:**
+- `DB_PASSWORD` - データベースパスワード
+
+**本番環境環境変数:**
+- `PORT` - サーバーポート（デフォルト: 8080）
+- `DB_URL` - データベース接続URL
+- `DB_USER` - データベースユーザー名
+- `DB_PASSWORD` - データベースパスワード
+- `FLYWAY_URL` - Flywayデータベース接続URL
+- `REDIS_HOST` - Redisホストアドレス（デフォルト: localhost）
+- `REDIS_PORT` - Redisポート（デフォルト: 6379）
+- `REDIS_DATABASE` - Redisデータベース番号（デフォルト: 0）
+- `REDIS_TIMEOUT` - Redisタイムアウト（デフォルト: 2000ms）
+- `CACHE_TTL` - キャッシュ生存時間（デフォルト: 1800000ms）
+- `DB_POOL_MAX_SIZE` - データベース接続プール最大サイズ（デフォルト: 10）
+- `DB_POOL_MAX_IDLE_TIME` - 接続プール最大アイドル時間（デフォルト: PT10M）
+- `DB_POOL_MAX_LIFE_TIME` - 接続プール最大生存時間（デフォルト: PT30M）
+- `DB_POOL_INITIAL_SIZE` - 接続プール初期サイズ（デフォルト: 2）
+
+### 本番環境設定
+
+本番環境は `application-prod.properties` 設定ファイルを使用：
+
+```properties
+# 本番環境サーバー設定
+server.port=${PORT:8080}
+
+# 本番環境データベース設定
+spring.r2dbc.url=${DB_URL}
+spring.r2dbc.username=${DB_USER}
+spring.r2dbc.password=${DB_PASSWORD}
+
+# 本番環境Redis設定
+spring.data.redis.host=${REDIS_HOST:localhost}
+spring.data.redis.port=${REDIS_PORT:6379}
+spring.data.redis.database=${REDIS_DATABASE:0}
+spring.data.redis.timeout=${REDIS_TIMEOUT:2000ms}
+
+# 本番環境キャッシュ設定
+spring.cache.redis.time-to-live=${CACHE_TTL:1800000}
+
+# 本番環境データベース接続プール設定
+spring.r2dbc.pool.max-size=${DB_POOL_MAX_SIZE:10}
+spring.r2dbc.pool.max-idle-time=${DB_POOL_MAX_IDLE_TIME:PT10M}
+spring.r2dbc.pool.max-life-time=${DB_POOL_MAX_LIFE_TIME:PT30M}
+spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
+```
 
 ## 📊 監視
 
@@ -628,29 +653,265 @@ CREATE TABLE database_audit_logs (
 
 ### Dockerデプロイ
 
-1. **Dockerfile作成**
-
-   ```dockerfile
-   FROM openjdk:21-jdk-slim
-   COPY build/libs/*.jar app.jar
-   EXPOSE 8080
-   ENTRYPOINT ["java", "-jar", "/app.jar"]
-   ```
-
-2. **ビルドと実行**
+1. **ビルドと実行**
 
    ```bash
+   # 開発環境（ポート9001）
    ./gradlew build
    docker build -t revenue-calculator-employee .
-   docker run -p 8080:8080 revenue-calculator-employee
+   docker run -p 9001:8080 -e SPRING_PROFILES_ACTIVE=default revenue-calculator-employee
+   
+   # 本番環境（ポート8080）
+   docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod revenue-calculator-employee
    ```
+
+### 本番環境デプロイ
+
+#### Google Cloud Run デプロイ
+
+このセクションでは、Google Cloud Runの包括的な本番環境デプロイ手順を提供します。
+
+##### 前提条件
+
+- 課金が有効なGoogle Cloudプロジェクト
+- Cloud SQL PostgreSQLインスタンス
+- Redisインスタンス（Cloud Memorystoreまたは外部）
+- 適切な権限を持つサービスアカウント
+
+##### 方法1：Cloud Runコンソールデプロイ
+
+1. **Cloud Runコンソールを開く**
+   - [Google Cloud Console](https://console.cloud.google.com/)にアクセス
+   - プロジェクトを選択
+   - **Cloud Run**にナビゲート
+
+2. **新しいサービスを作成**
+   - **「サービスを作成」**をクリック
+   - **「ソースからコンテナを1つデプロイ」**を選択
+
+3. **ソースコードを設定**
+   ```
+   ソース: ソースリポジトリからデプロイ
+   リポジトリタイプ: GitHub
+   リポジトリ: GitHubリポジトリを選択
+   ブランチ: main
+   ビルドタイプ: Dockerfile
+   Dockerfileパス: /Dockerfile
+   ```
+
+4. **サービス設定を設定**
+   ```
+   サービス名: revenue-calculator-employee
+   リージョン: your-region
+   CPU割り当て: リクエスト処理中のみCPUを割り当て
+   最小インスタンス数: 1
+   最大インスタンス数: 10
+   ```
+
+5. **コンテナ設定を設定**
+   ```
+   ポート: 9001
+   メモリ: 1 GiB（推奨）または2 GiB（メモリ問題が続く場合）
+   CPU: 2
+   リクエストタイムアウト: 300秒
+   起動タイムアウト: 300秒
+   ```
+
+6. **環境変数を設定**
+   ```
+   SPRING_PROFILES_ACTIVE: prod
+   DB_URL: r2dbc:postgresql://your-db-host:5432/asatex-revenue
+   DB_USER: your-db-username
+   DB_PASSWORD: your-db-password
+   FLYWAY_URL: jdbc:postgresql://your-db-host:5432/asatex-revenue
+   REDIS_HOST: your-redis-host
+   REDIS_PORT: 6379
+   REDIS_DATABASE: 0
+   CACHE_TTL: 1800000
+   DB_POOL_MAX_SIZE: 5
+   DB_POOL_MAX_IDLE_TIME: PT5M
+   DB_POOL_MAX_LIFE_TIME: PT15M
+   ```
+
+7. **VPC接続を設定**
+   - **「接続」**セクションで
+   - **「VPCコネクタを追加」**をクリック
+   - Cloud SQLアクセス用のVPCコネクタを選択
+
+8. **認証を設定**
+   - **「セキュリティ」**セクションで
+   - サービスアカウント：`your-service-account@your-project.iam.gserviceaccount.com`
+   - 未認証の呼び出しを許可：**はい**
+
+9. **サービスをデプロイ**
+   - **「作成」**をクリック
+   - ビルドとデプロイの完了を待つ（通常10-15分）
+
+##### 方法2：コマンドラインデプロイ
+
+1. **Dockerイメージをビルド**
+   ```bash
+   # イメージをビルド
+   docker build -t gcr.io/your-project-id/revenue-calculator-backend-employee .
+   
+   # イメージをGoogle Container Registryにプッシュ
+   docker push gcr.io/your-project-id/revenue-calculator-backend-employee
+   ```
+
+2. **Cloud Runにデプロイ**
+   ```bash
+   gcloud run deploy revenue-calculator-employee \
+     --image gcr.io/your-project-id/revenue-calculator-backend-employee \
+     --platform managed \
+     --region your-region \
+     --set-env-vars SPRING_PROFILES_ACTIVE="prod" \
+     --set-env-vars DB_URL="r2dbc:postgresql://your-db-host:5432/asatex-revenue" \
+     --set-env-vars DB_USER="your-db-username" \
+     --set-env-vars DB_PASSWORD="your-db-password" \
+     --set-env-vars FLYWAY_URL="jdbc:postgresql://your-db-host:5432/asatex-revenue" \
+     --set-env-vars REDIS_HOST="your-redis-host" \
+     --set-env-vars REDIS_PORT="6379" \
+     --set-env-vars REDIS_DATABASE="0" \
+     --set-env-vars CACHE_TTL="1800000" \
+     --set-env-vars DB_POOL_MAX_SIZE="5" \
+     --set-env-vars DB_POOL_MAX_IDLE_TIME="PT5M" \
+     --set-env-vars DB_POOL_MAX_LIFE_TIME="PT15M" \
+     --vpc-connector your-vpc-connector \
+     --service-account your-service-account@your-project.iam.gserviceaccount.com \
+     --allow-unauthenticated \
+     --memory 1Gi \
+     --cpu 2 \
+     --timeout 300 \
+     --port 9001
+   ```
+
+##### 環境変数設定
+
+**必要な環境変数：**
+```bash
+# アプリケーション設定
+SPRING_PROFILES_ACTIVE=prod
+
+# データベース設定（Cloud SQL + VPC接続）
+DB_URL=r2dbc:postgresql://your-db-host:5432/asatex-revenue
+DB_USER=your-db-username
+DB_PASSWORD=your-db-password
+FLYWAY_URL=jdbc:postgresql://your-db-host:5432/asatex-revenue
+
+# Redis設定
+REDIS_HOST=your-redis-host
+REDIS_PORT=6379
+REDIS_DATABASE=0
+CACHE_TTL=1800000
+```
+
+**オプションの環境変数：**
+```bash
+# データベース接続プール設定
+DB_POOL_MAX_SIZE=5
+DB_POOL_MAX_IDLE_TIME=PT5M
+DB_POOL_MAX_LIFE_TIME=PT15M
+```
+
+##### データベース設定
+
+**VPC接続設定：**
+
+1. **VPCコネクタの作成：**
+   ```bash
+   # Cloud RunがCloud SQLにアクセスするためのVPCコネクタを作成
+   gcloud compute networks vpc-access connectors create your-vpc-connector \
+     --region=your-region \
+     --subnet=your-subnet \
+     --subnet-project=your-project-id \
+     --min-instances=2 \
+     --max-instances=3
+   ```
+
+2. **データベースユーザー設定：**
+   ```sql
+   -- パスワード認証でデータベースユーザーを作成
+   CREATE USER your-db-username WITH PASSWORD 'your-db-password';
+   GRANT ALL PRIVILEGES ON DATABASE asatex_revenue TO your-db-username;
+   GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO your-db-username;
+   GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO your-db-username;
+   ```
+
+##### デプロイ検証
+
+1. **サービス状態を確認**
+   - Cloud Runコンソールで、サービス状態が**「実行中」**であることを確認
+
+2. **ヘルスチェックをテスト**
+   ```bash
+   # サービスURLを取得
+   SERVICE_URL=$(gcloud run services describe revenue-calculator-employee \
+       --region=your-region \
+       --format="value(status.url)")
+   
+   # ヘルスチェックをテスト
+   curl $SERVICE_URL/actuator/health
+   
+   # データベース接続をテスト
+   curl $SERVICE_URL/actuator/health/db
+   ```
+
+3. **API文書にアクセス**
+   - ブラウザを開く：`$SERVICE_URL/swagger-ui.html`
+
+##### デプロイ更新
+
+1. Cloud Runコンソールで、サービス名をクリック
+2. **「編集して新しいリビジョンをデプロイ」**をクリック
+3. **「ソース」**セクションで、**「再ビルド」**をクリック
+4. **「デプロイ」**をクリック
+
+##### トラブルシューティング
+
+**一般的な問題：**
+
+1. **ビルド失敗**
+   - Dockerfileの構文を確認
+   - すべての依存関係がインストールされていることを確認
+   - ビルドログを確認
+
+2. **デプロイ失敗**
+   - Cloud SQL接続設定を確認
+   - サービスアカウント権限を確認
+   - 環境変数設定を確認
+
+3. **アプリケーションが起動しない**
+   - Cloud Runログを確認
+   - データベース接続を確認
+   - Redis接続を確認
+
+**便利なコマンド：**
+```bash
+# サービスログを表示
+gcloud run services logs read revenue-calculator-employee --region=your-region
+
+# サービス詳細を表示
+gcloud run services describe revenue-calculator-employee --region=your-region
+
+# ビルドログを表示
+gcloud builds list --limit=5
+```
+
+##### セキュリティ考慮事項
+
+1. **VPCセキュリティ**：VPCコネクタが適切に設定され、セキュアであることを確認
+2. **環境変数**：Cloud Runで環境変数を設定する際、機密情報がログに露出しないことを確認
+3. **ネットワークアクセス**：Cloud RunサービスがVPCを通じてCloud SQLインスタンスにアクセスできることを確認
+4. **ファイアウォールルール**：Cloud SQLのファイアウォールルールを確認し、VPCからの接続を許可
+5. **データベースセキュリティ**：強力なパスワードを使用し、データベースユーザー権限を制限
+6. **VPCコネクタ**：VPCコネクタが適切なネットワークアクセス制御を持っていることを確認
 
 ### 本番環境設定
 
 ```properties
 # 本番環境設定
 spring.profiles.active=prod
-server.port=8080
+server.port=9001
 
 # データベース接続プール設定
 spring.r2dbc.pool.initial-size=10
@@ -686,9 +947,8 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 
 ### キャッシュ戦略
 
-- **従業員情報キャッシュ**: 1時間TTL
-- **従業員リストキャッシュ**: 30分TTL
-- **検索キャッシュ**: 15分TTL
+- **従業員情報キャッシュ**: 30分TTL
+- **従業員検索キャッシュ**: 15分TTL
 - **ページネーションキャッシュ**: 10分TTL
 - **自動キャッシュ無効化**: 書き込み操作時の関連キャッシュクリア
 

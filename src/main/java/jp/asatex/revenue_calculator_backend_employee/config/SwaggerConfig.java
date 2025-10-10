@@ -43,6 +43,7 @@ public class SwaggerConfig {
                 ));
     }
 
+
     /**
      * Build API description
      */
@@ -62,13 +63,15 @@ public class SwaggerConfig {
                 "- Write operations: 20 requests per minute\n\n" +
                 "## API Groups\n" +
                 "- **Employee Management**: Core business operations\n" +
-                "- **System Monitoring**: Internal monitoring endpoints (hidden by default)";
+                "- **System Monitoring**: Internal monitoring endpoints (hidden by default)\n\n" +
+                "## Documentation\n" +
+                "This API documentation is generated automatically from the source code annotations.";
     }
 
     @Bean
     public GroupedOpenApi employeeApi() {
         return GroupedOpenApi.builder()
-                .group("Employee Management")
+                .group("employee-management")
                 .pathsToMatch("/api/v1/employee/**")
                 .displayName("Employee Management API")
                 .build();
@@ -78,7 +81,7 @@ public class SwaggerConfig {
     @Profile("!prod")
     public GroupedOpenApi monitoringApi() {
         return GroupedOpenApi.builder()
-                .group("System Monitoring")
+                .group("system-monitoring")
                 .pathsToMatch("/api/v1/monitoring/**", "/api/v1/audit/**")
                 .displayName("System Monitoring API")
                 .build();
@@ -88,7 +91,7 @@ public class SwaggerConfig {
     @Profile("!prod")
     public GroupedOpenApi allApis() {
         return GroupedOpenApi.builder()
-                .group("All APIs")
+                .group("all-apis")
                 .pathsToMatch("/api/**")
                 .displayName("All APIs")
                 .build();
