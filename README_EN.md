@@ -55,13 +55,6 @@ A reactive employee management system backend service based on Spring Boot 3.x, 
   - Pagination Cache: 10 minutes TTL
 - **Rate Limiting**: Different limits for different operations (20-100 requests/minute)
 
-#### 🗄️ Database Audit
-
-- **Comprehensive Audit Trail**: INSERT, UPDATE, DELETE, SELECT operations
-- **Context Tracking**: User ID, Session ID, Request ID, IP Address
-- **Data Change Tracking**: Old values, new values, field-level changes
-- **Performance Monitoring**: Execution time, affected rows
-- **Error Tracking**: Failed operations with detailed error messages
 
 #### 🔄 Transaction Management
 
@@ -70,12 +63,6 @@ A reactive employee management system backend service based on Spring Boot 3.x, 
 - **Transaction Monitoring**: Real-time transaction tracking
 - **Performance Metrics**: Transaction execution time monitoring
 
-#### 📊 Comprehensive Logging
-
-- **Log Categories**: Application, Audit, Security, Performance, Error logs
-- **Structured Logging**: JSON format with context information
-- **Log Rotation**: Automatic log rotation and compression
-- **Retention Policies**: Different retention periods for different log types
 
 ### Data Validation
 
@@ -102,9 +89,7 @@ src/
 │   ├── java/jp/asatex/revenue_calculator_backend_employee/
 │   │   ├── config/           # Configuration classes
 │   │   │   ├── CacheConfig.java
-│   │   │   ├── DatabaseAuditConfig.java
-│   │   │   ├── InternationalizationConfig.java
-│   │   │   ├── LoggingConfig.java
+│   │   │   ├── JacksonConfig.java
 │   │   │   ├── MetricsConfig.java
 │   │   │   ├── MultiLanguageOpenApiConfig.java
 │   │   │   ├── RateLimitConfig.java
@@ -117,7 +102,6 @@ src/
 │   │   │   └── EmployeeDto.java
 │   │   ├── entity/          # Entity classes
 │   │   │   ├── Employee.java
-│   │   │   └── DatabaseAuditLog.java
 │   │   ├── exception/       # Exception handling
 │   │   │   ├── GlobalExceptionHandler.java
 │   │   │   ├── EmployeeNotFoundException.java
@@ -125,20 +109,15 @@ src/
 │   │   │   └── TransactionException.java
 │   │   ├── repository/      # Data access layer
 │   │   │   ├── EmployeeRepository.java
-│   │   │   └── DatabaseAuditLogRepository.java
 │   │   ├── service/         # Business logic layer
 │   │   │   ├── EmployeeService.java
-│   │   │   ├── AuditLogService.java
-│   │   │   ├── DatabaseAuditService.java
 │   │   │   ├── CacheMonitoringService.java
-│   │   │   ├── LogMonitoringService.java
 │   │   │   └── TransactionMonitoringService.java
 │   │   ├── util/            # Utility classes
 │   │   │   └── LoggingUtil.java
 │   │   └── RevenueCalculatorBackendEmployeeApplication.java
 │   └── resources/
 │       ├── application.properties
-│       ├── application-dev.properties
 │       ├── application-prod.properties
 │       ├── messages.properties          # English resource file
 │       ├── messages_zh_CN.properties    # Chinese resource file
@@ -226,7 +205,7 @@ src/
 6. **Verify the application**
 
    ```bash
-   curl http://localhost:9001/api/v1/employee/health
+   curl http://localhost:8080/api/v1/employee/health
    ```
 
 ## 📚 API Documentation
@@ -235,9 +214,9 @@ src/
 
 After starting the application, you can access Swagger UI through the following links:
 
-- **Swagger UI**: <http://localhost:9001/swagger-ui.html>
-- **OpenAPI JSON**: <http://localhost:9001/v3/api-docs>
-- **Swagger Configuration**: <http://localhost:9001/v3/api-docs/swagger-config>
+- **Swagger UI**: <http://localhost:8080/swagger-ui.html>
+- **OpenAPI JSON**: <http://localhost:8080/v3/api-docs>
+- **Swagger Configuration**: <http://localhost:8080/v3/api-docs/swagger-config>
 
 ### 🌐 Multi-language Support
 
@@ -249,19 +228,19 @@ The API documentation supports three languages and can be switched in the follow
 
    ```bash
    # English
-   curl -H "Accept-Language: en" http://localhost:9001/v3/api-docs
+   curl -H "Accept-Language: en" http://localhost:8080/v3/api-docs
    
    # Chinese
-   curl -H "Accept-Language: zh-CN" http://localhost:9001/v3/api-docs
+   curl -H "Accept-Language: zh-CN" http://localhost:8080/v3/api-docs
    
    # Japanese
-   curl -H "Accept-Language: ja" http://localhost:9001/v3/api-docs
+   curl -H "Accept-Language: ja" http://localhost:8080/v3/api-docs
    ```
 
 2. **Through Swagger UI groups**:
-   - **English Documentation**: <http://localhost:9001/swagger-ui.html?urls.primaryName=english>
-   - **Chinese Documentation**: <http://localhost:9001/swagger-ui.html?urls.primaryName=chinese>
-   - **Japanese Documentation**: <http://localhost:9001/swagger-ui.html?urls.primaryName=japanese>
+   - **English Documentation**: <http://localhost:8080/swagger-ui.html?urls.primaryName=english>
+   - **Chinese Documentation**: <http://localhost:8080/swagger-ui.html?urls.primaryName=chinese>
+   - **Japanese Documentation**: <http://localhost:8080/swagger-ui.html?urls.primaryName=japanese>
 
 #### Supported Languages
 
@@ -272,7 +251,7 @@ The API documentation supports three languages and can be switched in the follow
 ### Base URL
 
 ```text
-http://localhost:9001/api/v1/employee
+http://localhost:8080/api/v1/employee
 ```
 
 ### Endpoint List
@@ -475,7 +454,7 @@ The project has comprehensive test coverage:
 
 ```properties
 # Server configuration
-server.port=9001
+server.port=8080
 
 # Database configuration
 spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
@@ -641,7 +620,7 @@ The project uses Flyway for database version management:
    ```dockerfile
    FROM openjdk:21-jdk-slim
    COPY build/libs/*.jar app.jar
-   EXPOSE 9001
+   EXPOSE 8080
    ENTRYPOINT ["java", "-jar", "/app.jar"]
    ```
 
@@ -650,7 +629,7 @@ The project uses Flyway for database version management:
    ```bash
    ./gradlew build
    docker build -t revenue-calculator-employee .
-   docker run -p 9001:9001 revenue-calculator-employee
+   docker run -p 8080:8080 revenue-calculator-employee
    ```
 
 ### Production Environment Configuration
@@ -658,7 +637,7 @@ The project uses Flyway for database version management:
 ```properties
 # Production environment configuration
 spring.profiles.active=prod
-server.port=9001
+server.port=8080
 
 # Database connection pool configuration
 spring.r2dbc.pool.initial-size=10

@@ -61,13 +61,13 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
    ```
 
 3. **Access API Documentation / 访问API文档 / API文書アクセス**:
-   - **Swagger UI**: <http://localhost:9001/swagger-ui.html>
+   - **Swagger UI**: <http://localhost:8080/swagger-ui.html>
    - **Multi-language docs**: See language-specific README files above
 
 4. **Test the API / 测试API / APIテスト**:
 
    ```bash
-   curl http://localhost:9001/api/v1/employee/health
+   curl http://localhost:8080/api/v1/employee/health
    ```
 
 ---

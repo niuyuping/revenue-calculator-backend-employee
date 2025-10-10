@@ -67,11 +67,6 @@ class EmployeeServiceTest {
     @Mock
     private TransactionMonitoringService transactionMonitoringService;
 
-    @Mock
-    private AuditLogService auditLogService;
-
-    @Mock
-    private DatabaseAuditService databaseAuditService;
 
     @InjectMocks
     private EmployeeService employeeService;
@@ -103,20 +98,6 @@ class EmployeeServiceTest {
                     return operation;
                 });
 
-        // Configure DatabaseAuditService Mock
-        org.mockito.Mockito.lenient().when(databaseAuditService.logInsertOperation(any(String.class), any(String.class), any(), any(String.class), any(Long.class), any(Integer.class)))
-                .thenReturn(Mono.empty());
-        
-        org.mockito.Mockito.lenient().when(databaseAuditService.logUpdateOperation(any(String.class), any(String.class), any(), any(), any(String.class), any(Long.class), any(Integer.class)))
-                .thenReturn(Mono.empty());
-        
-        org.mockito.Mockito.lenient().when(databaseAuditService.logDeleteOperation(any(String.class), any(String.class), any(), any(String.class), any(Long.class), any(Integer.class)))
-                .thenReturn(Mono.empty());
-        
-        org.mockito.Mockito.lenient().when(databaseAuditService.logFailedOperation(any(String.class), any(String.class), any(String.class), any(String.class), any(Long.class), any(String.class)))
-                .thenReturn(Mono.empty());
-
-        // AuditLogService method calls are optional, no Mock configuration needed
     }
 
     @Test
@@ -135,8 +116,6 @@ class EmployeeServiceTest {
     void getEmployeeById_WhenEmployeeExists_ShouldReturnEmployee() {
         // Given
         when(employeeRepository.findById(1L)).thenReturn(Mono.just(testEmployee));
-        when(databaseAuditService.logSelectOperation(any(String.class), any(String.class), any(String.class), any(Long.class), any(Integer.class)))
-                .thenReturn(Mono.empty());
 
         // When & Then
         StepVerifier.create(employeeService.getEmployeeById(1L))
@@ -187,25 +166,12 @@ class EmployeeServiceTest {
                 .verifyComplete();
     }
 
-    @Test
-    void searchEmployeesByFurigana_ShouldReturnMatchingEmployees() {
-        // Given
-        List<Employee> employees = Arrays.asList(testEmployee);
-        when(employeeRepository.findByFuriganaContaining("%tanaka%")).thenReturn(Flux.fromIterable(employees));
-
-        // When & Then
-        StepVerifier.create(employeeService.searchEmployeesByFurigana("tanaka"))
-                .expectNextMatches(dto -> dto.getFurigana().contains("tanaka"))
-                .verifyComplete();
-    }
 
     @Test
     void createEmployee_WhenEmployeeNumberNotExists_ShouldCreateEmployee() {
         // Given
         when(employeeRepository.existsByEmployeeNumber("EMP001")).thenReturn(Mono.just(false));
         when(employeeRepository.save(any(Employee.class))).thenReturn(Mono.just(testEmployee));
-        when(databaseAuditService.logInsertOperation(any(String.class), any(String.class), any(), any(String.class), any(Long.class), any(Integer.class)))
-                .thenReturn(Mono.empty());
 
         // When & Then
         StepVerifier.create(employeeService.createEmployee(testEmployeeDto))
@@ -235,8 +201,6 @@ class EmployeeServiceTest {
 
         when(employeeRepository.findById(1L)).thenReturn(Mono.just(testEmployee));
         when(employeeRepository.save(any(Employee.class))).thenReturn(Mono.just(testEmployee));
-        when(databaseAuditService.logUpdateOperation(any(String.class), any(String.class), any(), any(), any(String.class), any(Long.class), any(Integer.class)))
-                .thenReturn(Mono.empty());
 
         // When & Then
         StepVerifier.create(employeeService.updateEmployee(1L, updateDto))
@@ -264,8 +228,6 @@ class EmployeeServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Mono.just(testEmployee));
         when(employeeRepository.existsByEmployeeNumber("EMP002")).thenReturn(Mono.just(false));
         when(employeeRepository.save(any(Employee.class))).thenReturn(Mono.just(updatedEmployee));
-        when(databaseAuditService.logUpdateOperation(any(String.class), any(String.class), any(), any(), any(String.class), any(Long.class), any(Integer.class)))
-                .thenReturn(Mono.empty());
 
         // When & Then
         StepVerifier.create(employeeService.updateEmployee(1L, updateDto))
@@ -307,8 +269,6 @@ class EmployeeServiceTest {
         // Given
         when(employeeRepository.existsById(1L)).thenReturn(Mono.just(true));
         when(employeeRepository.deleteById(1L)).thenReturn(Mono.empty());
-        when(databaseAuditService.logDeleteOperation(any(String.class), any(String.class), any(), any(String.class), any(Long.class), any(Integer.class)))
-                .thenReturn(Mono.empty());
 
         // When & Then
         StepVerifier.create(employeeService.deleteEmployeeById(1L))
@@ -331,8 +291,6 @@ class EmployeeServiceTest {
         // Given
         when(employeeRepository.existsByEmployeeNumber("EMP001")).thenReturn(Mono.just(true));
         when(employeeRepository.deleteByEmployeeNumber("EMP001")).thenReturn(Mono.empty());
-        when(databaseAuditService.logDeleteOperation(any(String.class), any(String.class), any(), any(String.class), any(Long.class), any(Integer.class)))
-                .thenReturn(Mono.empty());
 
         // When & Then
         StepVerifier.create(employeeService.deleteEmployeeByNumber("EMP001"))
@@ -350,35 +308,4 @@ class EmployeeServiceTest {
                 .verify();
     }
 
-    @Test
-    void convertToDto_ShouldConvertEntityToDto() {
-        // Given
-        Employee entity = testEmployee;
-
-        // When
-        EmployeeDto result = employeeService.convertToDto(entity);
-
-        // Then
-        assert result.getEmployeeId().equals(entity.getEmployeeId());
-        assert result.getEmployeeNumber().equals(entity.getEmployeeNumber());
-        assert result.getName().equals(entity.getName());
-        assert result.getFurigana().equals(entity.getFurigana());
-        assert result.getBirthday().equals(entity.getBirthday());
-    }
-
-    @Test
-    void convertToEntity_ShouldConvertDtoToEntity() {
-        // Given
-        EmployeeDto dto = testEmployeeDto;
-
-        // When
-        Employee result = employeeService.convertToEntity(dto);
-
-        // Then
-        assert result.getEmployeeId().equals(dto.getEmployeeId());
-        assert result.getEmployeeNumber().equals(dto.getEmployeeNumber());
-        assert result.getName().equals(dto.getName());
-        assert result.getFurigana().equals(dto.getFurigana());
-        assert result.getBirthday().equals(dto.getBirthday());
-    }
 }

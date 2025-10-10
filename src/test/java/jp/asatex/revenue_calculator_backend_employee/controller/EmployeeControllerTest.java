@@ -3,7 +3,6 @@ package jp.asatex.revenue_calculator_backend_employee.controller;
 import jp.asatex.revenue_calculator_backend_employee.dto.EmployeeDto;
 import jp.asatex.revenue_calculator_backend_employee.exception.EmployeeNotFoundException;
 import jp.asatex.revenue_calculator_backend_employee.service.EmployeeService;
-import jp.asatex.revenue_calculator_backend_employee.service.AuditLogService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -31,8 +30,6 @@ class EmployeeControllerTest {
     @MockitoBean
     private EmployeeService employeeService;
 
-    @MockitoBean
-    private AuditLogService auditLogService;
 
     @Test
     void testGetAllEmployees() {
@@ -192,37 +189,6 @@ class EmployeeControllerTest {
                 .hasSize(0);
     }
 
-    @Test
-    void testSearchEmployeesByFurigana() {
-        // Prepare test data
-        EmployeeDto employee1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
-        EmployeeDto employee2 = new EmployeeDto(2L, "EMP002", "Tanaka Hanako", "tanaka hanako", LocalDate.of(1985, 12, 3));
-
-        when(employeeService.searchEmployeesByFurigana("tanaka")).thenReturn(Flux.just(employee1, employee2));
-
-        // Execute test
-        webTestClient.get()
-                .uri("/api/v1/employee/search/furigana?furigana=tanaka")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBodyList(EmployeeDto.class)
-                .hasSize(2);
-    }
-
-    @Test
-    void testSearchEmployeesByFuriganaNotFound() {
-        when(employeeService.searchEmployeesByFurigana("yamada")).thenReturn(Flux.empty());
-
-        webTestClient.get()
-                .uri("/api/v1/employee/search/furigana?furigana=yamada")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(EmployeeDto.class)
-                .hasSize(0);
-    }
 
     @Test
     void testGetEmployeeByNumberNotFound() {

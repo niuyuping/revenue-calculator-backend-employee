@@ -98,12 +98,12 @@ class CacheAndRateLimitIntegrationTest {
         PageRequest pageRequest = new PageRequest(0, 10, "employeeId", SortDirection.ASC);
 
         // First pagination query
-        var firstQuery = employeeService.getAllEmployeesWithPagination(pageRequest).block();
+        var firstQuery = employeeService.getEmployeesWithPagination(pageRequest).block();
         assertThat(firstQuery).isNotNull();
         assertThat(firstQuery.getContent()).hasSize(5);
 
         // Second pagination query - should fetch from cache
-        var secondQuery = employeeService.getAllEmployeesWithPagination(pageRequest).block();
+        var secondQuery = employeeService.getEmployeesWithPagination(pageRequest).block();
         assertThat(secondQuery).isNotNull();
         assertThat(secondQuery.getContent()).hasSize(5);
 
@@ -181,17 +181,15 @@ class CacheAndRateLimitIntegrationTest {
         EmployeeDto createdEmployee = employeeService.createEmployee(testEmployee).block();
         assertThat(createdEmployee).isNotNull();
 
-        PageRequest pageRequest = new PageRequest(0, 10, "employeeId", SortDirection.ASC);
-
         // First search
-        var firstSearch = employeeService.searchEmployeesByNameWithPagination("Cache", pageRequest).block();
+        var firstSearch = employeeService.searchEmployeesByName("Cache").collectList().block();
         assertThat(firstSearch).isNotNull();
-        assertThat(firstSearch.getContent()).hasSize(1);
+        assertThat(firstSearch).hasSize(1);
 
         // Second search - should fetch from cache
-        var secondSearch = employeeService.searchEmployeesByNameWithPagination("Cache", pageRequest).block();
+        var secondSearch = employeeService.searchEmployeesByName("Cache").collectList().block();
         assertThat(secondSearch).isNotNull();
-        assertThat(secondSearch.getContent()).hasSize(1);
+        assertThat(secondSearch).hasSize(1);
 
         // Verify cache has data
         var searchCache = cacheManager.getCache("employeeSearch");
@@ -219,7 +217,7 @@ class CacheAndRateLimitIntegrationTest {
 
         // Test search rate limiting
         webTestClient.get()
-                .uri("/api/v1/employee/search/name/paged?name=Cache&page=0&size=10&sortBy=employeeId&sortDirection=ASC")
+                .uri("/api/v1/employee/search/name?name=Cache")
                 .exchange()
                 .expectStatus().isOk();
     }

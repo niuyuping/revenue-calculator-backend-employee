@@ -1,7 +1,6 @@
 package jp.asatex.revenue_calculator_backend_employee.controller;
 
 import jp.asatex.revenue_calculator_backend_employee.service.EmployeeService;
-import jp.asatex.revenue_calculator_backend_employee.service.AuditLogService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -24,8 +23,6 @@ class EmployeeControllerParameterValidationTest {
     @MockitoBean
     private EmployeeService employeeService;
 
-    @MockitoBean
-    private AuditLogService auditLogService;
 
     @Test
     void testGetEmployeeById_WithInvalidId_ShouldReturnBadRequest() {
@@ -127,39 +124,6 @@ class EmployeeControllerParameterValidationTest {
                 .jsonPath("$.message").isEqualTo("Required query parameters are missing");
     }
 
-    @Test
-    void testSearchEmployeesByFurigana_WithEmptyFurigana_ShouldReturnBadRequest() {
-        webTestClient.get()
-                .uri("/api/v1/employee/search/furigana?furigana=")
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.error").isEqualTo("Validation Failed")
-                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
-    }
-
-    @Test
-    void testSearchEmployeesByFurigana_WithTooLongFurigana_ShouldReturnBadRequest() {
-        String longFurigana = "a".repeat(201);
-        webTestClient.get()
-                .uri("/api/v1/employee/search/furigana?furigana=" + longFurigana)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.error").isEqualTo("Validation Failed")
-                .jsonPath("$.message").isEqualTo("Request data does not conform to validation rules");
-    }
-
-    @Test
-    void testSearchEmployeesByFurigana_WithMissingParameter_ShouldReturnBadRequest() {
-        webTestClient.get()
-                .uri("/api/v1/employee/search/furigana")
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.error").isEqualTo("Parameter validation failed")
-                .jsonPath("$.message").isEqualTo("Required query parameters are missing");
-    }
 
     @Test
     void testUpdateEmployee_WithInvalidId_ShouldReturnBadRequest() {
@@ -228,13 +192,6 @@ class EmployeeControllerParameterValidationTest {
                 .expectStatus().isOk(); // Validation passes, returns empty result
     }
 
-    @Test
-    void testValidFuriganaSearch_ShouldPassValidation() {
-        webTestClient.get()
-                .uri("/api/v1/employee/search/furigana?furigana=tanaka")
-                .exchange()
-                .expectStatus().isOk(); // Validation passes, returns empty result
-    }
 
     @Test
     void testValidId_ShouldPassValidation() {

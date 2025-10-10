@@ -125,25 +125,6 @@ public class EmployeeController {
         return employeeService.searchEmployeesByName(name);
     }
     
-    /**
-     * Search employees by furigana
-     * GET /api/v1/employee/search/furigana?q={furigana}
-     * @param furigana Furigana keyword
-     * @return Flux<EmployeeDto>
-     */
-    @Operation(summary = "Search employees by furigana", description = "Search for employees whose furigana contains the keyword")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Success", 
-                    content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid search keyword"),
-            @ApiResponse(responseCode = "500", description = "Server error")
-    })
-    @GetMapping("/search/furigana")
-    public Flux<EmployeeDto> searchEmployeesByFurigana(
-            @Parameter(description = "Furigana search keyword", required = true, example = "tanaka")
-            @RequestParam @NotBlank(message = "Search keyword cannot be empty") @Size(min = 1, max = 200, message = "Search keyword length must be between 1-200 characters") String furigana) {
-        return employeeService.searchEmployeesByFurigana(furigana);
-    }
     
     /**
      * Get all employees with pagination
@@ -174,78 +155,10 @@ public class EmployeeController {
             @RequestParam(defaultValue = "ASC") String sortDirection) {
         
         PageRequest pageRequest = new PageRequest(page, size, sortBy, SortDirection.fromString(sortDirection));
-        return employeeService.getAllEmployeesWithPagination(pageRequest);
+        return employeeService.getEmployeesWithPagination(pageRequest);
     }
     
-    /**
-     * Search employees with pagination (by name)
-     * GET /api/v1/employee/search/name/paged
-     * @param name Name keyword
-     * @param page Page number (starts from 0)
-     * @param size Page size
-     * @param sortBy Sort field
-     * @param sortDirection Sort direction
-     * @return Mono<PageResponse<EmployeeDto>>
-     */
-    @Operation(summary = "Search employees with pagination (by name)", description = "Name search with pagination and sorting support")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Success", 
-                    content = @Content(schema = @Schema(implementation = PageResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid search parameters"),
-            @ApiResponse(responseCode = "500", description = "Server error")
-    })
-    @GetMapping("/search/name/paged")
-    @RateLimiter(name = "employee-search")
-    public Mono<PageResponse<EmployeeDto>> searchEmployeesByNameWithPagination(
-            @Parameter(description = "Name search keyword", required = true, example = "Tanaka")
-            @RequestParam @NotBlank(message = "Search keyword cannot be empty") @Size(min = 1, max = 100, message = "Search keyword length must be between 1-100 characters") String name,
-            @Parameter(description = "Page number, starting from 0", example = "0")
-            @RequestParam(defaultValue = "0") @Min(0) int page,
-            @Parameter(description = "Page size", example = "10")
-            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
-            @Parameter(description = "Sort field", example = "name")
-            @RequestParam(defaultValue = "employeeId") String sortBy,
-            @Parameter(description = "Sort direction", example = "ASC")
-            @RequestParam(defaultValue = "ASC") String sortDirection) {
-        
-        PageRequest pageRequest = new PageRequest(page, size, sortBy, SortDirection.fromString(sortDirection));
-        return employeeService.searchEmployeesByNameWithPagination(name, pageRequest);
-    }
     
-    /**
-     * Search employees with pagination (by furigana)
-     * GET /api/v1/employee/search/furigana/paged
-     * @param furigana Furigana keyword
-     * @param page Page number (starts from 0)
-     * @param size Page size
-     * @param sortBy Sort field
-     * @param sortDirection Sort direction
-     * @return Mono<PageResponse<EmployeeDto>>
-     */
-    @Operation(summary = "Search employees with pagination (by furigana)", description = "Furigana search with pagination and sorting support")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Success", 
-                    content = @Content(schema = @Schema(implementation = PageResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid search parameters"),
-            @ApiResponse(responseCode = "500", description = "Server error")
-    })
-    @GetMapping("/search/furigana/paged")
-    @RateLimiter(name = "employee-search")
-    public Mono<PageResponse<EmployeeDto>> searchEmployeesByFuriganaWithPagination(
-            @Parameter(description = "Furigana search keyword", required = true, example = "tanaka")
-            @RequestParam @NotBlank(message = "Search keyword cannot be empty") @Size(min = 1, max = 200, message = "Search keyword length must be between 1-200 characters") String furigana,
-            @Parameter(description = "Page number, starting from 0", example = "0")
-            @RequestParam(defaultValue = "0") @Min(0) int page,
-            @Parameter(description = "Page size", example = "10")
-            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
-            @Parameter(description = "Sort field", example = "name")
-            @RequestParam(defaultValue = "employeeId") String sortBy,
-            @Parameter(description = "Sort direction", example = "ASC")
-            @RequestParam(defaultValue = "ASC") String sortDirection) {
-        
-        PageRequest pageRequest = new PageRequest(page, size, sortBy, SortDirection.fromString(sortDirection));
-        return employeeService.searchEmployeesByFuriganaWithPagination(furigana, pageRequest);
-    }
     
     /**
      * Create new employee

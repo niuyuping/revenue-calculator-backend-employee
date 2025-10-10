@@ -102,9 +102,7 @@ src/
 │   ├── java/jp/asatex/revenue_calculator_backend_employee/
 │   │   ├── config/           # 設定クラス
 │   │   │   ├── CacheConfig.java
-│   │   │   ├── DatabaseAuditConfig.java
-│   │   │   ├── InternationalizationConfig.java
-│   │   │   ├── LoggingConfig.java
+│   │   │   ├── JacksonConfig.java
 │   │   │   ├── MetricsConfig.java
 │   │   │   ├── MultiLanguageOpenApiConfig.java
 │   │   │   ├── RateLimitConfig.java
@@ -117,7 +115,6 @@ src/
 │   │   │   └── EmployeeDto.java
 │   │   ├── entity/          # エンティティクラス
 │   │   │   ├── Employee.java
-│   │   │   └── DatabaseAuditLog.java
 │   │   ├── exception/       # 例外処理
 │   │   │   ├── GlobalExceptionHandler.java
 │   │   │   ├── EmployeeNotFoundException.java
@@ -125,20 +122,15 @@ src/
 │   │   │   └── TransactionException.java
 │   │   ├── repository/      # データアクセス層
 │   │   │   ├── EmployeeRepository.java
-│   │   │   └── DatabaseAuditLogRepository.java
 │   │   ├── service/         # ビジネスロジック層
 │   │   │   ├── EmployeeService.java
-│   │   │   ├── AuditLogService.java
-│   │   │   ├── DatabaseAuditService.java
 │   │   │   ├── CacheMonitoringService.java
-│   │   │   ├── LogMonitoringService.java
 │   │   │   └── TransactionMonitoringService.java
 │   │   ├── util/            # ユーティリティクラス
 │   │   │   └── LoggingUtil.java
 │   │   └── RevenueCalculatorBackendEmployeeApplication.java
 │   └── resources/
 │       ├── application.properties
-│       ├── application-dev.properties
 │       ├── application-prod.properties
 │       ├── messages.properties          # 英語リソースファイル
 │       ├── messages_zh_CN.properties    # 中国語リソースファイル
@@ -226,7 +218,7 @@ src/
 6. **動作確認**
 
    ```bash
-   curl http://localhost:9001/api/v1/employee/health
+   curl http://localhost:8080/api/v1/employee/health
    ```
 
 ## 📚 API文書
@@ -235,9 +227,9 @@ src/
 
 アプリケーション起動後、以下のリンクからSwagger UIにアクセスできます：
 
-- **Swagger UI**: <http://localhost:9001/swagger-ui.html>
-- **OpenAPI JSON**: <http://localhost:9001/v3/api-docs>
-- **Swagger設定**: <http://localhost:9001/v3/api-docs/swagger-config>
+- **Swagger UI**: <http://localhost:8080/swagger-ui.html>
+- **OpenAPI JSON**: <http://localhost:8080/v3/api-docs>
+- **Swagger設定**: <http://localhost:8080/v3/api-docs/swagger-config>
 
 ### 🌐 多言語サポート
 
@@ -249,19 +241,19 @@ API文書は3つの言語をサポートし、以下の方法で切り替えで�
 
    ```bash
    # 英語
-   curl -H "Accept-Language: en" http://localhost:9001/v3/api-docs
+   curl -H "Accept-Language: en" http://localhost:8080/v3/api-docs
    
    # 中国語
-   curl -H "Accept-Language: zh-CN" http://localhost:9001/v3/api-docs
+   curl -H "Accept-Language: zh-CN" http://localhost:8080/v3/api-docs
    
    # 日本語
-   curl -H "Accept-Language: ja" http://localhost:9001/v3/api-docs
+   curl -H "Accept-Language: ja" http://localhost:8080/v3/api-docs
    ```
 
 2. **Swagger UIグループを使用**：
-   - **英語文書**: <http://localhost:9001/swagger-ui.html?urls.primaryName=english>
-   - **中国語文書**: <http://localhost:9001/swagger-ui.html?urls.primaryName=chinese>
-   - **日本語文書**: <http://localhost:9001/swagger-ui.html?urls.primaryName=japanese>
+   - **英語文書**: <http://localhost:8080/swagger-ui.html?urls.primaryName=english>
+   - **中国語文書**: <http://localhost:8080/swagger-ui.html?urls.primaryName=chinese>
+   - **日本語文書**: <http://localhost:8080/swagger-ui.html?urls.primaryName=japanese>
 
 #### サポート言語
 
@@ -272,7 +264,7 @@ API文書は3つの言語をサポートし、以下の方法で切り替えで�
 ### ベースURL
 
 ```text
-http://localhost:9001/api/v1/employee
+http://localhost:8080/api/v1/employee
 ```
 
 ### エンドポイント一覧
@@ -475,7 +467,7 @@ POST /api/v1/monitoring/logs/reset
 
 ```properties
 # サーバー設定
-server.port=9001
+server.port=8080
 
 # データベース設定
 spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
@@ -641,7 +633,7 @@ CREATE TABLE database_audit_logs (
    ```dockerfile
    FROM openjdk:21-jdk-slim
    COPY build/libs/*.jar app.jar
-   EXPOSE 9001
+   EXPOSE 8080
    ENTRYPOINT ["java", "-jar", "/app.jar"]
    ```
 
@@ -650,7 +642,7 @@ CREATE TABLE database_audit_logs (
    ```bash
    ./gradlew build
    docker build -t revenue-calculator-employee .
-   docker run -p 9001:9001 revenue-calculator-employee
+   docker run -p 8080:8080 revenue-calculator-employee
    ```
 
 ### 本番環境設定
@@ -658,7 +650,7 @@ CREATE TABLE database_audit_logs (
 ```properties
 # 本番環境設定
 spring.profiles.active=prod
-server.port=9001
+server.port=8080
 
 # データベース接続プール設定
 spring.r2dbc.pool.initial-size=10

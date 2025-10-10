@@ -17,13 +17,13 @@ public class EmployeeDto {
     @Schema(description = "Employee ID", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private Long employeeId;
     
-    @Schema(description = "Employee number", example = "EMP001", required = true)
+    @Schema(description = "Employee number", example = "EMP001", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "Employee number cannot be empty")
     @Size(min = 1, max = 20, message = "Employee number length must be between 1-20 characters")
     @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "Employee number can only contain letters, numbers, underscores, and hyphens")
     private String employeeNumber;
     
-    @Schema(description = "Name", example = "Tanaka Taro", required = true)
+    @Schema(description = "Name", example = "Tanaka Taro", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "Name cannot be empty")
     @Size(min = 1, max = 100, message = "Name length must be between 1-100 characters")
     private String name;

@@ -3,7 +3,6 @@ package jp.asatex.revenue_calculator_backend_employee.config;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
-import jp.asatex.revenue_calculator_backend_employee.service.AuditLogService;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -86,10 +85,4 @@ public class TestConfig {
                 .register(meterRegistry);
     }
 
-    @Bean
-    @Primary
-    @Profile("test")
-    public AuditLogService auditLogService() {
-        return org.mockito.Mockito.mock(AuditLogService.class);
-    }
 }

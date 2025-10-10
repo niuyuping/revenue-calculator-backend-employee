@@ -6,7 +6,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import jp.asatex.revenue_calculator_backend_employee.service.EmployeeService;
-import jp.asatex.revenue_calculator_backend_employee.service.AuditLogService;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -25,8 +24,6 @@ public class GlobalExceptionHandlerTest {
     @MockitoBean
     private EmployeeService employeeService;
 
-    @MockitoBean
-    private AuditLogService auditLogService;
 
     @Test
     public void testHandleEmployeeNotFoundException() {

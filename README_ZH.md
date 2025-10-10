@@ -55,13 +55,6 @@
   - 分页缓存: 10分钟TTL
 - **限流保护**: 不同操作类型设置不同限制（20-100请求/分钟）
 
-#### 🗄️ 数据库审计
-
-- **全面审计跟踪**: INSERT、UPDATE、DELETE、SELECT操作
-- **上下文跟踪**: 用户ID、会话ID、请求ID、IP地址
-- **数据变更跟踪**: 旧值、新值、字段级变更
-- **性能监控**: 执行时间、影响行数
-- **错误跟踪**: 失败操作的详细错误信息
 
 #### 🔄 事务管理
 
@@ -70,12 +63,6 @@
 - **事务监控**: 实时事务跟踪
 - **性能指标**: 事务执行时间监控
 
-#### 📊 全面日志
-
-- **日志分类**: 应用、审计、安全、性能、错误日志
-- **结构化日志**: JSON格式，包含上下文信息
-- **日志轮转**: 自动日志轮转和压缩
-- **保留策略**: 不同日志类型设置不同保留期
 
 ### 数据验证
 
@@ -102,43 +89,37 @@ src/
 │   ├── java/jp/asatex/revenue_calculator_backend_employee/
 │   │   ├── config/           # 配置类
 │   │   │   ├── CacheConfig.java
-│   │   │   ├── DatabaseAuditConfig.java
-│   │   │   ├── InternationalizationConfig.java
-│   │   │   ├── LoggingConfig.java
+│   │   │   ├── JacksonConfig.java
 │   │   │   ├── MetricsConfig.java
-│   │   │   ├── MultiLanguageOpenApiConfig.java
 │   │   │   ├── RateLimitConfig.java
 │   │   │   ├── SwaggerConfig.java
 │   │   │   ├── TransactionConfig.java
-│   │   │   └── ValidationConfig.java
+│   │   │   ├── ValidationConfig.java
+│   │   │   ├── WebFluxConfig.java
+│   │   │   └── WebFluxJacksonConfig.java
 │   │   ├── controller/       # REST控制器
-│   │   │   └── EmployeeController.java
+│   │   │   ├── CacheMonitoringController.java
+│   │   │   ├── EmployeeController.java
+│   │   │   └── TransactionMonitoringController.java
 │   │   ├── dto/             # 数据传输对象
 │   │   │   └── EmployeeDto.java
 │   │   ├── entity/          # 实体类
-│   │   │   ├── Employee.java
-│   │   │   └── DatabaseAuditLog.java
+│   │   │   └── Employee.java
 │   │   ├── exception/       # 异常处理
 │   │   │   ├── GlobalExceptionHandler.java
 │   │   │   ├── EmployeeNotFoundException.java
 │   │   │   ├── DuplicateEmployeeNumberException.java
 │   │   │   └── TransactionException.java
 │   │   ├── repository/      # 数据访问层
-│   │   │   ├── EmployeeRepository.java
-│   │   │   └── DatabaseAuditLogRepository.java
+│   │   │   └── EmployeeRepository.java
 │   │   ├── service/         # 业务逻辑层
 │   │   │   ├── EmployeeService.java
-│   │   │   ├── AuditLogService.java
-│   │   │   ├── DatabaseAuditService.java
 │   │   │   ├── CacheMonitoringService.java
-│   │   │   ├── LogMonitoringService.java
 │   │   │   └── TransactionMonitoringService.java
-│   │   ├── util/            # 工具类
-│   │   │   └── LoggingUtil.java
+│   │   └── util/            # 工具类
 │   │   └── RevenueCalculatorBackendEmployeeApplication.java
 │   └── resources/
 │       ├── application.properties
-│       ├── application-dev.properties
 │       ├── application-prod.properties
 │       ├── messages.properties          # 英文资源文件
 │       ├── messages_zh_CN.properties    # 中文资源文件
@@ -149,8 +130,7 @@ src/
 │           ├── V1__Create_employees_table.sql
 │           ├── V2__Insert_initial_employee_data.sql
 │           ├── V3__Add_constraints_to_employees_table.sql
-│           ├── V4__Add_soft_delete_columns.sql
-│           └── V5__Create_database_audit_logs_table.sql
+│           └── V4__Add_soft_delete_columns.sql
 └── test/                    # 测试代码
     ├── java/jp/asatex/revenue_calculator_backend_employee/
     │   ├── config/          # 配置测试
@@ -226,7 +206,7 @@ src/
 6. **验证运行**
 
    ```bash
-   curl http://localhost:9001/api/v1/employee/health
+   curl http://localhost:8080/api/v1/employee/health
    ```
 
 ## 📚 API文档
@@ -235,9 +215,9 @@ src/
 
 启动应用后，可以通过以下链接访问Swagger UI：
 
-- **Swagger UI**: <http://localhost:9001/swagger-ui.html>
-- **OpenAPI JSON**: <http://localhost:9001/v3/api-docs>
-- **Swagger配置**: <http://localhost:9001/v3/api-docs/swagger-config>
+- **Swagger UI**: <http://localhost:8080/swagger-ui.html>
+- **OpenAPI JSON**: <http://localhost:8080/v3/api-docs>
+- **Swagger配置**: <http://localhost:8080/v3/api-docs/swagger-config>
 
 ### 🌐 多语言支持
 
@@ -249,19 +229,19 @@ API文档支持三种语言，可以通过以下方式切换：
 
    ```bash
    # 英文
-   curl -H "Accept-Language: en" http://localhost:9001/v3/api-docs
+   curl -H "Accept-Language: en" http://localhost:8080/v3/api-docs
    
    # 中文
-   curl -H "Accept-Language: zh-CN" http://localhost:9001/v3/api-docs
+   curl -H "Accept-Language: zh-CN" http://localhost:8080/v3/api-docs
    
    # 日文
-   curl -H "Accept-Language: ja" http://localhost:9001/v3/api-docs
+   curl -H "Accept-Language: ja" http://localhost:8080/v3/api-docs
    ```
 
 2. **通过Swagger UI分组**：
-   - **英文文档**: <http://localhost:9001/swagger-ui.html?urls.primaryName=english>
-   - **中文文档**: <http://localhost:9001/swagger-ui.html?urls.primaryName=chinese>
-   - **日文文档**: <http://localhost:9001/swagger-ui.html?urls.primaryName=japanese>
+   - **英文文档**: <http://localhost:8080/swagger-ui.html?urls.primaryName=english>
+   - **中文文档**: <http://localhost:8080/swagger-ui.html?urls.primaryName=chinese>
+   - **日文文档**: <http://localhost:8080/swagger-ui.html?urls.primaryName=japanese>
 
 #### 支持的语言
 
@@ -272,7 +252,7 @@ API文档支持三种语言，可以通过以下方式切换：
 ### 基础URL
 
 ```text
-http://localhost:9001/api/v1/employee
+http://localhost:8080/api/v1/employee
 ```
 
 ### 端点列表
@@ -390,16 +370,6 @@ DELETE /api/v1/monitoring/cache/clear
 DELETE /api/v1/monitoring/cache/clear/{cacheName}
 ```
 
-#### 数据库审计
-
-```http
-GET /api/v1/audit/database/stats
-GET /api/v1/audit/database/logs/operation/{operationType}
-GET /api/v1/audit/database/logs/table/{tableName}
-GET /api/v1/audit/database/logs/user/{userId}
-GET /api/v1/audit/database/logs/time-range?startTime={startTime}&endTime={endTime}
-DELETE /api/v1/audit/database/logs/cleanup?retentionDays={retentionDays}
-```
 
 #### 事务监控
 
@@ -407,13 +377,6 @@ DELETE /api/v1/audit/database/logs/cleanup?retentionDays={retentionDays}
 GET /api/v1/monitoring/transaction/stats
 ```
 
-#### 日志监控
-
-```http
-GET /api/v1/monitoring/logs/stats
-GET /api/v1/monitoring/logs/health
-POST /api/v1/monitoring/logs/reset
-```
 
 ### 错误响应格式
 
@@ -467,7 +430,6 @@ POST /api/v1/monitoring/logs/reset
 - **缓存测试** - 缓存功能测试
 - **限流测试** - 限流功能测试
 - **事务测试** - 事务管理测试
-- **审计测试** - 数据库审计测试
 
 ## 🔧 配置
 
@@ -475,7 +437,7 @@ POST /api/v1/monitoring/logs/reset
 
 ```properties
 # 服务器配置
-server.port=9001
+server.port=8080
 
 # 数据库配置
 spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
@@ -564,10 +526,6 @@ logging.file.name=logs/revenue-calculator-employee.log
 - `transaction.commit` - 事务提交次数
 - `transaction.rollback` - 事务回滚次数
 - `transaction.error` - 事务错误次数
-- `logs.audit` - 审计日志数量
-- `logs.security` - 安全日志数量
-- `logs.performance` - 性能日志数量
-- `logs.error` - 错误日志数量
 
 ## 🗄️ 数据库
 
@@ -589,30 +547,6 @@ CREATE TABLE employees (
 );
 ```
 
-#### database_audit_logs表
-
-```sql
-CREATE TABLE database_audit_logs (
-    id BIGSERIAL PRIMARY KEY,
-    operation_type VARCHAR(20) NOT NULL,
-    table_name VARCHAR(100) NOT NULL,
-    record_id VARCHAR(100),
-    user_id VARCHAR(100),
-    session_id VARCHAR(100),
-    request_id VARCHAR(100),
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-    old_values TEXT,
-    new_values TEXT,
-    sql_statement TEXT,
-    execution_time_ms BIGINT,
-    affected_rows INTEGER,
-    error_message TEXT,
-    operation_status VARCHAR(20) NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    created_by VARCHAR(100)
-);
-```
 
 ### 数据库约束
 
@@ -630,7 +564,6 @@ CREATE TABLE database_audit_logs (
 - `V2__Insert_initial_employee_data.sql` - 插入初始数据
 - `V3__Add_constraints_to_employees_table.sql` - 添加约束
 - `V4__Add_soft_delete_columns.sql` - 添加软删除支持
-- `V5__Create_database_audit_logs_table.sql` - 创建审计日志表
 
 ## 🚀 部署
 
@@ -641,7 +574,7 @@ CREATE TABLE database_audit_logs (
    ```dockerfile
    FROM openjdk:21-jdk-slim
    COPY build/libs/*.jar app.jar
-   EXPOSE 9001
+   EXPOSE 8080
    ENTRYPOINT ["java", "-jar", "/app.jar"]
    ```
 
@@ -650,7 +583,7 @@ CREATE TABLE database_audit_logs (
    ```bash
    ./gradlew build
    docker build -t revenue-calculator-employee .
-   docker run -p 9001:9001 revenue-calculator-employee
+   docker run -p 8080:8080 revenue-calculator-employee
    ```
 
 ### 生产环境配置
@@ -658,7 +591,7 @@ CREATE TABLE database_audit_logs (
 ```properties
 # 生产环境配置
 spring.profiles.active=prod
-server.port=9001
+server.port=8080
 
 # 数据库连接池配置
 spring.r2dbc.pool.initial-size=10
@@ -711,7 +644,6 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 - 连接池配置
 - 查询优化
 - 索引优化
-- 全面审计日志，性能影响最小
 
 ## 🤝 贡献指南
 

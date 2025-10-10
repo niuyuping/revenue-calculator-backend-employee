@@ -4,8 +4,8 @@
 
 ## 📋 **项目信息**
 
-- **项目ID**: `gen-lang-client-0889947961`
-- **区域**: `asia-northeast1`
+- **项目ID**: `your-project-id`
+- **区域**: `your-region`
 - **服务名称**: `revenue-calculator-employee`
 - **端口**: `8080`
 - **认证方式**: IAM身份验证
@@ -21,7 +21,7 @@
 #### 2.1 打开Cloud Run控制台
 
 1. 访问 [Google Cloud Console](https://console.cloud.google.com/)
-2. 选择项目：`gen-lang-client-0889947961`
+2. 选择项目：`your-project-id`
 3. 导航到 **Cloud Run**
 
 #### 2.2 创建新服务
@@ -44,7 +44,7 @@ Dockerfile路径: /Dockerfile
 
 ```
 服务名称: revenue-calculator-employee
-区域: asia-northeast1
+区域: your-region
 CPU分配: CPU仅在有请求时分配
 最小实例数: 1
 最大实例数: 10
@@ -64,9 +64,9 @@ CPU: 2
 
 ```
 SPRING_PROFILES_ACTIVE: prod
-DB_URL: r2dbc:postgresql:///asatex-revenue?unixSocketPath=/cloudsql/gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database
+DB_URL: r2dbc:postgresql:///asatex-revenue?unixSocketPath=/cloudsql/your-project-id:your-region:your-database-instance
 DB_USERNAME: your-service-account@your-project.iam.gserviceaccount.com
-REDIS_HOST: 10.13.121.67
+REDIS_HOST: your-redis-host
 REDIS_PORT: 6379
 REDIS_DATABASE: 0
 CACHE_TTL: 1800000
@@ -79,12 +79,12 @@ DB_POOL_MAX_LIFE_TIME: PT15M
 
 1. 在 **"连接"** 部分
 2. 点击 **"添加Cloud SQL连接"**
-3. 选择：`gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database`
+3. 选择：`your-project-id:your-region:your-database-instance`
 
 #### 2.8 配置身份验证
 
 1. 在 **"安全"** 部分
-2. 服务账户：`641240287587-compute@developer.gserviceaccount.com`
+2. 服务账户：`your-service-account@your-project.iam.gserviceaccount.com`
 3. 允许未通过身份验证的调用：**是**
 
 #### 2.9 部署服务
@@ -98,32 +98,32 @@ DB_POOL_MAX_LIFE_TIME: PT15M
 
 ```bash
 # 构建镜像
-docker build -t gcr.io/gen-lang-client-0889947961/revenue-calculator-backend-employee .
+docker build -t gcr.io/your-project-id/revenue-calculator-backend-employee .
 
 # 推送镜像到Google Container Registry
-docker push gcr.io/gen-lang-client-0889947961/revenue-calculator-backend-employee
+docker push gcr.io/your-project-id/revenue-calculator-backend-employee
 ```
 
 ### 2. **部署到Cloud Run**
 
 ```bash
 gcloud run deploy revenue-calculator-employee \
-  --image gcr.io/gen-lang-client-0889947961/revenue-calculator-backend-employee \
+  --image gcr.io/your-project-id/revenue-calculator-backend-employee \
   --platform managed \
-  --region asia-northeast1 \
+  --region your-region \
   --set-env-vars SPRING_PROFILES_ACTIVE="prod" \
-  --set-env-vars DB_URL="r2dbc:postgresql:///asatex-revenue?unixSocketPath=/cloudsql/gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database" \
-  --set-env-vars DB_USERNAME="641240287587-compute@developer.gserviceaccount.com" \
-  --set-env-vars INSTANCE_CONNECTION_NAME="gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database" \
-  --set-env-vars REDIS_HOST="10.13.121.67" \
+  --set-env-vars DB_URL="r2dbc:postgresql:///asatex-revenue?unixSocketPath=/cloudsql/your-project-id:your-region:your-database-instance" \
+  --set-env-vars DB_USERNAME="your-service-account@your-project.iam.gserviceaccount.com" \
+  --set-env-vars INSTANCE_CONNECTION_NAME="your-project-id:your-region:your-database-instance" \
+  --set-env-vars REDIS_HOST="your-redis-host" \
   --set-env-vars REDIS_PORT="6379" \
   --set-env-vars REDIS_DATABASE="0" \
   --set-env-vars CACHE_TTL="1800000" \
   --set-env-vars DB_POOL_MAX_SIZE="5" \
   --set-env-vars DB_POOL_MAX_IDLE_TIME="PT5M" \
   --set-env-vars DB_POOL_MAX_LIFE_TIME="PT15M" \
-  --add-cloudsql-instances gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database \
-  --service-account 641240287587-compute@developer.gserviceaccount.com \
+  --add-cloudsql-instances your-project-id:your-region:your-database-instance \
+  --service-account your-service-account@your-project.iam.gserviceaccount.com \
   --allow-unauthenticated \
   --memory 1Gi \
   --cpu 2 \
@@ -140,12 +140,12 @@ gcloud run deploy revenue-calculator-employee \
 SPRING_PROFILES_ACTIVE=prod
 
 # 数据库配置（Cloud SQL + IAM身份验证）
-DB_URL=r2dbc:postgresql:///asatex-revenue?unixSocketPath=/cloudsql/gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database
-DB_USERNAME=641240287587-compute@developer.gserviceaccount.com
-INSTANCE_CONNECTION_NAME=gen-lang-client-0889947961:asia-northeast1:asatex-revenue-calculator-database
+DB_URL=r2dbc:postgresql:///asatex-revenue?unixSocketPath=/cloudsql/your-project-id:your-region:your-database-instance
+DB_USERNAME=your-service-account@your-project.iam.gserviceaccount.com
+INSTANCE_CONNECTION_NAME=your-project-id:your-region:your-database-instance
 
 # Redis配置
-REDIS_HOST=10.13.121.67
+REDIS_HOST=your-redis-host
 REDIS_PORT=6379
 REDIS_DATABASE=0
 CACHE_TTL=1800000
@@ -173,21 +173,21 @@ DB_POOL_MAX_LIFE_TIME=PT15M
 2. **Cloud SQL IAM配置**：
    ```bash
    # 为服务账户添加Cloud SQL Client角色
-   gcloud projects add-iam-policy-binding 641240287587 \
-     --member="serviceAccount:641240287587-compute@developer.gserviceaccount.com" \
+   gcloud projects add-iam-policy-binding your-project-id \
+     --member="serviceAccount:your-service-account@your-project.iam.gserviceaccount.com" \
      --role="roles/cloudsql.client"
    
    # 为服务账户添加Cloud SQL Instance User角色
-   gcloud projects add-iam-policy-binding 641240287587 \
-     --member="serviceAccount:641240287587-compute@developer.gserviceaccount.com" \
+   gcloud projects add-iam-policy-binding your-project-id \
+     --member="serviceAccount:your-service-account@your-project.iam.gserviceaccount.com" \
      --role="roles/cloudsql.instanceUser"
    ```
 
 3. **数据库用户映射**：
    ```sql
    -- 在Cloud SQL中创建IAM用户映射
-   CREATE USER "641240287587-compute@developer.gserviceaccount.com";
-   GRANT ALL PRIVILEGES ON DATABASE asatex_revenue TO "641240287587-compute@developer.gserviceaccount.com";
+   CREATE USER "your-service-account@your-project.iam.gserviceaccount.com";
+   GRANT ALL PRIVILEGES ON DATABASE asatex_revenue TO "your-service-account@your-project.iam.gserviceaccount.com";
    ```
 
 ## 🔍 **验证部署**
@@ -201,7 +201,7 @@ DB_POOL_MAX_LIFE_TIME=PT15M
 ```bash
 # 获取服务URL
 SERVICE_URL=$(gcloud run services describe revenue-calculator-employee \
-    --region=asia-northeast1 \
+    --region=your-region \
     --format="value(status.url)")
 
 # 测试健康检查
@@ -247,10 +247,10 @@ curl $SERVICE_URL/actuator/health/db
 
 ```bash
 # 查看服务日志
-gcloud run services logs read revenue-calculator-employee --region=asia-northeast1
+gcloud run services logs read revenue-calculator-employee --region=your-region
 
 # 查看服务详情
-gcloud run services describe revenue-calculator-employee --region=asia-northeast1
+gcloud run services describe revenue-calculator-employee --region=your-region
 
 # 查看构建日志
 gcloud builds list --limit=5
@@ -273,7 +273,7 @@ gcloud builds list --limit=5
 https://your-service-url/swagger-ui.html
 
 # 开发环境 (显示所有API)
-http://localhost:9001/swagger-ui.html
+http://localhost:8080/swagger-ui.html
 ```
 
 ### **OpenAPI JSON**
@@ -282,7 +282,7 @@ http://localhost:9001/swagger-ui.html
 https://your-service-url/v3/api-docs
 
 # 开发环境
-http://localhost:9001/v3/api-docs
+http://localhost:8080/v3/api-docs
 ```
 
-**注意**: 生产环境中，监控和审计端点已从Swagger文档中隐藏，只显示核心的员工管理API，提高安全性和用户体验。
+**注意**: 生产环境中，只显示核心的员工管理API，提高安全性和用户体验。
