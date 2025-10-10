@@ -512,8 +512,32 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
 - `GET /actuator/flyway` - 数据库迁移状态
 - `GET /actuator/metrics` - 系统指标
 
+### 自定义监控端点
+
+#### **数据库监控**:
+- `GET /api/v1/monitoring/database/connection/stats` - 数据库连接统计
+- `GET /api/v1/monitoring/database/performance/stats` - 数据库性能统计
+- `GET /api/v1/monitoring/database/health` - 数据库健康信息
+- `GET /api/v1/monitoring/database/table/stats` - 数据库表统计
+
+#### **缓存监控**:
+- `GET /api/v1/monitoring/cache/stats` - 缓存统计信息
+- `DELETE /api/v1/monitoring/cache/clear` - 清除所有缓存
+- `DELETE /api/v1/monitoring/cache/clear/{cacheName}` - 清除指定缓存
+
+#### **事务监控**:
+- `GET /api/v1/monitoring/transaction/stats` - 事务统计信息
+
 ### 健康检查响应示例
 
+**基础健康检查** (生产环境默认):
+```json
+{
+  "status": "UP"
+}
+```
+
+**详细健康检查** (配置 `show-details=when-authorized` 后):
 ```json
 {
   "status": "UP",
@@ -522,7 +546,16 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
       "status": "UP",
       "details": {
         "database": "PostgreSQL",
-        "validationQuery": "isValid()"
+        "status": "Connected",
+        "validationQuery": "SELECT 1"
+      }
+    },
+    "redis": {
+      "status": "UP", 
+      "details": {
+        "redis": "Connected",
+        "status": "Available",
+        "test": "Ping successful"
       }
     },
     "diskSpace": {
@@ -535,6 +568,192 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
     }
   }
 }
+```
+
+**Redis连接失败时的响应**:
+```json
+{
+  "status": "DOWN",
+  "components": {
+    "redis": {
+      "status": "DOWN",
+      "details": {
+        "redis": "Connection failed",
+        "status": "Unavailable", 
+        "error": "Redis connection error"
+      }
+    }
+  }
+}
+```
+
+### 自定义监控端点
+
+#### **数据库监控端点**:
+
+**数据库连接统计**:
+```json
+{
+  "totalConnections": 25,
+  "activeConnections": 3,
+  "idleConnections": 22,
+  "connectionErrors": 0,
+  "averageConnectionTime": 45.2
+}
+```
+
+**数据库性能统计**:
+```json
+{
+  "totalQueries": 1250,
+  "totalInserts": 45,
+  "totalUpdates": 120,
+  "totalDeletes": 8,
+  "totalErrors": 2,
+  "averageQueryTime": 12.5,
+  "maxQueryTime": 150.0,
+  "errorRate": 0.16
+}
+```
+
+**数据库健康信息**:
+```json
+{
+  "status": "UP",
+  "version": "PostgreSQL 15.4",
+  "database": "asatex-revenue",
+  "user": "db_user",
+  "lastChecked": "2024-01-15T10:30:00Z",
+  "message": "Connected successfully"
+}
+```
+
+**数据库表统计**:
+```json
+{
+  "tables": {
+    "employees": {
+      "tableName": "employees",
+      "rowCount": 1250,
+      "inserts": 45,
+      "updates": 120,
+      "deletes": 8
+    },
+    "database_audit_logs": {
+      "tableName": "database_audit_logs",
+      "rowCount": 5000,
+      "inserts": 200,
+      "updates": 0,
+      "deletes": 0
+    }
+  },
+  "totalRows": 6250,
+  "totalInserts": 245,
+  "totalUpdates": 120,
+  "totalDeletes": 8
+}
+```
+
+#### **缓存监控端点**:
+
+**缓存统计信息**:
+```json
+{
+  "totalCaches": 3,
+  "totalHits": 1250,
+  "totalMisses": 45,
+  "totalPuts": 1295,
+  "totalEvictions": 12,
+  "averageHitRate": 0.965,
+  "cacheDetails": [
+    {
+      "cacheName": "employeeCache",
+      "hits": 800,
+      "misses": 20,
+      "puts": 820,
+      "evictions": 5,
+      "hitRate": 0.975
+    }
+  ]
+}
+```
+
+### 生产环境Redis监控使用说明
+
+#### 1. **部署更新后的配置**
+
+重新部署应用以应用新的健康检查配置：
+
+```bash
+# 构建并部署到Cloud Run
+./gradlew build
+gcloud run deploy revenue-calculator-employee \
+  --source . \
+  --platform managed \
+  --region asia-northeast1 \
+  --allow-unauthenticated
+```
+
+#### 2. **验证Redis连接状态**
+
+部署后，访问健康检查端点应该能看到详细的组件信息：
+
+```bash
+# 检查详细健康状态
+curl https://your-domain.com/actuator/health
+
+# 检查缓存统计
+curl https://your-domain.com/actuator/metrics/cache.hit
+curl https://your-domain.com/actuator/metrics/cache.miss
+
+# 检查自定义缓存统计
+curl https://your-domain.com/api/v1/monitoring/cache/stats
+
+# 检查数据库连接统计
+curl https://your-domain.com/api/v1/monitoring/database/connection/stats
+
+# 检查数据库性能统计
+curl https://your-domain.com/api/v1/monitoring/database/performance/stats
+
+# 检查数据库健康信息
+curl https://your-domain.com/api/v1/monitoring/database/health
+
+# 检查数据库表统计
+curl https://your-domain.com/api/v1/monitoring/database/table/stats
+
+# 检查事务统计
+curl https://your-domain.com/api/v1/monitoring/transaction/stats
+```
+
+#### 3. **连接状态判断**
+
+**Redis连接状态**:
+- **正常状态**: `"redis": {"status": "UP"}` 且 `"test": "Ping successful"`
+- **连接失败**: `"redis": {"status": "DOWN"}` 且包含错误信息
+- **配置问题**: 如果Redis组件不存在，检查环境变量配置
+
+**数据库连接状态**:
+- **正常状态**: `"db": {"status": "UP"}` 且 `"status": "Connected"`
+- **连接失败**: `"db": {"status": "DOWN"}` 且包含错误信息
+- **性能问题**: 检查 `errorRate` 和 `averageQueryTime` 指标
+
+**数据库性能监控**:
+- **查询性能**: `averageQueryTime` < 100ms 为正常
+- **错误率**: `errorRate` < 1% 为正常
+- **连接池**: `activeConnections` 不应超过 `totalConnections` 的80%
+
+#### 4. **故障排查**
+
+如果Redis连接失败，检查以下配置：
+
+```bash
+# 检查环境变量
+gcloud run services describe revenue-calculator-employee \
+  --region asia-northeast1 \
+  --format="value(spec.template.spec.template.spec.containers[0].env[].name,spec.template.spec.template.spec.containers[0].env[].value)"
+
+# 检查应用日志
+gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=revenue-calculator-employee" --limit=50
 ```
 
 ### 自定义指标
