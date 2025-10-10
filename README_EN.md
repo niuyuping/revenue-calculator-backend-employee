@@ -17,7 +17,6 @@ A reactive employee management system backend service based on Spring Boot 3.x, 
 - **Spring WebFlux** - Reactive Web Framework
 - **Spring Data R2DBC** - Reactive Database Access
 - **PostgreSQL** - Relational Database
-- **Redis** - Cache Database
 - **Flyway** - Database Migration Tool
 - **Jakarta Validation** - Data Validation
 - **Spring Boot Actuator** - Application Monitoring
@@ -38,7 +37,6 @@ A reactive employee management system backend service based on Spring Boot 3.x, 
 - ✅ **Data Validation** - Complete input data validation and constraints
 - ✅ **Exception Handling** - Unified exception handling and error responses
 - ✅ **Reactive Programming** - Fully non-blocking reactive architecture
-- ✅ **Cache Support** - Redis cache for performance enhancement
 - ✅ **API Rate Limiting** - Resilience4j rate limiting protection
 - ✅ **Monitoring Metrics** - Complete business and performance monitoring
 - ✅ **API Documentation** - Complete Swagger/OpenAPI documentation
@@ -47,8 +45,6 @@ A reactive employee management system backend service based on Spring Boot 3.x, 
 
 #### 🔄 Cache & Rate Limiting
 
-- **Redis Cache Manager**: Multi-level caching strategy
-- **Cache Strategies**:
   - Employee Info Cache: 30 minutes TTL
   - Employee Search Cache: 15 minutes TTL
   - Pagination Cache: 10 minutes TTL
@@ -148,7 +144,6 @@ src/
 
 - Java 21+
 - PostgreSQL 12+
-- Redis 6+
 - Gradle 8.0+
 
 ### Installation and Running
@@ -167,12 +162,6 @@ src/
    createdb asatex-revenue
    ```
 
-3. **Redis setup**
-
-   ```bash
-   # Start Redis service
-   redis-server
-   ```
 
 4. **Application configuration**
 
@@ -184,9 +173,6 @@ src/
    spring.r2dbc.username=your_username
    spring.r2dbc.password=your_password
    
-   # Redis configuration
-   spring.data.redis.host=localhost
-   spring.data.redis.port=6379
    
    # Flyway configuration
    spring.flyway.url=jdbc:postgresql://localhost:5432/asatex-revenue
@@ -441,9 +427,6 @@ spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
 spring.r2dbc.username=db_user
 spring.r2dbc.password=${DB_PASSWORD}
 
-# Redis configuration
-spring.data.redis.host=localhost
-spring.data.redis.port=6379
 
 # Flyway configuration
 spring.flyway.url=jdbc:postgresql://localhost:5432/asatex-revenue
@@ -451,9 +434,6 @@ spring.flyway.user=db_user
 spring.flyway.password=${DB_PASSWORD}
 spring.flyway.baseline-on-migrate=true
 
-# Cache configuration
-spring.cache.type=redis
-spring.cache.redis.time-to-live=1800000
 
 # Rate limiting configuration
 resilience4j.ratelimiter.instances.employee-api.limit-for-period=100
@@ -481,11 +461,6 @@ logging.file.name=logs/revenue-calculator-employee.log
 - `DB_USER` - Database username
 - `DB_PASSWORD` - Database password
 - `FLYWAY_URL` - Flyway database connection URL
-- `REDIS_HOST` - Redis host address (default: localhost)
-- `REDIS_PORT` - Redis port (default: 6379)
-- `REDIS_DATABASE` - Redis database number (default: 0)
-- `REDIS_TIMEOUT` - Redis timeout (default: 2000ms)
-- `CACHE_TTL` - Cache time-to-live (default: 1800000ms)
 - `DB_POOL_MAX_SIZE` - Database connection pool max size (default: 10)
 - `DB_POOL_MAX_IDLE_TIME` - Connection pool max idle time (default: PT10M)
 - `DB_POOL_MAX_LIFE_TIME` - Connection pool max life time (default: PT30M)
@@ -504,14 +479,6 @@ spring.r2dbc.url=${DB_URL}
 spring.r2dbc.username=${DB_USER}
 spring.r2dbc.password=${DB_PASSWORD}
 
-# Production Redis configuration
-spring.data.redis.host=${REDIS_HOST:localhost}
-spring.data.redis.port=${REDIS_PORT:6379}
-spring.data.redis.database=${REDIS_DATABASE:0}
-spring.data.redis.timeout=${REDIS_TIMEOUT:2000ms}
-
-# Production cache configuration
-spring.cache.redis.time-to-live=${CACHE_TTL:1800000}
 
 # Production database connection pool configuration
 spring.r2dbc.pool.max-size=${DB_POOL_MAX_SIZE:10}
@@ -662,7 +629,6 @@ This section provides comprehensive production deployment instructions for Googl
 
 - Google Cloud Project with billing enabled
 - Cloud SQL PostgreSQL instance
-- Redis instance (Cloud Memorystore or external)
 - Service account with appropriate permissions
 
 ##### Method 1: Cloud Run Console Deployment
@@ -711,10 +677,6 @@ This section provides comprehensive production deployment instructions for Googl
    DB_USER: your-db-username
    DB_PASSWORD: your-db-password
    FLYWAY_URL: jdbc:postgresql://your-db-host:5432/asatex-revenue
-   REDIS_HOST: your-redis-host
-   REDIS_PORT: 6379
-   REDIS_DATABASE: 0
-   CACHE_TTL: 1800000
    DB_POOL_MAX_SIZE: 5
    DB_POOL_MAX_IDLE_TIME: PT5M
    DB_POOL_MAX_LIFE_TIME: PT15M
@@ -756,10 +718,6 @@ This section provides comprehensive production deployment instructions for Googl
      --set-env-vars DB_USER="your-db-username" \
      --set-env-vars DB_PASSWORD="your-db-password" \
      --set-env-vars FLYWAY_URL="jdbc:postgresql://your-db-host:5432/asatex-revenue" \
-     --set-env-vars REDIS_HOST="your-redis-host" \
-     --set-env-vars REDIS_PORT="6379" \
-     --set-env-vars REDIS_DATABASE="0" \
-     --set-env-vars CACHE_TTL="1800000" \
      --set-env-vars DB_POOL_MAX_SIZE="5" \
      --set-env-vars DB_POOL_MAX_IDLE_TIME="PT5M" \
      --set-env-vars DB_POOL_MAX_LIFE_TIME="PT15M" \
@@ -785,11 +743,6 @@ DB_USER=your-db-username
 DB_PASSWORD=your-db-password
 FLYWAY_URL=jdbc:postgresql://your-db-host:5432/asatex-revenue
 
-# Redis configuration
-REDIS_HOST=your-redis-host
-REDIS_PORT=6379
-REDIS_DATABASE=0
-CACHE_TTL=1800000
 ```
 
 **Optional Environment Variables:**
@@ -870,7 +823,6 @@ DB_POOL_MAX_LIFE_TIME=PT15M
 3. **Application Won't Start**
    - View Cloud Run logs
    - Check database connection
-   - Verify Redis connection
 
 **Useful Commands:**
 ```bash

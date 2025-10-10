@@ -10,7 +10,6 @@ import org.testcontainers.containers.wait.strategy.Wait;
 /**
  * TestContainers configuration class
  * Provides PostgreSQL container for testing
- * Redis uses local Docker service
  */
 @TestConfiguration
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)

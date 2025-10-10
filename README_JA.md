@@ -17,7 +17,6 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 - **Spring WebFlux** - リアクティブWebフレームワーク
 - **Spring Data R2DBC** - リアクティブデータベースアクセス
 - **PostgreSQL** - リレーショナルデータベース
-- **Redis** - キャッシュデータベース
 - **Flyway** - データベースマイグレーションツール
 - **Jakarta Validation** - データ検証
 - **Spring Boot Actuator** - アプリケーション監視
@@ -38,7 +37,6 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 - ✅ **データ検証** - 完全な入力データ検証と制約
 - ✅ **例外処理** - 統一された例外処理とエラーレスポンス
 - ✅ **リアクティブプログラミング** - 完全非ブロッキングリアクティブアーキテクチャ
-- ✅ **キャッシュサポート** - パフォーマンス向上のためのRedisキャッシュ
 - ✅ **APIレート制限** - Resilience4jレート制限保護
 - ✅ **監視メトリクス** - 完全なビジネスとパフォーマンス監視
 - ✅ **API文書** - 完全なSwagger/OpenAPI文書
@@ -47,8 +45,6 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 
 #### 🔄 キャッシュとレート制限
 
-- **Redisキャッシュマネージャー**: マルチレベルキャッシュ戦略
-- **キャッシュ戦略**:
   - 従業員情報キャッシュ: 30分TTL
   - 従業員検索キャッシュ: 15分TTL
   - ページネーションキャッシュ: 10分TTL
@@ -161,7 +157,6 @@ src/
 
 - Java 21+
 - PostgreSQL 12+
-- Redis 6+
 - Gradle 8.0+
 
 ### インストールと実行
@@ -180,12 +175,6 @@ src/
    createdb asatex-revenue
    ```
 
-3. **Redis設定**
-
-   ```bash
-   # Redisサービスの開始
-   redis-server
-   ```
 
 4. **アプリケーション設定**
 
@@ -197,9 +186,6 @@ src/
    spring.r2dbc.username=your_username
    spring.r2dbc.password=your_password
    
-   # Redis設定
-   spring.data.redis.host=localhost
-   spring.data.redis.port=6379
    
    # Flyway設定
    spring.flyway.url=jdbc:postgresql://localhost:5432/asatex-revenue
@@ -454,9 +440,6 @@ spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
 spring.r2dbc.username=db_user
 spring.r2dbc.password=${DB_PASSWORD}
 
-# Redis設定
-spring.data.redis.host=localhost
-spring.data.redis.port=6379
 
 # Flyway設定
 spring.flyway.url=jdbc:postgresql://localhost:5432/asatex-revenue
@@ -464,9 +447,6 @@ spring.flyway.user=db_user
 spring.flyway.password=${DB_PASSWORD}
 spring.flyway.baseline-on-migrate=true
 
-# キャッシュ設定
-spring.cache.type=redis
-spring.cache.redis.time-to-live=1800000
 
 # レート制限設定
 resilience4j.ratelimiter.instances.employee-api.limit-for-period=100
@@ -494,11 +474,6 @@ logging.file.name=logs/revenue-calculator-employee.log
 - `DB_USER` - データベースユーザー名
 - `DB_PASSWORD` - データベースパスワード
 - `FLYWAY_URL` - Flywayデータベース接続URL
-- `REDIS_HOST` - Redisホストアドレス（デフォルト: localhost）
-- `REDIS_PORT` - Redisポート（デフォルト: 6379）
-- `REDIS_DATABASE` - Redisデータベース番号（デフォルト: 0）
-- `REDIS_TIMEOUT` - Redisタイムアウト（デフォルト: 2000ms）
-- `CACHE_TTL` - キャッシュ生存時間（デフォルト: 1800000ms）
 - `DB_POOL_MAX_SIZE` - データベース接続プール最大サイズ（デフォルト: 10）
 - `DB_POOL_MAX_IDLE_TIME` - 接続プール最大アイドル時間（デフォルト: PT10M）
 - `DB_POOL_MAX_LIFE_TIME` - 接続プール最大生存時間（デフォルト: PT30M）
@@ -517,14 +492,6 @@ spring.r2dbc.url=${DB_URL}
 spring.r2dbc.username=${DB_USER}
 spring.r2dbc.password=${DB_PASSWORD}
 
-# 本番環境Redis設定
-spring.data.redis.host=${REDIS_HOST:localhost}
-spring.data.redis.port=${REDIS_PORT:6379}
-spring.data.redis.database=${REDIS_DATABASE:0}
-spring.data.redis.timeout=${REDIS_TIMEOUT:2000ms}
-
-# 本番環境キャッシュ設定
-spring.cache.redis.time-to-live=${CACHE_TTL:1800000}
 
 # 本番環境データベース接続プール設定
 spring.r2dbc.pool.max-size=${DB_POOL_MAX_SIZE:10}
@@ -675,7 +642,6 @@ CREATE TABLE database_audit_logs (
 
 - 課金が有効なGoogle Cloudプロジェクト
 - Cloud SQL PostgreSQLインスタンス
-- Redisインスタンス（Cloud Memorystoreまたは外部）
 - 適切な権限を持つサービスアカウント
 
 ##### 方法1：Cloud Runコンソールデプロイ
@@ -724,10 +690,6 @@ CREATE TABLE database_audit_logs (
    DB_USER: your-db-username
    DB_PASSWORD: your-db-password
    FLYWAY_URL: jdbc:postgresql://your-db-host:5432/asatex-revenue
-   REDIS_HOST: your-redis-host
-   REDIS_PORT: 6379
-   REDIS_DATABASE: 0
-   CACHE_TTL: 1800000
    DB_POOL_MAX_SIZE: 5
    DB_POOL_MAX_IDLE_TIME: PT5M
    DB_POOL_MAX_LIFE_TIME: PT15M
@@ -769,10 +731,6 @@ CREATE TABLE database_audit_logs (
      --set-env-vars DB_USER="your-db-username" \
      --set-env-vars DB_PASSWORD="your-db-password" \
      --set-env-vars FLYWAY_URL="jdbc:postgresql://your-db-host:5432/asatex-revenue" \
-     --set-env-vars REDIS_HOST="your-redis-host" \
-     --set-env-vars REDIS_PORT="6379" \
-     --set-env-vars REDIS_DATABASE="0" \
-     --set-env-vars CACHE_TTL="1800000" \
      --set-env-vars DB_POOL_MAX_SIZE="5" \
      --set-env-vars DB_POOL_MAX_IDLE_TIME="PT5M" \
      --set-env-vars DB_POOL_MAX_LIFE_TIME="PT15M" \
@@ -798,11 +756,6 @@ DB_USER=your-db-username
 DB_PASSWORD=your-db-password
 FLYWAY_URL=jdbc:postgresql://your-db-host:5432/asatex-revenue
 
-# Redis設定
-REDIS_HOST=your-redis-host
-REDIS_PORT=6379
-REDIS_DATABASE=0
-CACHE_TTL=1800000
 ```
 
 **オプションの環境変数：**
@@ -883,7 +836,6 @@ DB_POOL_MAX_LIFE_TIME=PT15M
 3. **アプリケーションが起動しない**
    - Cloud Runログを確認
    - データベース接続を確認
-   - Redis接続を確認
 
 **便利なコマンド：**
 ```bash

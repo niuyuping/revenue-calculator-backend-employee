@@ -74,7 +74,6 @@ public class SwaggerConfig {
                 "- Complete CRUD operations for employee data\n" +
                 "- Advanced search functionality (by name and furigana)\n" +
                 "- Reactive programming with Spring WebFlux\n" +
-                "- Redis caching for performance optimization\n" +
                 "- Rate limiting for API protection\n\n" +
                 "## Authentication\n" +
                 "Currently no authentication required. All endpoints are publicly accessible.\n\n" +

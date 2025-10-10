@@ -17,7 +17,6 @@
 - **Spring WebFlux** - 响应式Web框架
 - **Spring Data R2DBC** - 响应式数据库访问
 - **PostgreSQL** - 关系型数据库
-- **Redis** - 缓存数据库
 - **Flyway** - 数据库迁移工具
 - **Jakarta Validation** - 数据验证
 - **Spring Boot Actuator** - 应用监控
@@ -38,20 +37,14 @@
 - ✅ **数据验证** - 完整的输入数据验证和约束
 - ✅ **异常处理** - 统一的异常处理和错误响应
 - ✅ **响应式编程** - 完全非阻塞响应式架构
-- ✅ **缓存支持** - Redis缓存提升性能
 - ✅ **API限流** - Resilience4j限流保护
 - ✅ **监控指标** - 完整的业务和性能监控
 - ✅ **API文档** - 完整的Swagger/OpenAPI文档
 
 ### 企业级功能
 
-#### 🔄 缓存和限流
+#### 🔄 限流保护
 
-- **Redis缓存管理器**: 多级缓存策略
-- **缓存策略**:
-  - 员工信息缓存: 30分钟TTL
-  - 员工搜索缓存: 15分钟TTL
-  - 分页缓存: 10分钟TTL
 - **限流保护**: 不同操作类型设置不同限制（20-100请求/分钟）
 
 
@@ -149,7 +142,6 @@ src/
 
 - Java 21+
 - PostgreSQL 12+
-- Redis 6+
 - Gradle 8.0+
 
 ### 安装和运行
@@ -168,12 +160,6 @@ src/
    createdb asatex-revenue
    ```
 
-3. **Redis设置**
-
-   ```bash
-   # 启动Redis服务
-   redis-server
-   ```
 
 4. **应用配置**
 
@@ -185,9 +171,6 @@ src/
    spring.r2dbc.username=your_username
    spring.r2dbc.password=your_password
    
-   # Redis配置
-   spring.data.redis.host=localhost
-   spring.data.redis.port=6379
    
    # Flyway配置
    spring.flyway.url=jdbc:postgresql://localhost:5432/asatex-revenue
@@ -424,9 +407,6 @@ spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
 spring.r2dbc.username=db_user
 spring.r2dbc.password=${DB_PASSWORD}
 
-# Redis配置
-spring.data.redis.host=localhost
-spring.data.redis.port=6379
 
 # Flyway配置
 spring.flyway.url=jdbc:postgresql://localhost:5432/asatex-revenue
@@ -434,9 +414,6 @@ spring.flyway.user=db_user
 spring.flyway.password=${DB_PASSWORD}
 spring.flyway.baseline-on-migrate=true
 
-# 缓存配置
-spring.cache.type=redis
-spring.cache.redis.time-to-live=1800000
 
 # 限流配置
 resilience4j.ratelimiter.instances.employee-api.limit-for-period=100
@@ -464,11 +441,6 @@ logging.file.name=logs/revenue-calculator-employee.log
 - `DB_USER` - 数据库用户名
 - `DB_PASSWORD` - 数据库密码
 - `FLYWAY_URL` - Flyway数据库连接URL
-- `REDIS_HOST` - Redis主机地址 (默认: localhost)
-- `REDIS_PORT` - Redis端口 (默认: 6379)
-- `REDIS_DATABASE` - Redis数据库编号 (默认: 0)
-- `REDIS_TIMEOUT` - Redis超时时间 (默认: 2000ms)
-- `CACHE_TTL` - 缓存生存时间 (默认: 1800000ms)
 - `DB_POOL_MAX_SIZE` - 数据库连接池最大大小 (默认: 10)
 - `DB_POOL_MAX_IDLE_TIME` - 连接池最大空闲时间 (默认: PT10M)
 - `DB_POOL_MAX_LIFE_TIME` - 连接池最大生存时间 (默认: PT30M)
@@ -487,14 +459,6 @@ spring.r2dbc.url=${DB_URL}
 spring.r2dbc.username=${DB_USER}
 spring.r2dbc.password=${DB_PASSWORD}
 
-# 生产环境Redis配置
-spring.data.redis.host=${REDIS_HOST:localhost}
-spring.data.redis.port=${REDIS_PORT:6379}
-spring.data.redis.database=${REDIS_DATABASE:0}
-spring.data.redis.timeout=${REDIS_TIMEOUT:2000ms}
-
-# 生产环境缓存配置
-spring.cache.redis.time-to-live=${CACHE_TTL:1800000}
 
 # 生产环境数据库连接池配置
 spring.r2dbc.pool.max-size=${DB_POOL_MAX_SIZE:10}
@@ -550,14 +514,6 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
         "validationQuery": "SELECT 1"
       }
     },
-    "redis": {
-      "status": "UP", 
-      "details": {
-        "redis": "Connected",
-        "status": "Available",
-        "test": "Ping successful"
-      }
-    },
     "diskSpace": {
       "status": "UP",
       "details": {
@@ -570,19 +526,6 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
 }
 ```
 
-**Redis连接失败时的响应**:
-```json
-{
-  "status": "DOWN",
-  "components": {
-    "redis": {
-      "status": "DOWN",
-      "details": {
-        "redis": "Connection failed",
-        "status": "Unavailable", 
-        "error": "Redis connection error"
-      }
-    }
   }
 }
 ```
@@ -678,7 +621,7 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
 }
 ```
 
-### 生产环境Redis监控使用说明
+### 生产环境监控使用说明
 
 #### 1. **部署更新后的配置**
 
@@ -694,7 +637,7 @@ gcloud run deploy revenue-calculator-employee \
   --allow-unauthenticated
 ```
 
-#### 2. **验证Redis连接状态**
+#### 2. **验证系统状态**
 
 部署后，访问健康检查端点应该能看到详细的组件信息：
 
@@ -727,10 +670,6 @@ curl https://your-domain.com/api/v1/monitoring/transaction/stats
 
 #### 3. **连接状态判断**
 
-**Redis连接状态**:
-- **正常状态**: `"redis": {"status": "UP"}` 且 `"test": "Ping successful"`
-- **连接失败**: `"redis": {"status": "DOWN"}` 且包含错误信息
-- **配置问题**: 如果Redis组件不存在，检查环境变量配置
 
 **数据库连接状态**:
 - **正常状态**: `"db": {"status": "UP"}` 且 `"status": "Connected"`
@@ -751,7 +690,7 @@ curl https://your-domain.com/api/v1/monitoring/transaction/stats
 - 添加了全局异常处理器
 - 在生产环境配置中禁用了favicon处理
 
-**Redis连接失败排查**:
+**系统故障排查**:
 
 ```bash
 # 检查环境变量
@@ -842,7 +781,6 @@ CREATE TABLE employees (
 
 - 已启用计费的Google Cloud项目
 - Cloud SQL PostgreSQL实例
-- Redis实例（Cloud Memorystore或外部）
 - 具有适当权限的服务账户
 
 ##### 方法一：Cloud Run控制台部署
@@ -891,10 +829,6 @@ CREATE TABLE employees (
    DB_USER: your-db-username
    DB_PASSWORD: your-db-password
    FLYWAY_URL: jdbc:postgresql://your-db-host:5432/asatex-revenue
-   REDIS_HOST: your-redis-host
-   REDIS_PORT: 6379
-   REDIS_DATABASE: 0
-   CACHE_TTL: 1800000
    DB_POOL_MAX_SIZE: 5
    DB_POOL_MAX_IDLE_TIME: PT5M
    DB_POOL_MAX_LIFE_TIME: PT15M
@@ -936,10 +870,6 @@ CREATE TABLE employees (
      --set-env-vars DB_USER="your-db-username" \
      --set-env-vars DB_PASSWORD="your-db-password" \
      --set-env-vars FLYWAY_URL="jdbc:postgresql://your-db-host:5432/asatex-revenue" \
-     --set-env-vars REDIS_HOST="your-redis-host" \
-     --set-env-vars REDIS_PORT="6379" \
-     --set-env-vars REDIS_DATABASE="0" \
-     --set-env-vars CACHE_TTL="1800000" \
      --set-env-vars DB_POOL_MAX_SIZE="5" \
      --set-env-vars DB_POOL_MAX_IDLE_TIME="PT5M" \
      --set-env-vars DB_POOL_MAX_LIFE_TIME="PT15M" \
@@ -965,11 +895,6 @@ DB_USER=your-db-username
 DB_PASSWORD=your-db-password
 FLYWAY_URL=jdbc:postgresql://your-db-host:5432/asatex-revenue
 
-# Redis配置
-REDIS_HOST=your-redis-host
-REDIS_PORT=6379
-REDIS_DATABASE=0
-CACHE_TTL=1800000
 ```
 
 **可选的环境变量：**
@@ -1050,7 +975,6 @@ DB_POOL_MAX_LIFE_TIME=PT15M
 3. **应用无法启动**
    - 查看Cloud Run日志
    - 检查数据库连接
-   - 验证Redis连接
 
 **有用的命令：**
 ```bash

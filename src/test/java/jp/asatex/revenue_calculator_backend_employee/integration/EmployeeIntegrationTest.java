@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -39,21 +38,12 @@ class EmployeeIntegrationTest {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    @Autowired
-    private CacheManager cacheManager;
 
     @BeforeEach
     void setUp() {
         // Clean up test data
         employeeRepository.deleteAll().block();
         
-        // Clean up cache
-        cacheManager.getCacheNames().forEach(cacheName -> {
-            var cache = cacheManager.getCache(cacheName);
-            if (cache != null) {
-                cache.clear();
-            }
-        });
     }
 
     @Test

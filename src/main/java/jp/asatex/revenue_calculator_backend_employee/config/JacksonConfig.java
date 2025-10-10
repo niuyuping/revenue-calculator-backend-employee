@@ -1,15 +1,12 @@
 package jp.asatex.revenue_calculator_backend_employee.config;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 
 /**
  * Unified Jackson configuration class
@@ -42,23 +39,4 @@ public class JacksonConfig {
         return mapper;
     }
 
-    /**
-     * Create JSR310-compatible Redis serializer
-     * Uses unified ObjectMapper to ensure consistency of cache serialization
-     * Configures type information to support correct deserialization
-     */
-    @Bean
-    public GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer(ObjectMapper objectMapper) {
-        // Create ObjectMapper specifically for Redis
-        ObjectMapper redisObjectMapper = objectMapper.copy();
-        
-        // Enable type information to support correct deserialization
-        redisObjectMapper.activateDefaultTyping(
-            LaissezFaireSubTypeValidator.instance,
-            ObjectMapper.DefaultTyping.NON_FINAL,
-            JsonTypeInfo.As.PROPERTY
-        );
-        
-        return new GenericJackson2JsonRedisSerializer(redisObjectMapper);
-    }
 }

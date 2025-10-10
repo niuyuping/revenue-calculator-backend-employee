@@ -36,7 +36,6 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 - ✅ **Advanced Search** / **高级搜索** / **高度な検索** (Name Search)
 - ✅ **Pagination Support** / **分页支持** / **ページネーションサポート** (Sorted & Paginated)
 - ✅ **Data Validation** / **数据验证** / **データ検証** (Jakarta Validation)
-- ✅ **Cache Support** / **缓存支持** / **キャッシュサポート** (Redis)
 - ✅ **Rate Limiting** / **限流保护** / **レート制限** (Resilience4j)
 - ✅ **Transaction Management** / **事务管理** / **トランザクション管理** (ACID compliance)
 - ✅ **Monitoring & Metrics** / **监控指标** / **監視・メトリクス** (Actuator + Custom metrics)
@@ -44,14 +43,14 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 ### Technology Stack / 技术栈 / 技術スタック
 
 - **Java 21** + **Spring Boot 3.5.6**
-- **PostgreSQL** + **Redis** + **Flyway**
+- **PostgreSQL** + **Flyway**
 - **Swagger/OpenAPI 3**
 - **JUnit 5** + **TestContainers**
 
 ### Quick Start / 快速开始 / クイックスタート
 
 1. **Prerequisites / 前提条件 / 前提条件**:
-   - Java 21+, PostgreSQL 12+, Redis 6+, Gradle 8.0+
+   - Java 21+, PostgreSQL 12+, Gradle 8.0+
 
 2. **Run the application / 运行应用 / アプリケーション実行**:
 

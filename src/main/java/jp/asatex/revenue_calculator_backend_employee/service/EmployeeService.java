@@ -12,8 +12,6 @@ import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -74,7 +72,6 @@ public class EmployeeService {
      * @param id Employee ID
      * @return Mono<EmployeeDto>
      */
-    @Cacheable(value = "employees", key = "#id")
     public Mono<EmployeeDto> getEmployeeById(Long id) {
         logger.debug("Retrieving employee with ID: {}", id);
         employeeQueryCounter.increment();
@@ -95,7 +92,6 @@ public class EmployeeService {
      * @param employeeNumber Employee number
      * @return Mono<EmployeeDto>
      */
-    @Cacheable(value = "employees", key = "#employeeNumber")
     public Mono<EmployeeDto> getEmployeeByNumber(String employeeNumber) {
         logger.debug("Retrieving employee with number: {}", employeeNumber);
         employeeQueryCounter.increment();
@@ -117,7 +113,6 @@ public class EmployeeService {
      * @return Mono<EmployeeDto>
      */
     @Transactional
-    @CacheEvict(value = {"employeeList", "employeePagination", "employeeSearch"}, allEntries = true)
     public Mono<EmployeeDto> createEmployee(EmployeeDto employeeDto) {
         logger.info("Creating new employee with number: {}", employeeDto.getEmployeeNumber());
         employeeOperationCounter.increment();
@@ -153,7 +148,6 @@ public class EmployeeService {
      * @return Mono<EmployeeDto>
      */
     @Transactional
-    @CacheEvict(value = {"employees", "employeeList", "employeePagination", "employeeSearch"}, allEntries = true)
     public Mono<EmployeeDto> updateEmployee(Long id, EmployeeDto employeeDto) {
         logger.info("Updating employee with ID: {}", id);
         employeeOperationCounter.increment();
@@ -186,7 +180,6 @@ public class EmployeeService {
      * @return Mono<Void>
      */
     @Transactional
-    @CacheEvict(value = {"employees", "employeeList", "employeePagination", "employeeSearch"}, allEntries = true)
     public Mono<Void> deleteEmployeeById(Long id) {
         logger.info("Deleting employee with ID: {}", id);
         employeeOperationCounter.increment();
@@ -213,7 +206,6 @@ public class EmployeeService {
      * @return Mono<Void>
      */
     @Transactional
-    @CacheEvict(value = {"employees", "employeeList", "employeePagination", "employeeSearch"}, allEntries = true)
     public Mono<Void> deleteEmployeeByNumber(String employeeNumber) {
         logger.info("Deleting employee with number: {}", employeeNumber);
         employeeOperationCounter.increment();
@@ -239,7 +231,6 @@ public class EmployeeService {
      * @param name Employee name
      * @return Flux<EmployeeDto>
      */
-    @Cacheable(value = "employeeSearch", key = "#name")
     public Flux<EmployeeDto> searchEmployeesByName(String name) {
         logger.debug("Searching employees by name: {}", name);
         employeeQueryCounter.increment();
@@ -255,7 +246,6 @@ public class EmployeeService {
      * @param furigana Employee furigana
      * @return Flux<EmployeeDto>
      */
-    @Cacheable(value = "employeeSearch", key = "#furigana")
     public Flux<EmployeeDto> searchEmployeesByFurigana(String furigana) {
         logger.debug("Searching employees by furigana: {}", furigana);
         employeeQueryCounter.increment();
@@ -271,7 +261,6 @@ public class EmployeeService {
      * @param pageRequest Page request
      * @return Mono<PageResponse<EmployeeDto>>
      */
-    @Cacheable(value = "employeePagination", key = "#pageRequest.page + '_' + #pageRequest.size + '_' + #pageRequest.sortBy + '_' + #pageRequest.sortDirection")
     public Mono<PageResponse<EmployeeDto>> getEmployeesWithPagination(PageRequest pageRequest) {
         logger.debug("Retrieving employees with pagination: page={}, size={}", pageRequest.getPage(), pageRequest.getSize());
         employeeQueryCounter.increment();

@@ -125,11 +125,6 @@ class RevenueCalculatorBackendEmployeeApplicationTests {
             assertThat(applicationContext.containsBean("swaggerConfig")).isTrue();
         }
 
-        @Test
-        @DisplayName("CacheConfig should exist")
-        void testCacheConfigExists() {
-            assertThat(applicationContext.containsBean("cacheConfig")).isTrue();
-        }
 
         @Test
         @DisplayName("RateLimitConfig should exist")
