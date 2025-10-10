@@ -742,9 +742,16 @@ curl https://your-domain.com/api/v1/monitoring/transaction/stats
 - **错误率**: `errorRate` < 1% 为正常
 - **连接池**: `activeConnections` 不应超过 `totalConnections` 的80%
 
-#### 4. **故障排查**
+#### 4. **常见问题解决**
 
-如果Redis连接失败，检查以下配置：
+**Favicon 500错误**:
+如果生产环境出现favicon.ico的500错误，已通过以下方式解决：
+- 添加了favicon.ico文件到 `src/main/resources/static/`
+- 配置了WebFlux静态资源处理
+- 添加了全局异常处理器
+- 在生产环境配置中禁用了favicon处理
+
+**Redis连接失败排查**:
 
 ```bash
 # 检查环境变量
