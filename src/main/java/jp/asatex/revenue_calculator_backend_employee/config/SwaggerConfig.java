@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.models.GroupedOpenApi;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -18,6 +19,12 @@ import java.util.List;
  */
 @Configuration
 public class SwaggerConfig {
+
+    @Value("${server.port:8080}")
+    private String serverPort;
+
+    @Value("${spring.profiles.active:default}")
+    private String activeProfile;
 
     @Bean
     public OpenAPI customOpenAPI() {
@@ -33,14 +40,28 @@ public class SwaggerConfig {
                         .license(new License()
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")))
-                .servers(List.of(
-                        new Server()
-                                .url("http://localhost:9001")
-                                .description("Development server"),
-                        new Server()
-                                .url("https://api.asatex.jp")
-                                .description("Production server")
-                ));
+                .servers(buildServers());
+    }
+
+    /**
+     * Build server list based on active profile
+     */
+    private List<Server> buildServers() {
+        if ("prod".equals(activeProfile)) {
+            // Production environment - auto-detect from current request
+            return List.of(
+                    new Server()
+                            .url("/")
+                            .description("Production server")
+            );
+        } else {
+            // Development environment
+            return List.of(
+                    new Server()
+                            .url("http://localhost:" + serverPort)
+                            .description("Development server")
+            );
+        }
     }
 
 
