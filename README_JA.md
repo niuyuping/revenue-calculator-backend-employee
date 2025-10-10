@@ -172,7 +172,7 @@ src/
 
    ```bash
    # PostgreSQLデータベースの作成
-   createdb asatex-revenue
+   createdb employee
    ```
 
 
@@ -182,13 +182,13 @@ src/
 
    ```properties
    # データベース設定
-   spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
+   spring.r2dbc.url=r2dbc:postgresql://localhost:5432/employee
    spring.r2dbc.username=your_username
    spring.r2dbc.password=your_password
    
    
    # Flyway設定
-   spring.flyway.url=jdbc:postgresql://localhost:5432/asatex-revenue
+   spring.flyway.url=jdbc:postgresql://localhost:5432/employee
    spring.flyway.user=your_username
    spring.flyway.password=your_password
    ```
@@ -436,13 +436,13 @@ POST /api/v1/monitoring/logs/reset
 server.port=9001
 
 # データベース設定
-spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
+spring.r2dbc.url=r2dbc:postgresql://localhost:5432/employee
 spring.r2dbc.username=db_user
 spring.r2dbc.password=${DB_PASSWORD}
 
 
 # Flyway設定
-spring.flyway.url=jdbc:postgresql://localhost:5432/asatex-revenue
+spring.flyway.url=jdbc:postgresql://localhost:5432/employee
 spring.flyway.user=db_user
 spring.flyway.password=${DB_PASSWORD}
 spring.flyway.baseline-on-migrate=true
@@ -560,7 +560,7 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
 #### employeesテーブル
 
 ```sql
-CREATE TABLE employees (
+CREATE TABLE employeeInfo (
     employee_id BIGSERIAL PRIMARY KEY,
     employee_number VARCHAR(20) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
@@ -686,10 +686,10 @@ CREATE TABLE database_audit_logs (
 6. **環境変数を設定**
    ```
    SPRING_PROFILES_ACTIVE: prod
-   DB_URL: r2dbc:postgresql://your-db-host:5432/asatex-revenue
+   DB_URL: r2dbc:postgresql://your-db-host:5432/employee
    DB_USER: your-db-username
    DB_PASSWORD: your-db-password
-   FLYWAY_URL: jdbc:postgresql://your-db-host:5432/asatex-revenue
+   FLYWAY_URL: jdbc:postgresql://your-db-host:5432/employee
    DB_POOL_MAX_SIZE: 5
    DB_POOL_MAX_IDLE_TIME: PT5M
    DB_POOL_MAX_LIFE_TIME: PT15M
@@ -727,10 +727,10 @@ CREATE TABLE database_audit_logs (
      --platform managed \
      --region your-region \
      --set-env-vars SPRING_PROFILES_ACTIVE="prod" \
-     --set-env-vars DB_URL="r2dbc:postgresql://your-db-host:5432/asatex-revenue" \
+     --set-env-vars DB_URL="r2dbc:postgresql://your-db-host:5432/employee" \
      --set-env-vars DB_USER="your-db-username" \
      --set-env-vars DB_PASSWORD="your-db-password" \
-     --set-env-vars FLYWAY_URL="jdbc:postgresql://your-db-host:5432/asatex-revenue" \
+     --set-env-vars FLYWAY_URL="jdbc:postgresql://your-db-host:5432/employee" \
      --set-env-vars DB_POOL_MAX_SIZE="5" \
      --set-env-vars DB_POOL_MAX_IDLE_TIME="PT5M" \
      --set-env-vars DB_POOL_MAX_LIFE_TIME="PT15M" \
@@ -751,10 +751,10 @@ CREATE TABLE database_audit_logs (
 SPRING_PROFILES_ACTIVE=prod
 
 # データベース設定（Cloud SQL + VPC接続）
-DB_URL=r2dbc:postgresql://your-db-host:5432/asatex-revenue
+DB_URL=r2dbc:postgresql://your-db-host:5432/employee
 DB_USER=your-db-username
 DB_PASSWORD=your-db-password
-FLYWAY_URL=jdbc:postgresql://your-db-host:5432/asatex-revenue
+FLYWAY_URL=jdbc:postgresql://your-db-host:5432/employee
 
 ```
 

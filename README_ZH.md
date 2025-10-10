@@ -157,7 +157,7 @@ src/
 
    ```bash
    # 创建PostgreSQL数据库
-   createdb asatex-revenue
+   createdb employee
    ```
 
 
@@ -167,13 +167,13 @@ src/
 
    ```properties
    # 数据库配置
-   spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
+   spring.r2dbc.url=r2dbc:postgresql://localhost:5432/employee
    spring.r2dbc.username=your_username
    spring.r2dbc.password=your_password
    
    
    # Flyway配置
-   spring.flyway.url=jdbc:postgresql://localhost:5432/asatex-revenue
+   spring.flyway.url=jdbc:postgresql://localhost:5432/employee
    spring.flyway.user=your_username
    spring.flyway.password=your_password
    ```
@@ -403,13 +403,13 @@ GET /api/v1/monitoring/transaction/stats
 server.port=9001
 
 # 数据库配置
-spring.r2dbc.url=r2dbc:postgresql://localhost:5432/asatex-revenue
+spring.r2dbc.url=r2dbc:postgresql://localhost:5432/employee
 spring.r2dbc.username=db_user
 spring.r2dbc.password=${DB_PASSWORD}
 
 
 # Flyway配置
-spring.flyway.url=jdbc:postgresql://localhost:5432/asatex-revenue
+spring.flyway.url=jdbc:postgresql://localhost:5432/employee
 spring.flyway.user=db_user
 spring.flyway.password=${DB_PASSWORD}
 spring.flyway.baseline-on-migrate=true
@@ -564,7 +564,7 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
 {
   "status": "UP",
   "version": "PostgreSQL 15.4",
-  "database": "asatex-revenue",
+  "database": "employee",
   "user": "db_user",
   "lastChecked": "2024-01-15T10:30:00Z",
   "message": "Connected successfully"
@@ -825,10 +825,10 @@ CREATE TABLE employees (
 6. **配置环境变量**
    ```
    SPRING_PROFILES_ACTIVE: prod
-   DB_URL: r2dbc:postgresql://your-db-host:5432/asatex-revenue
+   DB_URL: r2dbc:postgresql://your-db-host:5432/employee
    DB_USER: your-db-username
    DB_PASSWORD: your-db-password
-   FLYWAY_URL: jdbc:postgresql://your-db-host:5432/asatex-revenue
+   FLYWAY_URL: jdbc:postgresql://your-db-host:5432/employee
    DB_POOL_MAX_SIZE: 5
    DB_POOL_MAX_IDLE_TIME: PT5M
    DB_POOL_MAX_LIFE_TIME: PT15M
@@ -866,10 +866,10 @@ CREATE TABLE employees (
      --platform managed \
      --region your-region \
      --set-env-vars SPRING_PROFILES_ACTIVE="prod" \
-     --set-env-vars DB_URL="r2dbc:postgresql://your-db-host:5432/asatex-revenue" \
+     --set-env-vars DB_URL="r2dbc:postgresql://your-db-host:5432/employee" \
      --set-env-vars DB_USER="your-db-username" \
      --set-env-vars DB_PASSWORD="your-db-password" \
-     --set-env-vars FLYWAY_URL="jdbc:postgresql://your-db-host:5432/asatex-revenue" \
+     --set-env-vars FLYWAY_URL="jdbc:postgresql://your-db-host:5432/employee" \
      --set-env-vars DB_POOL_MAX_SIZE="5" \
      --set-env-vars DB_POOL_MAX_IDLE_TIME="PT5M" \
      --set-env-vars DB_POOL_MAX_LIFE_TIME="PT15M" \
@@ -890,10 +890,10 @@ CREATE TABLE employees (
 SPRING_PROFILES_ACTIVE=prod
 
 # 数据库配置（Cloud SQL + VPC连接）
-DB_URL=r2dbc:postgresql://your-db-host:5432/asatex-revenue
+DB_URL=r2dbc:postgresql://your-db-host:5432/employee
 DB_USER=your-db-username
 DB_PASSWORD=your-db-password
-FLYWAY_URL=jdbc:postgresql://your-db-host:5432/asatex-revenue
+FLYWAY_URL=jdbc:postgresql://your-db-host:5432/employee
 
 ```
 
