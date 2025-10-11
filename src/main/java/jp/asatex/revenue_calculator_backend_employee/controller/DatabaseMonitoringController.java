@@ -24,46 +24,13 @@ public class DatabaseMonitoringController {
     private DatabaseMonitoringService databaseMonitoringService;
 
     /**
-     * Get database connection statistics
-     * @return Database connection statistics information
+     * Get comprehensive database monitoring information
+     * @return Complete database monitoring information including health, performance, and table statistics
      */
-    @GetMapping(value = "/database/connection/stats", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/database/stats", produces = MediaType.APPLICATION_JSON_VALUE)
     @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "Get database connection statistics", description = "Returns current database connection pool statistics including active, idle, and total connections")
-    public Mono<DatabaseMonitoringService.ConnectionStats> getConnectionStats() {
-        return databaseMonitoringService.getConnectionStats();
-    }
-
-    /**
-     * Get database performance statistics
-     * @return Database performance statistics information
-     */
-    @GetMapping(value = "/database/performance/stats", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "Get database performance statistics", description = "Returns database performance metrics including query execution times, connection times, and error rates")
-    public Mono<DatabaseMonitoringService.PerformanceStats> getPerformanceStats() {
-        return databaseMonitoringService.getPerformanceStats();
-    }
-
-    /**
-     * Get database health information
-     * @return Database health information
-     */
-    @GetMapping(value = "/database/health", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "Get database health information", description = "Returns detailed database health information including connection status, version, and configuration")
-    public Mono<DatabaseMonitoringService.DatabaseHealth> getDatabaseHealth() {
-        return databaseMonitoringService.getDatabaseHealth();
-    }
-
-    /**
-     * Get database table statistics
-     * @return Database table statistics information
-     */
-    @GetMapping(value = "/database/table/stats", produces = MediaType.APPLICATION_JSON_VALUE)
-    @RateLimiter(name = "monitoring-api")
-    @Operation(summary = "Get database table statistics", description = "Returns statistics for database tables including row counts, table sizes, and index information")
-    public Mono<DatabaseMonitoringService.TableStats> getTableStats() {
-        return databaseMonitoringService.getTableStats();
+    @Operation(summary = "Get comprehensive database statistics", description = "Returns complete database monitoring information including health status, performance metrics, and table statistics")
+    public Mono<DatabaseMonitoringService.DatabaseStats> getDatabaseStats() {
+        return databaseMonitoringService.getDatabaseStats();
     }
 }

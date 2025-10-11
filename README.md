@@ -10,19 +10,19 @@ Choose your preferred language to view the complete documentation:
 
 [**README_ZH.md**](README_ZH.md) - 完整的中文文档
 
-基于 Spring Boot 3.x、R2DBC、WebFlux 的响应式员工管理系统后端服务。包含完整的CRUD操作、搜索功能、分页查询、数据验证、缓存支持、限流保护、事务管理等企业级特性。
+基于 Spring Boot 3.x、R2DBC、WebFlux 的响应式员工管理系统后端服务。包含完整的CRUD操作、搜索功能、分页查询、数据验证、限流保护、事务管理等企业级特性。
 
 ### 🇺🇸 English Version
 
 [**README_EN.md**](README_EN.md) - Complete English documentation
 
-A reactive employee management system backend service based on Spring Boot 3.x, R2DBC, and WebFlux. Features complete CRUD operations, search functionality, pagination support, data validation, cache support, rate limiting, transaction management, and more.
+A reactive employee management system backend service based on Spring Boot 3.x, R2DBC, and WebFlux. Features complete CRUD operations, search functionality, pagination support, data validation, rate limiting, transaction management, and more.
 
 ### 🇯🇵 日本語版 (Japanese)
 
 [**README_JA.md**](README_JA.md) - 完全な日本語文書
 
-Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業員管理システムのバックエンドサービス。完全なCRUD操作、検索機能、ページネーション、データ検証、キャッシュサポート、レート制限、トランザクション管理などの機能を提供します。
+Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業員管理システムのバックエンドサービス。完全なCRUD操作、検索機能、ページネーション、データ検証、レート制限、トランザクション管理などの機能を提供します。
 
 ---
 

@@ -43,11 +43,8 @@ A reactive employee management system backend service based on Spring Boot 3.x, 
 
 ### Enterprise Features
 
-#### 🔄 Cache & Rate Limiting
+#### 🔄 Rate Limiting
 
-  - Employee Info Cache: 30 minutes TTL
-  - Employee Search Cache: 15 minutes TTL
-  - Pagination Cache: 10 minutes TTL
 - **Rate Limiting**: Different limits for different operations (20-100 requests/minute)
 
 
@@ -83,7 +80,6 @@ src/
 ├── main/
 │   ├── java/jp/asatex/revenue_calculator_backend_employee/
 │   │   ├── config/           # Configuration classes
-│   │   │   ├── CacheConfig.java
 │   │   │   ├── JacksonConfig.java
 │   │   │   ├── MetricsConfig.java
 │   │   │   ├── MultiLanguageOpenApiConfig.java
@@ -109,7 +105,6 @@ src/
 │   │   │   ├── EmployeeRepository.java
 │   │   ├── service/         # Business logic layer
 │   │   │   ├── EmployeeService.java
-│   │   │   ├── CacheMonitoringService.java
 │   │   │   └── TransactionMonitoringService.java
 │   │   ├── util/            # Utility classes
 │   │   │   └── LoggingUtil.java
@@ -326,13 +321,6 @@ GET /api/v1/employee/health
 
 ### Monitoring Endpoints
 
-#### Cache Monitoring
-
-```http
-GET /api/v1/monitoring/cache/stats
-DELETE /api/v1/monitoring/cache/clear
-DELETE /api/v1/monitoring/cache/clear/{cacheName}
-```
 
 #### Database Audit
 
@@ -408,7 +396,6 @@ The project has comprehensive test coverage:
 - **Parameter Validation Tests** - Input validation testing
 - **Integration Tests** - End-to-end testing
 - **Configuration Tests** - Configuration class testing
-- **Cache Tests** - Cache functionality testing
 - **Rate Limiting Tests** - Rate limiting testing
 - **Transaction Tests** - Transaction management testing
 - **Audit Tests** - Database audit testing
@@ -528,8 +515,6 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
 - `employee.update.total` - Total employee updates
 - `employee.delete.total` - Total employee deletions
 - `employee.query.total` - Total employee queries
-- `cache.hits.total` - Total cache hits
-- `cache.misses.total` - Total cache misses
 - `rate.limit.triggered.total` - Total rate limit triggers
 - `transaction.start` - Transaction start count
 - `transaction.commit` - Transaction commit count
@@ -884,12 +869,6 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 
 ## 📈 Performance Optimization
 
-### Cache Strategy
-
-- **Employee Information Cache**: 30 minutes TTL
-- **Employee Search Cache**: 15 minutes TTL
-- **Pagination Cache**: 10 minutes TTL
-- **Automatic Cache Invalidation**: Clear related cache on write operations
 
 ### Reactive Programming
 

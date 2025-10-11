@@ -80,7 +80,6 @@ src/
 ├── main/
 │   ├── java/jp/asatex/revenue_calculator_backend_employee/
 │   │   ├── config/           # 配置类
-│   │   │   ├── CacheConfig.java
 │   │   │   ├── JacksonConfig.java
 │   │   │   ├── MetricsConfig.java
 │   │   │   ├── RateLimitConfig.java
@@ -90,7 +89,6 @@ src/
 │   │   │   ├── WebFluxConfig.java
 │   │   │   └── WebFluxJacksonConfig.java
 │   │   ├── controller/       # REST控制器
-│   │   │   ├── CacheMonitoringController.java
 │   │   │   ├── EmployeeController.java
 │   │   │   └── TransactionMonitoringController.java
 │   │   ├── dto/             # 数据传输对象
@@ -109,7 +107,6 @@ src/
 │   │   │   └── EmployeeRepository.java
 │   │   ├── service/         # 业务逻辑层
 │   │   │   ├── EmployeeService.java
-│   │   │   ├── CacheMonitoringService.java
 │   │   │   └── TransactionMonitoringService.java
 │   │   └── util/            # 工具类
 │   │   └── RevenueCalculatorBackendEmployeeApplication.java
@@ -324,13 +321,6 @@ GET /api/v1/employee/health
 
 ### 监控端点
 
-#### 缓存监控
-
-```http
-GET /api/v1/monitoring/cache/stats
-DELETE /api/v1/monitoring/cache/clear
-DELETE /api/v1/monitoring/cache/clear/{cacheName}
-```
 
 
 #### 事务监控
@@ -389,7 +379,6 @@ GET /api/v1/monitoring/transaction/stats
 - **参数验证测试** - 输入验证测试
 - **集成测试** - 端到端测试
 - **配置测试** - 配置类测试
-- **缓存测试** - 缓存功能测试
 - **限流测试** - 限流功能测试
 - **事务测试** - 事务管理测试
 
@@ -479,15 +468,8 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
 ### 自定义监控端点
 
 #### **数据库监控**:
-- `GET /api/v1/monitoring/database/connection/stats` - 数据库连接统计
-- `GET /api/v1/monitoring/database/performance/stats` - 数据库性能统计
-- `GET /api/v1/monitoring/database/health` - 数据库健康信息
-- `GET /api/v1/monitoring/database/table/stats` - 数据库表统计
+- `GET /api/v1/monitoring/database/stats` - 综合数据库统计信息（包含健康状态、连接统计、表统计）
 
-#### **缓存监控**:
-- `GET /api/v1/monitoring/cache/stats` - 缓存统计信息
-- `DELETE /api/v1/monitoring/cache/clear` - 清除所有缓存
-- `DELETE /api/v1/monitoring/cache/clear/{cacheName}` - 清除指定缓存
 
 #### **事务监控**:
 - `GET /api/v1/monitoring/transaction/stats` - 事务统计信息
@@ -534,92 +516,49 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
 
 #### **数据库监控端点**:
 
-**数据库连接统计**:
+**综合数据库统计信息**:
 ```json
 {
-  "totalConnections": 25,
-  "activeConnections": 3,
-  "idleConnections": 22,
-  "connectionErrors": 0,
-  "averageConnectionTime": 45.2
-}
-```
-
-**数据库性能统计**:
-```json
-{
-  "totalQueries": 1250,
-  "totalInserts": 45,
-  "totalUpdates": 120,
-  "totalDeletes": 8,
-  "totalErrors": 2,
-  "averageQueryTime": 12.5,
-  "maxQueryTime": 150.0,
-  "errorRate": 0.16
-}
-```
-
-**数据库健康信息**:
-```json
-{
-  "status": "UP",
-  "version": "PostgreSQL 15.4",
-  "database": "employee",
-  "user": "db_user",
-  "lastChecked": "2024-01-15T10:30:00Z",
-  "message": "Connected successfully"
-}
-```
-
-**数据库表统计**:
-```json
-{
-  "tables": {
-    "employees": {
-      "tableName": "employees",
-      "rowCount": 1250,
-      "inserts": 45,
-      "updates": 120,
-      "deletes": 8
-    },
-    "database_audit_logs": {
-      "tableName": "database_audit_logs",
-      "rowCount": 5000,
-      "inserts": 200,
-      "updates": 0,
-      "deletes": 0
-    }
+  "health": {
+    "status": "UP",
+    "version": "PostgreSQL 15.4",
+    "database": "employee",
+    "user": "db_user",
+    "lastChecked": "2024-01-15T10:30:00Z",
+    "message": "Connected successfully"
   },
-  "totalRows": 6250,
-  "totalInserts": 245,
-  "totalUpdates": 120,
-  "totalDeletes": 8
+  "connectionStats": {
+    "totalConnections": 25,
+    "activeConnections": 3,
+    "idleConnections": 22,
+    "connectionErrors": 0,
+    "averageConnectionTime": 0.0
+  },
+  "tableStats": {
+    "tables": {
+      "employees": {
+        "tableName": "employees",
+        "rowCount": 1250,
+        "inserts": 45,
+        "updates": 120,
+        "deletes": 8
+      },
+      "database_audit_logs": {
+        "tableName": "database_audit_logs",
+        "rowCount": 5000,
+        "inserts": 200,
+        "updates": 0,
+        "deletes": 0
+      }
+    },
+    "totalRows": 6250,
+    "totalInserts": 245,
+    "totalUpdates": 120,
+    "totalDeletes": 8
+  }
 }
 ```
 
-#### **缓存监控端点**:
-
-**缓存统计信息**:
-```json
-{
-  "totalCaches": 3,
-  "totalHits": 1250,
-  "totalMisses": 45,
-  "totalPuts": 1295,
-  "totalEvictions": 12,
-  "averageHitRate": 0.965,
-  "cacheDetails": [
-    {
-      "cacheName": "employeeCache",
-      "hits": 800,
-      "misses": 20,
-      "puts": 820,
-      "evictions": 5,
-      "hitRate": 0.975
-    }
-  ]
-}
-```
 
 ### 生产环境监控使用说明
 
@@ -645,24 +584,9 @@ gcloud run deploy revenue-calculator-employee \
 # 检查详细健康状态
 curl https://your-domain.com/actuator/health
 
-# 检查缓存统计
-curl https://your-domain.com/actuator/metrics/cache.hit
-curl https://your-domain.com/actuator/metrics/cache.miss
 
-# 检查自定义缓存统计
-curl https://your-domain.com/api/v1/monitoring/cache/stats
-
-# 检查数据库连接统计
-curl https://your-domain.com/api/v1/monitoring/database/connection/stats
-
-# 检查数据库性能统计
-curl https://your-domain.com/api/v1/monitoring/database/performance/stats
-
-# 检查数据库健康信息
-curl https://your-domain.com/api/v1/monitoring/database/health
-
-# 检查数据库表统计
-curl https://your-domain.com/api/v1/monitoring/database/table/stats
+# 检查综合数据库统计
+curl https://your-domain.com/api/v1/monitoring/database/stats
 
 # 检查事务统计
 curl https://your-domain.com/api/v1/monitoring/transaction/stats
@@ -709,8 +633,6 @@ gcloud logging read "resource.type=cloud_run_revision AND resource.labels.servic
 - `employee.update.total` - 员工更新总数
 - `employee.delete.total` - 员工删除总数
 - `employee.query.total` - 员工查询总数
-- `cache.hits.total` - 缓存命中总数
-- `cache.misses.total` - 缓存未命中总数
 - `rate.limit.triggered.total` - 限流触发总数
 - `transaction.start` - 事务开始次数
 - `transaction.commit` - 事务提交次数
@@ -1036,12 +958,6 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 
 ## 📈 性能优化
 
-### 缓存策略
-
-- **员工信息缓存**: 30分钟TTL
-- **员工搜索缓存**: 15分钟TTL
-- **分页缓存**: 10分钟TTL
-- **自动缓存失效**: 写操作时清除相关缓存
 
 ### 响应式编程
 

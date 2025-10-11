@@ -90,27 +90,6 @@ public class MetricsConfig {
                 .register(meterRegistry);
     }
 
-    /**
-     * Cache hit counter
-     */
-    @Bean
-    public Counter cacheHitCounter(MeterRegistry meterRegistry) {
-        return Counter.builder("cache.hits.total")
-                .description("Total number of cache hits")
-                .tag("service", "revenue-calculator-employee")
-                .register(meterRegistry);
-    }
-
-    /**
-     * Cache miss counter
-     */
-    @Bean
-    public Counter cacheMissCounter(MeterRegistry meterRegistry) {
-        return Counter.builder("cache.misses.total")
-                .description("Total number of cache misses")
-                .tag("service", "revenue-calculator-employee")
-                .register(meterRegistry);
-    }
 
     /**
      * Rate limit trigger counter

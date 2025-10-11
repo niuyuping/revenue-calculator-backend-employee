@@ -118,27 +118,27 @@ public class EmployeeService {
         employeeOperationCounter.increment();
         employeeCreateCounter.increment();
         
-        long startTime = System.currentTimeMillis();
-        
-        return employeeRepository.existsByEmployeeNumber(employeeDto.getEmployeeNumber())
-                .flatMap(exists -> {
-                    if (exists) {
-                        logger.warn("Duplicate employee number detected: {}", employeeDto.getEmployeeNumber());
-                        return Mono.error(new DuplicateEmployeeNumberException("Employee number already exists: " + employeeDto.getEmployeeNumber()));
-                    }
-                    return Mono.just(convertToEntity(employeeDto));
-                })
-                .flatMap(employeeRepository::save)
-                .map(this::convertToDto)
-                .doOnSuccess(createdEmployee -> {
-                    long executionTime = System.currentTimeMillis() - startTime;
-                    logger.info("Successfully created employee: {} with ID: {}", 
-                            createdEmployee.getEmployeeNumber(), createdEmployee.getEmployeeId());
-                })
-                .doOnError(error -> {
-                    long executionTime = System.currentTimeMillis() - startTime;
-                    logger.error("Failed to create employee: {}", employeeDto.getEmployeeNumber(), error);
-                });
+        return transactionMonitoringService.monitorTransaction(
+                "CREATE_EMPLOYEE",
+                "Creating employee: " + employeeDto.getEmployeeNumber(),
+                employeeRepository.existsByEmployeeNumber(employeeDto.getEmployeeNumber())
+                        .flatMap(exists -> {
+                            if (exists) {
+                                logger.warn("Duplicate employee number detected: {}", employeeDto.getEmployeeNumber());
+                                return Mono.error(new DuplicateEmployeeNumberException("Employee number already exists: " + employeeDto.getEmployeeNumber()));
+                            }
+                            return Mono.just(convertToEntity(employeeDto));
+                        })
+                        .flatMap(employeeRepository::save)
+                        .map(this::convertToDto)
+                        .doOnSuccess(createdEmployee -> {
+                            logger.info("Successfully created employee: {} with ID: {}", 
+                                    createdEmployee.getEmployeeNumber(), createdEmployee.getEmployeeId());
+                        })
+                        .doOnError(error -> {
+                            logger.error("Failed to create employee: {}", employeeDto.getEmployeeNumber(), error);
+                        })
+        );
     }
     
     /**
@@ -153,25 +153,25 @@ public class EmployeeService {
         employeeOperationCounter.increment();
         employeeUpdateCounter.increment();
         
-        long startTime = System.currentTimeMillis();
-        
-        return employeeRepository.findById(id)
-                .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found with ID: " + id)))
-                .flatMap(existingEmployee -> {
-                    Employee updatedEmployee = convertToEntity(employeeDto);
-                    updatedEmployee.setEmployeeId(id);
-                    return employeeRepository.save(updatedEmployee);
-                })
-                .map(this::convertToDto)
-                .doOnSuccess(updatedEmployee -> {
-                    long executionTime = System.currentTimeMillis() - startTime;
-                    logger.info("Successfully updated employee: {} with ID: {}", 
-                            updatedEmployee.getEmployeeNumber(), updatedEmployee.getEmployeeId());
-                })
-                .doOnError(error -> {
-                    long executionTime = System.currentTimeMillis() - startTime;
-                    logger.error("Failed to update employee with ID: {}", id, error);
-                });
+        return transactionMonitoringService.monitorTransaction(
+                "UPDATE_EMPLOYEE",
+                "Updating employee ID: " + id,
+                employeeRepository.findById(id)
+                        .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found with ID: " + id)))
+                        .flatMap(existingEmployee -> {
+                            Employee updatedEmployee = convertToEntity(employeeDto);
+                            updatedEmployee.setEmployeeId(id);
+                            return employeeRepository.save(updatedEmployee);
+                        })
+                        .map(this::convertToDto)
+                        .doOnSuccess(updatedEmployee -> {
+                            logger.info("Successfully updated employee: {} with ID: {}", 
+                                    updatedEmployee.getEmployeeNumber(), updatedEmployee.getEmployeeId());
+                        })
+                        .doOnError(error -> {
+                            logger.error("Failed to update employee with ID: {}", id, error);
+                        })
+        );
     }
     
     /**
@@ -185,19 +185,19 @@ public class EmployeeService {
         employeeOperationCounter.increment();
         employeeDeleteCounter.increment();
         
-        long startTime = System.currentTimeMillis();
-        
-        return employeeRepository.findById(id)
-                .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found with ID: " + id)))
-                .flatMap(employeeRepository::delete)
-                .doOnSuccess(unused -> {
-                    long executionTime = System.currentTimeMillis() - startTime;
-                    logger.info("Successfully deleted employee with ID: {}", id);
-                })
-                .doOnError(error -> {
-                    long executionTime = System.currentTimeMillis() - startTime;
-                    logger.error("Failed to delete employee with ID: {}", id, error);
-                });
+        return transactionMonitoringService.monitorTransaction(
+                "DELETE_EMPLOYEE_BY_ID",
+                "Deleting employee ID: " + id,
+                employeeRepository.findById(id)
+                        .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found with ID: " + id)))
+                        .flatMap(employeeRepository::delete)
+                        .doOnSuccess(unused -> {
+                            logger.info("Successfully deleted employee with ID: {}", id);
+                        })
+                        .doOnError(error -> {
+                            logger.error("Failed to delete employee with ID: {}", id, error);
+                        })
+        );
     }
     
     /**
@@ -211,19 +211,19 @@ public class EmployeeService {
         employeeOperationCounter.increment();
         employeeDeleteCounter.increment();
         
-        long startTime = System.currentTimeMillis();
-        
-        return employeeRepository.findByEmployeeNumber(employeeNumber)
-                .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found with number: " + employeeNumber)))
-                .flatMap(employeeRepository::delete)
-                .doOnSuccess(unused -> {
-                    long executionTime = System.currentTimeMillis() - startTime;
-                    logger.info("Successfully deleted employee with number: {}", employeeNumber);
-                })
-                .doOnError(error -> {
-                    long executionTime = System.currentTimeMillis() - startTime;
-                    logger.error("Failed to delete employee with number: {}", employeeNumber, error);
-                });
+        return transactionMonitoringService.monitorTransaction(
+                "DELETE_EMPLOYEE_BY_NUMBER",
+                "Deleting employee number: " + employeeNumber,
+                employeeRepository.findByEmployeeNumber(employeeNumber)
+                        .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found with number: " + employeeNumber)))
+                        .flatMap(employeeRepository::delete)
+                        .doOnSuccess(unused -> {
+                            logger.info("Successfully deleted employee with number: {}", employeeNumber);
+                        })
+                        .doOnError(error -> {
+                            logger.error("Failed to delete employee with number: {}", employeeNumber, error);
+                        })
+        );
     }
     
     /**

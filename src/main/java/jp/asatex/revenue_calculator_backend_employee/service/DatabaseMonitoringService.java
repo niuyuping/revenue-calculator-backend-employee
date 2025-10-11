@@ -9,11 +9,9 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Database monitoring service
@@ -26,172 +24,35 @@ public class DatabaseMonitoringService {
 
     private final DatabaseClient databaseClient;
 
-    // Database operation counters
-    private final Counter queryCounter;
-    private final Counter insertCounter;
-    private final Counter updateCounter;
-    private final Counter deleteCounter;
-    private final Counter errorCounter;
-    private final Timer queryDurationTimer;
-    private final Timer connectionTimeTimer;
-
-    // Connection pool statistics
-    private final AtomicLong totalConnections = new AtomicLong(0);
-    private final AtomicLong activeConnections = new AtomicLong(0);
-    private final AtomicLong idleConnections = new AtomicLong(0);
-    private final AtomicLong connectionErrors = new AtomicLong(0);
-
-    public DatabaseMonitoringService(DatabaseClient databaseClient, MeterRegistry meterRegistry) {
+    public DatabaseMonitoringService(DatabaseClient databaseClient) {
         this.databaseClient = databaseClient;
-
-        // Initialize counters
-        this.queryCounter = Counter.builder("database.query.total")
-                .description("Total database queries executed")
-                .register(meterRegistry);
-
-        this.insertCounter = Counter.builder("database.insert.total")
-                .description("Total database insert operations")
-                .register(meterRegistry);
-
-        this.updateCounter = Counter.builder("database.update.total")
-                .description("Total database update operations")
-                .register(meterRegistry);
-
-        this.deleteCounter = Counter.builder("database.delete.total")
-                .description("Total database delete operations")
-                .register(meterRegistry);
-
-        this.errorCounter = Counter.builder("database.error.total")
-                .description("Total database errors")
-                .register(meterRegistry);
-
-        this.queryDurationTimer = Timer.builder("database.query.duration")
-                .description("Database query execution time")
-                .register(meterRegistry);
-
-        this.connectionTimeTimer = Timer.builder("database.connection.time")
-                .description("Database connection establishment time")
-                .register(meterRegistry);
     }
 
     /**
-     * Record database query execution
-     * @param operation Operation type (SELECT, INSERT, UPDATE, DELETE)
-     * @param query Query string
-     * @param duration Execution duration
+     * Get comprehensive database statistics
+     * @return Complete database monitoring information
      */
-    public void recordQuery(String operation, String query, Duration duration) {
-        queryCounter.increment();
-        queryDurationTimer.record(duration);
-
-        switch (operation.toUpperCase()) {
-            case "INSERT":
-                insertCounter.increment();
-                break;
-            case "UPDATE":
-                updateCounter.increment();
-                break;
-            case "DELETE":
-                deleteCounter.increment();
-                break;
-        }
-
-        logger.debug("Database query executed - Operation: {}, Duration: {}ms, Query: {}", 
-                operation, duration.toMillis(), query);
-    }
-
-    /**
-     * Record database error
-     * @param operation Operation type
-     * @param error Error information
-     */
-    public void recordError(String operation, Throwable error) {
-        errorCounter.increment();
-        logger.error("Database error - Operation: {}, Error: {}", operation, error.getMessage(), error);
-    }
-
-    /**
-     * Record connection establishment time
-     * @param duration Connection duration
-     */
-    public void recordConnectionTime(Duration duration) {
-        connectionTimeTimer.record(duration);
-        totalConnections.incrementAndGet();
-    }
-
-    /**
-     * Record active connection
-     */
-    public void recordActiveConnection() {
-        activeConnections.incrementAndGet();
-    }
-
-    /**
-     * Record idle connection
-     */
-    public void recordIdleConnection() {
-        idleConnections.incrementAndGet();
-    }
-
-    /**
-     * Record connection error
-     */
-    public void recordConnectionError() {
-        connectionErrors.incrementAndGet();
-    }
-
-    /**
-     * Get database connection statistics
-     * @return Connection statistics
-     */
-    public Mono<ConnectionStats> getConnectionStats() {
-        return Mono.fromCallable(() -> {
-            // Get connection pool information from database
-            return databaseClient.sql("SELECT 1")
-                    .fetch()
-                    .first()
-                    .map(result -> new ConnectionStats(
-                            totalConnections.get(),
-                            activeConnections.get(),
-                            idleConnections.get(),
-                            connectionErrors.get(),
-                            connectionTimeTimer.mean(java.util.concurrent.TimeUnit.MILLISECONDS)
-                    ))
-                    .onErrorReturn(new ConnectionStats(
-                            totalConnections.get(),
-                            activeConnections.get(),
-                            idleConnections.get(),
-                            connectionErrors.get(),
-                            connectionTimeTimer.mean(java.util.concurrent.TimeUnit.MILLISECONDS)
-                    ))
-                    .block();
-        });
-    }
-
-    /**
-     * Get database performance statistics
-     * @return Performance statistics
-     */
-    public Mono<PerformanceStats> getPerformanceStats() {
-        return Mono.fromCallable(() -> {
-            return new PerformanceStats(
-                    (long) queryCounter.count(),
-                    (long) insertCounter.count(),
-                    (long) updateCounter.count(),
-                    (long) deleteCounter.count(),
-                    (long) errorCounter.count(),
-                    queryDurationTimer.mean(java.util.concurrent.TimeUnit.MILLISECONDS),
-                    queryDurationTimer.max(java.util.concurrent.TimeUnit.MILLISECONDS),
-                    calculateErrorRate()
-            );
-        });
+    public Mono<DatabaseStats> getDatabaseStats() {
+        return Mono.zip(
+                getDatabaseHealth(),
+                getTableStats(),
+                getConnectionPoolStats()
+        ).map(tuple -> new DatabaseStats(
+                tuple.getT1(), // health
+                tuple.getT2(), // table stats
+                tuple.getT3()  // connection stats
+        )).onErrorReturn(new DatabaseStats(
+                new DatabaseHealth("DOWN", "Unknown", "Unknown", "Unknown", Instant.now(), "Connection failed"),
+                new TableStats(new HashMap<>(), 0, 0, 0, 0),
+                new ConnectionStats(0, 0, 0, 0, 0.0)
+        ));
     }
 
     /**
      * Get database health information
      * @return Database health information
      */
-    public Mono<DatabaseHealth> getDatabaseHealth() {
+    private Mono<DatabaseHealth> getDatabaseHealth() {
         return databaseClient.sql("SELECT version() as version, current_database() as database, current_user as user")
                 .fetch()
                 .first()
@@ -217,19 +78,22 @@ public class DatabaseMonitoringService {
      * Get database table statistics
      * @return Table statistics
      */
-    public Mono<TableStats> getTableStats() {
+    private Mono<TableStats> getTableStats() {
         return databaseClient.sql("""
                 SELECT 
-                    schemaname,
-                    tablename,
-                    n_tup_ins as inserts,
-                    n_tup_upd as updates,
-                    n_tup_del as deletes,
-                    n_live_tup as live_tuples,
-                    n_dead_tup as dead_tuples
-                FROM pg_stat_user_tables 
-                WHERE schemaname = 'public'
-                ORDER BY tablename
+                    t.table_name,
+                    COALESCE(s.n_tup_ins, 0) as inserts,
+                    COALESCE(s.n_tup_upd, 0) as updates,
+                    COALESCE(s.n_tup_del, 0) as deletes,
+                    COALESCE(s.n_live_tup, 0) as live_tuples,
+                    COALESCE(s.n_dead_tup, 0) as dead_tuples,
+                    COALESCE(c.reltuples::bigint, 0) as estimated_rows
+                FROM information_schema.tables t
+                LEFT JOIN pg_stat_user_tables s ON t.table_name = s.relname
+                LEFT JOIN pg_class c ON c.relname = t.table_name
+                WHERE t.table_schema = 'public' 
+                AND t.table_type = 'BASE TABLE'
+                ORDER BY t.table_name
                 """)
                 .fetch()
                 .all()
@@ -242,14 +106,18 @@ public class DatabaseMonitoringService {
                     long totalDeletes = 0;
 
                     for (Map<String, Object> row : rows) {
-                        String tableName = (String) row.get("tablename");
+                        String tableName = (String) row.get("table_name");
                         long liveTuples = ((Number) row.get("live_tuples")).longValue();
+                        long estimatedRows = ((Number) row.get("estimated_rows")).longValue();
                         long inserts = ((Number) row.get("inserts")).longValue();
                         long updates = ((Number) row.get("updates")).longValue();
                         long deletes = ((Number) row.get("deletes")).longValue();
 
-                        tables.put(tableName, new TableInfo(tableName, liveTuples, inserts, updates, deletes));
-                        totalRows += liveTuples;
+                        // Use estimated rows if live_tuples is 0 (for new tables)
+                        long actualRowCount = liveTuples > 0 ? liveTuples : estimatedRows;
+
+                        tables.put(tableName, new TableInfo(tableName, actualRowCount, inserts, updates, deletes));
+                        totalRows += actualRowCount;
                         totalInserts += inserts;
                         totalUpdates += updates;
                         totalDeletes += deletes;
@@ -261,15 +129,54 @@ public class DatabaseMonitoringService {
     }
 
     /**
-     * Calculate error rate
-     * @return Error rate percentage
+     * Get connection pool statistics from PostgreSQL
+     * @return Connection pool statistics
      */
-    private double calculateErrorRate() {
-        long totalOperations = (long) (queryCounter.count() + errorCounter.count());
-        if (totalOperations == 0) {
-            return 0.0;
+    private Mono<ConnectionStats> getConnectionPoolStats() {
+        return databaseClient.sql("""
+                SELECT 
+                    (SELECT setting::int FROM pg_settings WHERE name = 'max_connections') as max_connections,
+                    (SELECT count(*) FROM pg_stat_activity WHERE state = 'active') as active_connections,
+                    (SELECT count(*) FROM pg_stat_activity WHERE state = 'idle') as idle_connections,
+                    (SELECT count(*) FROM pg_stat_activity) as total_connections
+                """)
+                .fetch()
+                .first()
+                .map(result -> {
+                    int maxConnections = ((Number) result.get("max_connections")).intValue();
+                    int activeConnections = ((Number) result.get("active_connections")).intValue();
+                    int idleConnections = ((Number) result.get("idle_connections")).intValue();
+                    int totalConnections = ((Number) result.get("total_connections")).intValue();
+                    
+                    return new ConnectionStats(
+                            totalConnections,
+                            activeConnections,
+                            idleConnections,
+                            0, // connection errors - not easily available from pg_stat_activity
+                            0.0 // average connection time - not easily available
+                    );
+                })
+                .onErrorReturn(new ConnectionStats(0, 0, 0, 0, 0.0));
+    }
+
+    /**
+     * Comprehensive database statistics information class
+     */
+    public static class DatabaseStats {
+        private final DatabaseHealth health;
+        private final TableStats tableStats;
+        private final ConnectionStats connectionStats;
+
+        public DatabaseStats(DatabaseHealth health, TableStats tableStats, ConnectionStats connectionStats) {
+            this.health = health;
+            this.tableStats = tableStats;
+            this.connectionStats = connectionStats;
         }
-        return (errorCounter.count() / totalOperations) * 100.0;
+
+        // Getters
+        public DatabaseHealth getHealth() { return health; }
+        public TableStats getTableStats() { return tableStats; }
+        public ConnectionStats getConnectionStats() { return connectionStats; }
     }
 
     /**
@@ -299,42 +206,6 @@ public class DatabaseMonitoringService {
         public double getAverageConnectionTime() { return averageConnectionTime; }
     }
 
-    /**
-     * Performance statistics information class
-     */
-    public static class PerformanceStats {
-        private final long totalQueries;
-        private final long totalInserts;
-        private final long totalUpdates;
-        private final long totalDeletes;
-        private final long totalErrors;
-        private final double averageQueryTime;
-        private final double maxQueryTime;
-        private final double errorRate;
-
-        public PerformanceStats(long totalQueries, long totalInserts, long totalUpdates, 
-                              long totalDeletes, long totalErrors, double averageQueryTime, 
-                              double maxQueryTime, double errorRate) {
-            this.totalQueries = totalQueries;
-            this.totalInserts = totalInserts;
-            this.totalUpdates = totalUpdates;
-            this.totalDeletes = totalDeletes;
-            this.totalErrors = totalErrors;
-            this.averageQueryTime = averageQueryTime;
-            this.maxQueryTime = maxQueryTime;
-            this.errorRate = errorRate;
-        }
-
-        // Getters
-        public long getTotalQueries() { return totalQueries; }
-        public long getTotalInserts() { return totalInserts; }
-        public long getTotalUpdates() { return totalUpdates; }
-        public long getTotalDeletes() { return totalDeletes; }
-        public long getTotalErrors() { return totalErrors; }
-        public double getAverageQueryTime() { return averageQueryTime; }
-        public double getMaxQueryTime() { return maxQueryTime; }
-        public double getErrorRate() { return errorRate; }
-    }
 
     /**
      * Database health information class

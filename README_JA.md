@@ -43,11 +43,8 @@ Spring Boot 3.x、R2DBC、WebFluxをベースとしたリアクティブ従業�
 
 ### エンタープライズ機能
 
-#### 🔄 キャッシュとレート制限
+#### 🔄 レート制限
 
-  - 従業員情報キャッシュ: 30分TTL
-  - 従業員検索キャッシュ: 15分TTL
-  - ページネーションキャッシュ: 10分TTL
 - **レート制限**: 異なる操作タイプに異なる制限（20-100リクエスト/分）
 
 #### 🗄️ データベース監査
@@ -96,7 +93,6 @@ src/
 ├── main/
 │   ├── java/jp/asatex/revenue_calculator_backend_employee/
 │   │   ├── config/           # 設定クラス
-│   │   │   ├── CacheConfig.java
 │   │   │   ├── JacksonConfig.java
 │   │   │   ├── MetricsConfig.java
 │   │   │   ├── MultiLanguageOpenApiConfig.java
@@ -122,7 +118,6 @@ src/
 │   │   │   ├── EmployeeRepository.java
 │   │   ├── service/         # ビジネスロジック層
 │   │   │   ├── EmployeeService.java
-│   │   │   ├── CacheMonitoringService.java
 │   │   │   └── TransactionMonitoringService.java
 │   │   ├── util/            # ユーティリティクラス
 │   │   │   └── LoggingUtil.java
@@ -339,13 +334,6 @@ GET /api/v1/employee/health
 
 ### 監視エンドポイント
 
-#### キャッシュ監視
-
-```http
-GET /api/v1/monitoring/cache/stats
-DELETE /api/v1/monitoring/cache/clear
-DELETE /api/v1/monitoring/cache/clear/{cacheName}
-```
 
 #### データベース監査
 
@@ -421,7 +409,6 @@ POST /api/v1/monitoring/logs/reset
 - **パラメータ検証テスト** - 入力検証テスト
 - **統合テスト** - エンドツーエンドテスト
 - **設定テスト** - 設定クラステスト
-- **キャッシュテスト** - キャッシュ機能テスト
 - **レート制限テスト** - レート制限機能テスト
 - **トランザクションテスト** - トランザクション管理テスト
 - **監査テスト** - データベース監査テスト
@@ -541,8 +528,6 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
 - `employee.update.total` - 従業員更新総数
 - `employee.delete.total` - 従業員削除総数
 - `employee.query.total` - 従業員クエリ総数
-- `cache.hits.total` - キャッシュヒット総数
-- `cache.misses.total` - キャッシュミス総数
 - `rate.limit.triggered.total` - レート制限トリガー総数
 - `transaction.start` - トランザクション開始回数
 - `transaction.commit` - トランザクションコミット回数
@@ -897,12 +882,6 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 
 ## 📈 パフォーマンス最適化
 
-### キャッシュ戦略
-
-- **従業員情報キャッシュ**: 30分TTL
-- **従業員検索キャッシュ**: 15分TTL
-- **ページネーションキャッシュ**: 10分TTL
-- **自動キャッシュ無効化**: 書き込み操作時の関連キャッシュクリア
 
 ### リアクティブプログラミング
 
