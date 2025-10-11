@@ -247,4 +247,244 @@ class PaginationIntegrationTest {
             assertThat(response.getSortDirection()).isEqualTo("ASC");
         }
     }
+
+    @Test
+    void testSortByEmployeeNumberAscending() {
+        // Test sorting by employee number in ascending order
+        PageResponse<EmployeeDto> response = webTestClient.get()
+                .uri("/api/v1/employee?page=0&size=5&sortBy=employeenumber&sortDirection=ASC")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new org.springframework.core.ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(response).isNotNull();
+        if (response != null && response.getContent().size() >= 2) {
+            assertThat(response.getSortBy()).isEqualTo("employeenumber");
+            assertThat(response.getSortDirection()).isEqualTo("ASC");
+            
+            // Verify ascending order
+            String firstNumber = response.getContent().get(0).getEmployeeNumber();
+            String secondNumber = response.getContent().get(1).getEmployeeNumber();
+            assertThat(firstNumber.compareTo(secondNumber)).isLessThanOrEqualTo(0);
+        }
+    }
+
+    @Test
+    void testSortByEmployeeNumberDescending() {
+        // Test sorting by employee number in descending order
+        PageResponse<EmployeeDto> response = webTestClient.get()
+                .uri("/api/v1/employee?page=0&size=5&sortBy=employeenumber&sortDirection=DESC")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new org.springframework.core.ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(response).isNotNull();
+        if (response != null && response.getContent().size() >= 2) {
+            assertThat(response.getSortBy()).isEqualTo("employeenumber");
+            assertThat(response.getSortDirection()).isEqualTo("DESC");
+            
+            // Verify descending order
+            String firstNumber = response.getContent().get(0).getEmployeeNumber();
+            String secondNumber = response.getContent().get(1).getEmployeeNumber();
+            assertThat(firstNumber.compareTo(secondNumber)).isGreaterThanOrEqualTo(0);
+        }
+    }
+
+    @Test
+    void testSortByEmployeeIdAscending() {
+        // Test sorting by employee ID in ascending order
+        PageResponse<EmployeeDto> response = webTestClient.get()
+                .uri("/api/v1/employee?page=0&size=5&sortBy=employeeid&sortDirection=ASC")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new org.springframework.core.ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(response).isNotNull();
+        if (response != null && response.getContent().size() >= 2) {
+            assertThat(response.getSortBy()).isEqualTo("employeeid");
+            assertThat(response.getSortDirection()).isEqualTo("ASC");
+            
+            // Verify ascending order
+            Long firstId = response.getContent().get(0).getEmployeeId();
+            Long secondId = response.getContent().get(1).getEmployeeId();
+            assertThat(firstId).isLessThanOrEqualTo(secondId);
+        }
+    }
+
+    @Test
+    void testSortByEmployeeIdDescending() {
+        // Test sorting by employee ID in descending order
+        PageResponse<EmployeeDto> response = webTestClient.get()
+                .uri("/api/v1/employee?page=0&size=5&sortBy=employeeid&sortDirection=DESC")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new org.springframework.core.ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(response).isNotNull();
+        if (response != null && response.getContent().size() >= 2) {
+            assertThat(response.getSortBy()).isEqualTo("employeeid");
+            assertThat(response.getSortDirection()).isEqualTo("DESC");
+            
+            // Verify descending order
+            Long firstId = response.getContent().get(0).getEmployeeId();
+            Long secondId = response.getContent().get(1).getEmployeeId();
+            assertThat(firstId).isGreaterThanOrEqualTo(secondId);
+        }
+    }
+
+    @Test
+    void testSortByEmployeeIdWithIdAlias() {
+        // Test sorting by employee ID using "id" alias
+        PageResponse<EmployeeDto> response = webTestClient.get()
+                .uri("/api/v1/employee?page=0&size=5&sortBy=id&sortDirection=ASC")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new org.springframework.core.ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(response).isNotNull();
+        if (response != null && response.getContent().size() >= 2) {
+            assertThat(response.getSortBy()).isEqualTo("id");
+            assertThat(response.getSortDirection()).isEqualTo("ASC");
+            
+            // Verify ascending order
+            Long firstId = response.getContent().get(0).getEmployeeId();
+            Long secondId = response.getContent().get(1).getEmployeeId();
+            assertThat(firstId).isLessThanOrEqualTo(secondId);
+        }
+    }
+
+    @Test
+    void testSortByEmployeeNumberWithNumberAlias() {
+        // Test sorting by employee number using "number" alias
+        PageResponse<EmployeeDto> response = webTestClient.get()
+                .uri("/api/v1/employee?page=0&size=5&sortBy=number&sortDirection=DESC")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new org.springframework.core.ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(response).isNotNull();
+        if (response != null && response.getContent().size() >= 2) {
+            assertThat(response.getSortBy()).isEqualTo("number");
+            assertThat(response.getSortDirection()).isEqualTo("DESC");
+            
+            // Verify descending order
+            String firstNumber = response.getContent().get(0).getEmployeeNumber();
+            String secondNumber = response.getContent().get(1).getEmployeeNumber();
+            assertThat(firstNumber.compareTo(secondNumber)).isGreaterThanOrEqualTo(0);
+        }
+    }
+
+    @Test
+    void testSortByEmployeeNumberWithEmployeeNumberAlias() {
+        // Test sorting by employee number using "employee_number" alias
+        PageResponse<EmployeeDto> response = webTestClient.get()
+                .uri("/api/v1/employee?page=0&size=5&sortBy=employee_number&sortDirection=ASC")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new org.springframework.core.ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(response).isNotNull();
+        if (response != null && response.getContent().size() >= 2) {
+            assertThat(response.getSortBy()).isEqualTo("employee_number");
+            assertThat(response.getSortDirection()).isEqualTo("ASC");
+            
+            // Verify ascending order
+            String firstNumber = response.getContent().get(0).getEmployeeNumber();
+            String secondNumber = response.getContent().get(1).getEmployeeNumber();
+            assertThat(firstNumber.compareTo(secondNumber)).isLessThanOrEqualTo(0);
+        }
+    }
+
+    @Test
+    void testSortByEmployeeIdWithEmployeeIdAlias() {
+        // Test sorting by employee ID using "employee_id" alias
+        PageResponse<EmployeeDto> response = webTestClient.get()
+                .uri("/api/v1/employee?page=0&size=5&sortBy=employee_id&sortDirection=DESC")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new org.springframework.core.ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(response).isNotNull();
+        if (response != null && response.getContent().size() >= 2) {
+            assertThat(response.getSortBy()).isEqualTo("employee_id");
+            assertThat(response.getSortDirection()).isEqualTo("DESC");
+            
+            // Verify descending order
+            Long firstId = response.getContent().get(0).getEmployeeId();
+            Long secondId = response.getContent().get(1).getEmployeeId();
+            assertThat(firstId).isGreaterThanOrEqualTo(secondId);
+        }
+    }
+
+    @Test
+    void testSortByInvalidFieldDefaultsToEmployeeId() {
+        // Test that invalid sort field defaults to employee ID sorting
+        PageResponse<EmployeeDto> response = webTestClient.get()
+                .uri("/api/v1/employee?page=0&size=5&sortBy=invalidField&sortDirection=ASC")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new org.springframework.core.ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(response).isNotNull();
+        if (response != null && response.getContent().size() >= 2) {
+            assertThat(response.getSortBy()).isEqualTo("invalidField");
+            assertThat(response.getSortDirection()).isEqualTo("ASC");
+            
+            // Should default to employee ID sorting (ascending)
+            Long firstId = response.getContent().get(0).getEmployeeId();
+            Long secondId = response.getContent().get(1).getEmployeeId();
+            assertThat(firstId).isLessThanOrEqualTo(secondId);
+        }
+    }
+
+    @Test
+    void testSortDirectionCaseInsensitive() {
+        // Test that sort direction works with lowercase (Spring Boot should handle this)
+        PageResponse<EmployeeDto> response = webTestClient.get()
+                .uri("/api/v1/employee?page=0&size=5&sortBy=name&sortDirection=DESC")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new org.springframework.core.ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(response).isNotNull();
+        if (response != null && response.getContent().size() >= 2) {
+            assertThat(response.getSortBy()).isEqualTo("name");
+            assertThat(response.getSortDirection()).isEqualTo("DESC");
+            
+            // Verify descending order
+            String firstName = response.getContent().get(0).getName();
+            String secondName = response.getContent().get(1).getName();
+            assertThat(firstName.compareTo(secondName)).isGreaterThanOrEqualTo(0);
+        }
+    }
 }

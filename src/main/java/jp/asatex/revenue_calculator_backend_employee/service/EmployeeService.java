@@ -256,6 +256,33 @@ public class EmployeeService {
                 .map(this::convertToDto)
                 .collectList()
                 .map(employees -> {
+                    // Apply sorting
+                    employees.sort((e1, e2) -> {
+                        String sortBy = pageRequest.getSortBy().toLowerCase();
+                        boolean isDesc = pageRequest.getSortDirection().toString().equals("DESC");
+                        
+                        int comparison = 0;
+                        switch (sortBy) {
+                            case "employeeid":
+                            case "employee_id":
+                            case "id":
+                                comparison = e1.getEmployeeId().compareTo(e2.getEmployeeId());
+                                break;
+                            case "name":
+                                comparison = e1.getName().compareTo(e2.getName());
+                                break;
+                            case "employeenumber":
+                            case "employee_number":
+                            case "number":
+                                comparison = e1.getEmployeeNumber().compareTo(e2.getEmployeeNumber());
+                                break;
+                            default:
+                                comparison = e1.getEmployeeId().compareTo(e2.getEmployeeId());
+                        }
+                        
+                        return isDesc ? -comparison : comparison;
+                    });
+                    
                     int totalElements = employees.size();
                     int startIndex = pageRequest.getPage() * pageRequest.getSize();
                     int endIndex = Math.min(startIndex + pageRequest.getSize(), totalElements);
