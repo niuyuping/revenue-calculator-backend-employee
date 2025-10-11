@@ -47,14 +47,12 @@ A reactive employee management system backend service based on Spring Boot 3.x, 
 
 - **Rate Limiting**: Different limits for different operations (20-100 requests/minute)
 
-
 #### 🔄 Transaction Management
 
 - **ACID Compliance**: R2DBC-based transaction support
 - **Automatic Transaction Management**: `@Transactional` annotation support
 - **Transaction Monitoring**: Real-time transaction tracking
 - **Performance Metrics**: Transaction execution time monitoring
-
 
 ### Data Validation
 
@@ -157,8 +155,7 @@ src/
    createdb employee
    ```
 
-
-4. **Application configuration**
+3. **Application configuration**
 
    Edit `src/main/resources/application.properties`:
 
@@ -175,13 +172,13 @@ src/
    spring.flyway.password=your_password
    ```
 
-5. **Run the application**
+4. **Run the application**
 
    ```bash
    ./gradlew bootRun
    ```
 
-6. **Verify the application**
+5. **Verify the application**
 
    ```bash
    curl http://localhost:9001/api/v1/employee/health
@@ -321,7 +318,6 @@ GET /api/v1/employee/health
 
 ### Monitoring Endpoints
 
-
 #### Database Audit
 
 ```http
@@ -440,9 +436,11 @@ logging.file.name=logs/revenue-calculator-employee.log
 ### Environment Variables
 
 **Development Environment Variables:**
+
 - `DB_PASSWORD` - Database password
 
 **Production Environment Variables:**
+
 - `PORT` - Server port (default: 8080)
 - `DB_URL` - Database connection URL
 - `DB_USER` - Database username
@@ -610,7 +608,7 @@ The project uses Flyway for database version management:
 
 This section provides comprehensive production deployment instructions for Google Cloud Run.
 
-##### Prerequisites
+##### Deployment Prerequisites
 
 - Google Cloud Project with billing enabled
 - Cloud SQL PostgreSQL instance
@@ -628,7 +626,8 @@ This section provides comprehensive production deployment instructions for Googl
    - Select **"Deploy one container from source"**
 
 3. **Configure Source Code**
-   ```
+
+   ```text
    Source: Deploy from source repository
    Repository type: GitHub
    Repository: Select your GitHub repository
@@ -638,7 +637,8 @@ This section provides comprehensive production deployment instructions for Googl
    ```
 
 4. **Configure Service Settings**
-   ```
+
+   ```text
    Service name: revenue-calculator-employee
    Region: your-region
    CPU allocation: CPU is only allocated during request processing
@@ -647,7 +647,8 @@ This section provides comprehensive production deployment instructions for Googl
    ```
 
 5. **Configure Container Settings**
-   ```
+
+   ```text
    Port: 9001
    Memory: 1 GiB (recommended) or 2 GiB (if memory issues persist)
    CPU: 2
@@ -656,7 +657,8 @@ This section provides comprehensive production deployment instructions for Googl
    ```
 
 6. **Configure Environment Variables**
-   ```
+
+   ```text
    SPRING_PROFILES_ACTIVE: prod
    DB_URL: r2dbc:postgresql://your-db-host:5432/employee
    DB_USER: your-db-username
@@ -684,6 +686,7 @@ This section provides comprehensive production deployment instructions for Googl
 ##### Method 2: Command Line Deployment
 
 1. **Build Docker Image**
+
    ```bash
    # Build image
    docker build -t gcr.io/your-project-id/revenue-calculator-backend-employee .
@@ -693,6 +696,7 @@ This section provides comprehensive production deployment instructions for Googl
    ```
 
 2. **Deploy to Cloud Run**
+
    ```bash
    gcloud run deploy revenue-calculator-employee \
      --image gcr.io/your-project-id/revenue-calculator-backend-employee \
@@ -718,6 +722,7 @@ This section provides comprehensive production deployment instructions for Googl
 ##### Environment Variables Configuration
 
 **Required Environment Variables:**
+
 ```bash
 # Application configuration
 SPRING_PROFILES_ACTIVE=prod
@@ -731,6 +736,7 @@ FLYWAY_URL=jdbc:postgresql://your-db-host:5432/employee
 ```
 
 **Optional Environment Variables:**
+
 ```bash
 # Database connection pool configuration
 DB_POOL_MAX_SIZE=5
@@ -743,6 +749,7 @@ DB_POOL_MAX_LIFE_TIME=PT15M
 **VPC Connection Setup:**
 
 1. **Create VPC Connector:**
+
    ```bash
    # Create a VPC connector for Cloud Run to access Cloud SQL
    gcloud compute networks vpc-access connectors create your-vpc-connector \
@@ -754,6 +761,7 @@ DB_POOL_MAX_LIFE_TIME=PT15M
    ```
 
 2. **Database User Setup:**
+
    ```sql
    -- Create database user with password authentication
    CREATE USER your-db-username WITH PASSWORD 'your-db-password';
@@ -768,6 +776,7 @@ DB_POOL_MAX_LIFE_TIME=PT15M
    - In Cloud Run console, confirm service status is **"Running"**
 
 2. **Test Health Check**
+
    ```bash
    # Get service URL
    SERVICE_URL=$(gcloud run services describe revenue-calculator-employee \
@@ -810,6 +819,7 @@ DB_POOL_MAX_LIFE_TIME=PT15M
    - Check database connection
 
 **Useful Commands:**
+
 ```bash
 # View service logs
 gcloud run services logs read revenue-calculator-employee --region=your-region
@@ -830,7 +840,7 @@ gcloud builds list --limit=5
 5. **Database Security**: Use strong passwords and limit database user permissions
 6. **VPC Connector**: Ensure VPC connector has appropriate network access controls
 
-### Production Environment Configuration
+### Production Environment Configuration Example
 
 ```properties
 # Production environment configuration
@@ -868,7 +878,6 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 - Security event logging
 
 ## 📈 Performance Optimization
-
 
 ### Reactive Programming
 

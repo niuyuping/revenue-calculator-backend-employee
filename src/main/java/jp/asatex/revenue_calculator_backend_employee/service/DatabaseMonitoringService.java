@@ -1,10 +1,5 @@
 package jp.asatex.revenue_calculator_backend_employee.service;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -20,7 +15,6 @@ import java.util.Map;
 @Service
 public class DatabaseMonitoringService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseMonitoringService.class);
 
     private final DatabaseClient databaseClient;
 
@@ -143,7 +137,6 @@ public class DatabaseMonitoringService {
                 .fetch()
                 .first()
                 .map(result -> {
-                    int maxConnections = ((Number) result.get("max_connections")).intValue();
                     int activeConnections = ((Number) result.get("active_connections")).intValue();
                     int idleConnections = ((Number) result.get("idle_connections")).intValue();
                     int totalConnections = ((Number) result.get("total_connections")).intValue();

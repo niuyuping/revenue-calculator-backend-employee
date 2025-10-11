@@ -270,7 +270,6 @@ public class EmployeeService {
                 .collectList()
                 .map(employees -> {
                     int totalElements = employees.size();
-                    int totalPages = (int) Math.ceil((double) totalElements / pageRequest.getSize());
                     int startIndex = pageRequest.getPage() * pageRequest.getSize();
                     int endIndex = Math.min(startIndex + pageRequest.getSize(), totalElements);
                     

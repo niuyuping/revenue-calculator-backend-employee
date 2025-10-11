@@ -47,14 +47,12 @@
 
 - **限流保护**: 不同操作类型设置不同限制（20-100请求/分钟）
 
-
 #### 🔄 事务管理
 
 - **ACID合规**: 基于R2DBC的事务支持
 - **自动事务管理**: `@Transactional`注解支持
 - **事务监控**: 实时事务跟踪
 - **性能指标**: 事务执行时间监控
-
 
 ### 数据验证
 
@@ -157,8 +155,7 @@ src/
    createdb employee
    ```
 
-
-4. **应用配置**
+3. **应用配置**
 
    编辑 `src/main/resources/application.properties`:
 
@@ -175,13 +172,13 @@ src/
    spring.flyway.password=your_password
    ```
 
-5. **运行应用**
+4. **运行应用**
 
    ```bash
    ./gradlew bootRun
    ```
 
-6. **验证运行**
+5. **验证运行**
 
    ```bash
    curl http://localhost:9001/api/v1/employee/health
@@ -321,14 +318,11 @@ GET /api/v1/employee/health
 
 ### 监控端点
 
-
-
 #### 事务监控
 
 ```http
 GET /api/v1/monitoring/transaction/stats
 ```
-
 
 ### 错误响应格式
 
@@ -422,9 +416,11 @@ logging.file.name=logs/revenue-calculator-employee.log
 ### 环境变量
 
 **开发环境环境变量:**
+
 - `DB_PASSWORD` - 数据库密码
 
 **生产环境环境变量:**
+
 - `PORT` - 服务器端口 (默认: 8080)
 - `DB_URL` - 数据库连接URL
 - `DB_USER` - 数据库用户名
@@ -467,16 +463,18 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
 
 ### 自定义监控端点
 
-#### **数据库监控**:
+#### **数据库监控**
+
 - `GET /api/v1/monitoring/database/stats` - 综合数据库统计信息（包含健康状态、连接统计、表统计）
 
+#### **事务监控**
 
-#### **事务监控**:
 - `GET /api/v1/monitoring/transaction/stats` - 事务统计信息
 
 ### 健康检查响应示例
 
 **基础健康检查** (生产环境默认):
+
 ```json
 {
   "status": "UP"
@@ -484,6 +482,7 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
 ```
 
 **详细健康检查** (配置 `show-details=when-authorized` 后):
+
 ```json
 {
   "status": "UP",
@@ -508,15 +507,12 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
 }
 ```
 
-  }
-}
-```
+### 监控端点详细说明
 
-### 自定义监控端点
+#### 数据库监控端点
 
-#### **数据库监控端点**:
+##### 综合数据库统计信息
 
-**综合数据库统计信息**:
 ```json
 {
   "health": {
@@ -559,7 +555,6 @@ spring.r2dbc.pool.initial-size=${DB_POOL_INITIAL_SIZE:2}
 }
 ```
 
-
 ### 生产环境监控使用说明
 
 #### 1. **部署更新后的配置**
@@ -594,13 +589,14 @@ curl https://your-domain.com/api/v1/monitoring/transaction/stats
 
 #### 3. **连接状态判断**
 
+##### 数据库连接状态
 
-**数据库连接状态**:
 - **正常状态**: `"db": {"status": "UP"}` 且 `"status": "Connected"`
 - **连接失败**: `"db": {"status": "DOWN"}` 且包含错误信息
 - **性能问题**: 检查 `errorRate` 和 `averageQueryTime` 指标
 
-**数据库性能监控**:
+##### 数据库性能监控
+
 - **查询性能**: `averageQueryTime` < 100ms 为正常
 - **错误率**: `errorRate` < 1% 为正常
 - **连接池**: `activeConnections` 不应超过 `totalConnections` 的80%
@@ -608,7 +604,9 @@ curl https://your-domain.com/api/v1/monitoring/transaction/stats
 #### 4. **常见问题解决**
 
 **Favicon 500错误**:
+
 如果生产环境出现favicon.ico的500错误，已通过以下方式解决：
+
 - 添加了favicon.ico文件到 `src/main/resources/static/`
 - 配置了WebFlux静态资源处理
 - 添加了全局异常处理器
@@ -659,7 +657,6 @@ CREATE TABLE employees (
 );
 ```
 
-
 ### 数据库约束
 
 - 员工编号唯一性约束
@@ -699,7 +696,7 @@ CREATE TABLE employees (
 
 本节提供Google Cloud Run的完整生产环境部署说明。
 
-##### 前提条件
+##### 部署前提条件
 
 - 已启用计费的Google Cloud项目
 - Cloud SQL PostgreSQL实例
@@ -717,7 +714,8 @@ CREATE TABLE employees (
    - 选择 **"从头开始部署一个容器"**
 
 3. **配置源代码**
-   ```
+
+   ```text
    源代码: 从源代码仓库部署
    仓库类型: GitHub
    仓库: 选择您的GitHub仓库
@@ -727,7 +725,8 @@ CREATE TABLE employees (
    ```
 
 4. **配置服务设置**
-   ```
+
+   ```text
    服务名称: revenue-calculator-employee
    区域: your-region
    CPU分配: CPU仅在有请求时分配
@@ -736,7 +735,8 @@ CREATE TABLE employees (
    ```
 
 5. **配置容器设置**
-   ```
+
+   ```text
    端口: 9001
    内存: 1 GiB (推荐) 或 2 GiB (如果仍有内存问题)
    CPU: 2
@@ -745,7 +745,8 @@ CREATE TABLE employees (
    ```
 
 6. **配置环境变量**
-   ```
+
+   ```text
    SPRING_PROFILES_ACTIVE: prod
    DB_URL: r2dbc:postgresql://your-db-host:5432/employee
    DB_USER: your-db-username
@@ -773,6 +774,7 @@ CREATE TABLE employees (
 ##### 方法二：命令行部署
 
 1. **构建Docker镜像**
+
    ```bash
    # 构建镜像
    docker build -t gcr.io/your-project-id/revenue-calculator-backend-employee .
@@ -782,6 +784,7 @@ CREATE TABLE employees (
    ```
 
 2. **部署到Cloud Run**
+
    ```bash
    gcloud run deploy revenue-calculator-employee \
      --image gcr.io/your-project-id/revenue-calculator-backend-employee \
@@ -807,6 +810,7 @@ CREATE TABLE employees (
 ##### 环境变量配置
 
 **必需的环境变量：**
+
 ```bash
 # 应用配置
 SPRING_PROFILES_ACTIVE=prod
@@ -820,6 +824,7 @@ FLYWAY_URL=jdbc:postgresql://your-db-host:5432/employee
 ```
 
 **可选的环境变量：**
+
 ```bash
 # 数据库连接池配置
 DB_POOL_MAX_SIZE=5
@@ -832,6 +837,7 @@ DB_POOL_MAX_LIFE_TIME=PT15M
 **VPC连接设置：**
 
 1. **创建VPC连接器：**
+
    ```bash
    # 为Cloud Run创建VPC连接器以访问Cloud SQL
    gcloud compute networks vpc-access connectors create your-vpc-connector \
@@ -843,6 +849,7 @@ DB_POOL_MAX_LIFE_TIME=PT15M
    ```
 
 2. **数据库用户设置：**
+
    ```sql
    -- 创建带密码认证的数据库用户
    CREATE USER your-db-username WITH PASSWORD 'your-db-password';
@@ -857,6 +864,7 @@ DB_POOL_MAX_LIFE_TIME=PT15M
    - 在Cloud Run控制台中，确认服务状态为 **"正在运行"**
 
 2. **测试健康检查**
+
    ```bash
    # 获取服务URL
    SERVICE_URL=$(gcloud run services describe revenue-calculator-employee \
@@ -899,6 +907,7 @@ DB_POOL_MAX_LIFE_TIME=PT15M
    - 检查数据库连接
 
 **有用的命令：**
+
 ```bash
 # 查看服务日志
 gcloud run services logs read revenue-calculator-employee --region=your-region
@@ -919,7 +928,7 @@ gcloud builds list --limit=5
 5. **数据库安全**：使用强密码并限制数据库用户权限
 6. **VPC连接器**：确保VPC连接器具有适当的网络访问控制
 
-### 生产环境配置
+### 生产环境配置示例
 
 ```properties
 # 生产环境配置
@@ -957,7 +966,6 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 - 安全事件记录
 
 ## 📈 性能优化
-
 
 ### 响应式编程
 

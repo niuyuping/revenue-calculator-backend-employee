@@ -2,6 +2,7 @@ package jp.asatex.revenue_calculator_backend_employee.config;
 
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.core.annotation.Order;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -14,7 +15,8 @@ import reactor.core.publisher.Mono;
 public class SystemExceptionHandler implements ErrorWebExceptionHandler {
 
     @Override
-    public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
+    @NonNull
+    public Mono<Void> handle(@NonNull ServerWebExchange exchange, @NonNull Throwable ex) {
         // Handle favicon.ico requests gracefully - just return empty response to prevent 500 errors
         if (exchange.getRequest().getURI().getPath().equals("/favicon.ico")) {
             return Mono.empty();

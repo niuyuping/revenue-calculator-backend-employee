@@ -170,8 +170,7 @@ src/
    createdb employee
    ```
 
-
-4. **アプリケーション設定**
+3. **アプリケーション設定**
 
    `src/main/resources/application.properties`を編集:
 
@@ -188,13 +187,13 @@ src/
    spring.flyway.password=your_password
    ```
 
-5. **アプリケーションの実行**
+4. **アプリケーションの実行**
 
    ```bash
    ./gradlew bootRun
    ```
 
-6. **動作確認**
+5. **動作確認**
 
    ```bash
    curl http://localhost:9001/api/v1/employee/health
@@ -334,7 +333,6 @@ GET /api/v1/employee/health
 
 ### 監視エンドポイント
 
-
 #### データベース監査
 
 ```http
@@ -453,9 +451,11 @@ logging.file.name=logs/revenue-calculator-employee.log
 ### 環境変数
 
 **開発環境環境変数:**
+
 - `DB_PASSWORD` - データベースパスワード
 
 **本番環境環境変数:**
+
 - `PORT` - サーバーポート（デフォルト: 8080）
 - `DB_URL` - データベース接続URL
 - `DB_USER` - データベースユーザー名
@@ -623,7 +623,7 @@ CREATE TABLE database_audit_logs (
 
 このセクションでは、Google Cloud Runの包括的な本番環境デプロイ手順を提供します。
 
-##### 前提条件
+##### デプロイ前提条件
 
 - 課金が有効なGoogle Cloudプロジェクト
 - Cloud SQL PostgreSQLインスタンス
@@ -641,7 +641,8 @@ CREATE TABLE database_audit_logs (
    - **「ソースからコンテナを1つデプロイ」**を選択
 
 3. **ソースコードを設定**
-   ```
+
+   ```text
    ソース: ソースリポジトリからデプロイ
    リポジトリタイプ: GitHub
    リポジトリ: GitHubリポジトリを選択
@@ -651,7 +652,8 @@ CREATE TABLE database_audit_logs (
    ```
 
 4. **サービス設定を設定**
-   ```
+
+   ```text
    サービス名: revenue-calculator-employee
    リージョン: your-region
    CPU割り当て: リクエスト処理中のみCPUを割り当て
@@ -660,7 +662,8 @@ CREATE TABLE database_audit_logs (
    ```
 
 5. **コンテナ設定を設定**
-   ```
+
+   ```text
    ポート: 9001
    メモリ: 1 GiB（推奨）または2 GiB（メモリ問題が続く場合）
    CPU: 2
@@ -669,7 +672,8 @@ CREATE TABLE database_audit_logs (
    ```
 
 6. **環境変数を設定**
-   ```
+
+   ```text
    SPRING_PROFILES_ACTIVE: prod
    DB_URL: r2dbc:postgresql://your-db-host:5432/employee
    DB_USER: your-db-username
@@ -697,6 +701,7 @@ CREATE TABLE database_audit_logs (
 ##### 方法2：コマンドラインデプロイ
 
 1. **Dockerイメージをビルド**
+
    ```bash
    # イメージをビルド
    docker build -t gcr.io/your-project-id/revenue-calculator-backend-employee .
@@ -706,6 +711,7 @@ CREATE TABLE database_audit_logs (
    ```
 
 2. **Cloud Runにデプロイ**
+
    ```bash
    gcloud run deploy revenue-calculator-employee \
      --image gcr.io/your-project-id/revenue-calculator-backend-employee \
@@ -731,6 +737,7 @@ CREATE TABLE database_audit_logs (
 ##### 環境変数設定
 
 **必要な環境変数：**
+
 ```bash
 # アプリケーション設定
 SPRING_PROFILES_ACTIVE=prod
@@ -744,6 +751,7 @@ FLYWAY_URL=jdbc:postgresql://your-db-host:5432/employee
 ```
 
 **オプションの環境変数：**
+
 ```bash
 # データベース接続プール設定
 DB_POOL_MAX_SIZE=5
@@ -756,6 +764,7 @@ DB_POOL_MAX_LIFE_TIME=PT15M
 **VPC接続設定：**
 
 1. **VPCコネクタの作成：**
+
    ```bash
    # Cloud RunがCloud SQLにアクセスするためのVPCコネクタを作成
    gcloud compute networks vpc-access connectors create your-vpc-connector \
@@ -767,6 +776,7 @@ DB_POOL_MAX_LIFE_TIME=PT15M
    ```
 
 2. **データベースユーザー設定：**
+
    ```sql
    -- パスワード認証でデータベースユーザーを作成
    CREATE USER your-db-username WITH PASSWORD 'your-db-password';
@@ -781,6 +791,7 @@ DB_POOL_MAX_LIFE_TIME=PT15M
    - Cloud Runコンソールで、サービス状態が**「実行中」**であることを確認
 
 2. **ヘルスチェックをテスト**
+
    ```bash
    # サービスURLを取得
    SERVICE_URL=$(gcloud run services describe revenue-calculator-employee \
@@ -823,6 +834,7 @@ DB_POOL_MAX_LIFE_TIME=PT15M
    - データベース接続を確認
 
 **便利なコマンド：**
+
 ```bash
 # サービスログを表示
 gcloud run services logs read revenue-calculator-employee --region=your-region
@@ -843,7 +855,7 @@ gcloud builds list --limit=5
 5. **データベースセキュリティ**：強力なパスワードを使用し、データベースユーザー権限を制限
 6. **VPCコネクタ**：VPCコネクタが適切なネットワークアクセス制御を持っていることを確認
 
-### 本番環境設定
+### 本番環境設定例
 
 ```properties
 # 本番環境設定
@@ -881,7 +893,6 @@ logging.level.jp.asatex.revenue_calculator_backend_employee=INFO
 - セキュリティイベントログ
 
 ## 📈 パフォーマンス最適化
-
 
 ### リアクティブプログラミング
 
