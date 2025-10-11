@@ -19,9 +19,9 @@ public class ValidationConfig implements WebFluxConfigurer {
     }
 
     @Bean
-    public MethodValidationPostProcessor methodValidationPostProcessor() {
+    public static MethodValidationPostProcessor methodValidationPostProcessor() {
         MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
-        processor.setValidator(validator());
+        processor.setValidator(new LocalValidatorFactoryBean());
         return processor;
     }
 }

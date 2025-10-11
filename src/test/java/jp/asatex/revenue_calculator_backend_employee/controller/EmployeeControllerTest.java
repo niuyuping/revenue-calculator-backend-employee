@@ -1,8 +1,10 @@
 package jp.asatex.revenue_calculator_backend_employee.controller;
 
 import jp.asatex.revenue_calculator_backend_employee.dto.EmployeeDto;
-import jp.asatex.revenue_calculator_backend_employee.exception.EmployeeNotFoundException;
-import jp.asatex.revenue_calculator_backend_employee.service.EmployeeService;
+import jp.asatex.revenue_calculator_backend_employee.common.PageRequest;
+import jp.asatex.revenue_calculator_backend_employee.common.PageResponse;
+import jp.asatex.revenue_calculator_backend_employee.exception.EmployeeNotFoundHandler;
+import jp.asatex.revenue_calculator_backend_employee.application.EmployeeApplicationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -13,7 +15,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -28,26 +33,35 @@ class EmployeeControllerTest {
     private WebTestClient webTestClient;
 
     @MockitoBean
-    private EmployeeService employeeService;
+    private EmployeeApplicationService employeeApplicationService;
 
 
     @Test
-    void testGetAllEmployees() {
+    void testGetEmployeesWithPagination() {
         // Prepare test data
         EmployeeDto employee1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
         EmployeeDto employee2 = new EmployeeDto(2L, "EMP002", "Sato Hanako", "sato hanako", LocalDate.of(1985, 12, 3));
+        List<EmployeeDto> employees = Arrays.asList(employee1, employee2);
+        PageResponse<EmployeeDto> pageResponse = new PageResponse<>(employees, 0, 10, 2L, "name", "ASC");
 
-        when(employeeService.getAllEmployees()).thenReturn(Flux.just(employee1, employee2));
+        when(employeeApplicationService.getEmployeesWithPagination(any(PageRequest.class))).thenReturn(Mono.just(pageResponse));
 
         // Execute test
         webTestClient.get()
-                .uri("/api/v1/employee")
+                .uri("/api/v1/employee?page=0&size=10&sortBy=name&sortDirection=ASC")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBodyList(EmployeeDto.class)
-                .hasSize(2);
+                .expectBody(PageResponse.class)
+                .value(response -> {
+                    @SuppressWarnings("unchecked")
+                    PageResponse<EmployeeDto> typedResponse = (PageResponse<EmployeeDto>) response;
+                    assertThat(typedResponse.getContent()).hasSize(2);
+                    assertThat(typedResponse.getPage()).isEqualTo(0);
+                    assertThat(typedResponse.getSize()).isEqualTo(10);
+                    assertThat(typedResponse.getTotalElements()).isEqualTo(2L);
+                });
     }
 
     @Test
@@ -55,7 +69,7 @@ class EmployeeControllerTest {
         // Prepare test data
         EmployeeDto employee = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
 
-        when(employeeService.getEmployeeById(1L)).thenReturn(Mono.just(employee));
+        when(employeeApplicationService.getEmployeeById(1L)).thenReturn(Mono.just(employee));
 
         // Execute test
         webTestClient.get()
@@ -70,7 +84,7 @@ class EmployeeControllerTest {
 
     @Test
     void testGetEmployeeByIdNotFound() {
-        when(employeeService.getEmployeeById(999L)).thenReturn(Mono.empty());
+        when(employeeApplicationService.getEmployeeById(999L)).thenReturn(Mono.empty());
 
         webTestClient.get()
                 .uri("/api/v1/employee/999")
@@ -85,7 +99,7 @@ class EmployeeControllerTest {
         EmployeeDto newEmployee = new EmployeeDto(null, "EMP006", "New Employee", "new employee", LocalDate.of(2000, 1, 1));
         EmployeeDto createdEmployee = new EmployeeDto(6L, "EMP006", "New Employee", "new employee", LocalDate.of(2000, 1, 1));
 
-        when(employeeService.createEmployee(any(EmployeeDto.class))).thenReturn(Mono.just(createdEmployee));
+        when(employeeApplicationService.createEmployee(any(EmployeeDto.class))).thenReturn(Mono.just(createdEmployee));
 
         // Execute test
         webTestClient.post()
@@ -104,7 +118,7 @@ class EmployeeControllerTest {
         // Prepare test data
         EmployeeDto updatedEmployee = new EmployeeDto(1L, "EMP001", "Tanaka Taro (Updated)", "tanaka taro (updated)", LocalDate.of(1990, 5, 15));
 
-        when(employeeService.updateEmployee(anyLong(), any(EmployeeDto.class))).thenReturn(Mono.just(updatedEmployee));
+        when(employeeApplicationService.updateEmployee(anyLong(), any(EmployeeDto.class))).thenReturn(Mono.just(updatedEmployee));
 
         // Execute test
         webTestClient.put()
@@ -123,7 +137,7 @@ class EmployeeControllerTest {
         // Prepare test data
         EmployeeDto employee = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
 
-        when(employeeService.getEmployeeByNumber("EMP001")).thenReturn(Mono.just(employee));
+        when(employeeApplicationService.getEmployeeByNumber("EMP001")).thenReturn(Mono.just(employee));
 
         // Execute test
         webTestClient.get()
@@ -139,7 +153,7 @@ class EmployeeControllerTest {
 
     @Test
     void testDeleteEmployee() {
-        when(employeeService.deleteEmployeeById(1L)).thenReturn(Mono.empty());
+        when(employeeApplicationService.deleteEmployee(1L)).thenReturn(Mono.empty());
 
         webTestClient.delete()
                 .uri("/api/v1/employee/1")
@@ -149,7 +163,7 @@ class EmployeeControllerTest {
 
     @Test
     void testDeleteEmployeeByNumber() {
-        when(employeeService.deleteEmployeeByNumber("EMP001")).thenReturn(Mono.empty());
+        when(employeeApplicationService.deleteEmployeeByNumber("EMP001")).thenReturn(Mono.empty());
 
         webTestClient.delete()
                 .uri("/api/v1/employee/number/EMP001")
@@ -163,7 +177,7 @@ class EmployeeControllerTest {
         EmployeeDto employee1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15));
         EmployeeDto employee2 = new EmployeeDto(2L, "EMP002", "Tanaka Hanako", "tanaka hanako", LocalDate.of(1985, 12, 3));
 
-        when(employeeService.searchEmployeesByName("Tanaka")).thenReturn(Flux.just(employee1, employee2));
+        when(employeeApplicationService.searchEmployeesByName("Tanaka")).thenReturn(Flux.just(employee1, employee2));
 
         // Execute test
         webTestClient.get()
@@ -178,7 +192,7 @@ class EmployeeControllerTest {
 
     @Test
     void testSearchEmployeesByNameNotFound() {
-        when(employeeService.searchEmployeesByName("Yamada")).thenReturn(Flux.empty());
+        when(employeeApplicationService.searchEmployeesByName("Yamada")).thenReturn(Flux.empty());
 
         webTestClient.get()
                 .uri("/api/v1/employee/search/name?name=Yamada")
@@ -192,7 +206,7 @@ class EmployeeControllerTest {
 
     @Test
     void testGetEmployeeByNumberNotFound() {
-        when(employeeService.getEmployeeByNumber("NOTEXIST")).thenReturn(Mono.empty());
+        when(employeeApplicationService.getEmployeeByNumber("NOTEXIST")).thenReturn(Mono.empty());
 
         webTestClient.get()
                 .uri("/api/v1/employee/number/NOTEXIST")
@@ -205,8 +219,8 @@ class EmployeeControllerTest {
     void testUpdateEmployeeNotFound() {
         EmployeeDto updatedEmployee = new EmployeeDto(999L, "EMP999", "Test Employee", "test employee", LocalDate.of(1990, 5, 15));
 
-        when(employeeService.updateEmployee(anyLong(), any(EmployeeDto.class))).thenReturn(
-                Mono.error(new EmployeeNotFoundException("Employee not found, ID: 999"))
+        when(employeeApplicationService.updateEmployee(anyLong(), any(EmployeeDto.class))).thenReturn(
+                Mono.error(new EmployeeNotFoundHandler("Employee not found, ID: 999"))
         );
 
         webTestClient.put()
@@ -219,7 +233,7 @@ class EmployeeControllerTest {
 
     @Test
     void testDeleteEmployeeNotFound() {
-        when(employeeService.deleteEmployeeById(999L)).thenReturn(Mono.error(new EmployeeNotFoundException("Employee does not exist, ID: 999")));
+        when(employeeApplicationService.deleteEmployee(999L)).thenReturn(Mono.error(new EmployeeNotFoundHandler("Employee does not exist, ID: 999")));
 
         webTestClient.delete()
                 .uri("/api/v1/employee/999")
@@ -229,7 +243,7 @@ class EmployeeControllerTest {
 
     @Test
     void testDeleteEmployeeByNumberNotFound() {
-        when(employeeService.deleteEmployeeByNumber("NOTEXIST")).thenReturn(Mono.error(new EmployeeNotFoundException("Employee does not exist, number: NOTEXIST")));
+        when(employeeApplicationService.deleteEmployeeByNumber("NOTEXIST")).thenReturn(Mono.error(new EmployeeNotFoundHandler("Employee does not exist, number: NOTEXIST")));
 
         webTestClient.delete()
                 .uri("/api/v1/employee/number/NOTEXIST")

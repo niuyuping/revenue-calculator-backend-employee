@@ -1,7 +1,8 @@
-package jp.asatex.revenue_calculator_backend_employee.dto;
+package jp.asatex.revenue_calculator_backend_employee.common;
 
 /**
  * Sort direction enumeration
+ * Common utility for sorting operations across the application
  */
 public enum SortDirection {
     ASC("ASC"),

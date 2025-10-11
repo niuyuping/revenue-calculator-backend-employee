@@ -48,8 +48,8 @@ public class GlobalExceptionHandler {
     /**
      * Handle employee not found exception
      */
-    @ExceptionHandler(EmployeeNotFoundException.class)
-    public Mono<ResponseEntity<Map<String, Object>>> handleEmployeeNotFoundException(EmployeeNotFoundException ex) {
+    @ExceptionHandler(EmployeeNotFoundHandler.class)
+    public Mono<ResponseEntity<Map<String, Object>>> handleEmployeeNotFoundException(EmployeeNotFoundHandler ex) {
         Map<String, Object> response = new HashMap<>();
         response.put("error", "Employee not found");
         response.put("message", ex.getMessage());
@@ -61,8 +61,8 @@ public class GlobalExceptionHandler {
     /**
      * Handle duplicate employee number exception
      */
-    @ExceptionHandler(DuplicateEmployeeNumberException.class)
-    public Mono<ResponseEntity<Map<String, Object>>> handleDuplicateEmployeeNumberException(DuplicateEmployeeNumberException ex) {
+    @ExceptionHandler(DuplicateEmployeeNumberHandler.class)
+    public Mono<ResponseEntity<Map<String, Object>>> handleDuplicateEmployeeNumberException(DuplicateEmployeeNumberHandler ex) {
         Map<String, Object> response = new HashMap<>();
         response.put("error", "Duplicate employee number");
         response.put("message", ex.getMessage());
@@ -127,8 +127,8 @@ public class GlobalExceptionHandler {
     /**
      * Handle transaction exceptions
      */
-    @ExceptionHandler(TransactionException.class)
-    public Mono<ResponseEntity<Map<String, Object>>> handleTransactionException(TransactionException ex) {
+    @ExceptionHandler(TransactionHandler.class)
+    public Mono<ResponseEntity<Map<String, Object>>> handleTransactionException(TransactionHandler ex) {
         Map<String, Object> response = new HashMap<>();
         response.put("error", "Transaction processing failed");
         response.put("message", ex.getMessage());

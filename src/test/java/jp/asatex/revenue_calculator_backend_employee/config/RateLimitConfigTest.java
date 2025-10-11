@@ -31,16 +31,6 @@ class RateLimitConfigTest {
         assertThat(rateLimiterRegistry).isNotNull();
     }
 
-    @Test
-    @DisplayName("Employee API rate limiter should be configured correctly")
-    void testEmployeeApiRateLimiterConfiguration() {
-        RateLimiter rateLimiter = rateLimiterRegistry.rateLimiter("employee-api");
-        assertThat(rateLimiter).isNotNull();
-        RateLimiterConfig config = rateLimiter.getRateLimiterConfig();
-        assertThat(config.getLimitForPeriod()).isEqualTo(100);
-        assertThat(config.getLimitRefreshPeriod().toMinutes()).isEqualTo(1);
-        assertThat(config.getTimeoutDuration().toSeconds()).isEqualTo(1);
-    }
 
     @Test
     @DisplayName("Employee search API rate limiter should be configured correctly")
@@ -108,27 +98,15 @@ class RateLimitConfigTest {
         assertThat(config.getTimeoutDuration().toSeconds()).isEqualTo(1);
     }
 
-    @Test
-    @DisplayName("Global API rate limiter should be configured correctly")
-    void testGlobalApiRateLimiterConfiguration() {
-        RateLimiter rateLimiter = rateLimiterRegistry.rateLimiter("global-api");
-        assertThat(rateLimiter).isNotNull();
-        RateLimiterConfig config = rateLimiter.getRateLimiterConfig();
-        assertThat(config.getLimitForPeriod()).isEqualTo(1000);
-        assertThat(config.getLimitRefreshPeriod().toMinutes()).isEqualTo(1);
-        assertThat(config.getTimeoutDuration().toSeconds()).isEqualTo(1);
-    }
 
     @Test
     @DisplayName("All rate limiters should be in the registry")
     void testAllRateLimitersInRegistry() {
-        assertThat(rateLimiterRegistry.rateLimiter("employee-api")).isNotNull();
         assertThat(rateLimiterRegistry.rateLimiter("employee-search")).isNotNull();
         assertThat(rateLimiterRegistry.rateLimiter("employee-create")).isNotNull();
         assertThat(rateLimiterRegistry.rateLimiter("employee-update")).isNotNull();
         assertThat(rateLimiterRegistry.rateLimiter("employee-delete")).isNotNull();
         assertThat(rateLimiterRegistry.rateLimiter("employee-pagination")).isNotNull();
         assertThat(rateLimiterRegistry.rateLimiter("monitoring-api")).isNotNull();
-        assertThat(rateLimiterRegistry.rateLimiter("global-api")).isNotNull();
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import jp.asatex.revenue_calculator_backend_employee.service.EmployeeService;
+import jp.asatex.revenue_calculator_backend_employee.application.EmployeeApplicationService;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -22,13 +22,13 @@ public class GlobalExceptionHandlerTest {
     private WebTestClient webTestClient;
 
     @MockitoBean
-    private EmployeeService employeeService;
+    private EmployeeApplicationService employeeApplicationService;
 
 
     @Test
-    public void testHandleEmployeeNotFoundException() {
-        when(employeeService.getEmployeeById(any())).thenReturn(
-                Mono.error(new EmployeeNotFoundException("Employee does not exist, ID: 999"))
+    public void testHandleEmployeeNotFoundHandler() {
+        when(employeeApplicationService.getEmployeeById(any())).thenReturn(
+                Mono.error(new EmployeeNotFoundHandler("Employee does not exist, ID: 999"))
         );
         
         webTestClient.get()
@@ -41,9 +41,9 @@ public class GlobalExceptionHandlerTest {
     }
 
     @Test
-    public void testHandleDuplicateEmployeeNumberException() {
-        when(employeeService.createEmployee(any())).thenReturn(
-                Mono.error(new DuplicateEmployeeNumberException("Employee number already exists: EMP001"))
+    public void testHandleDuplicateEmployeeNumberHandler() {
+        when(employeeApplicationService.createEmployee(any())).thenReturn(
+                Mono.error(new DuplicateEmployeeNumberHandler("Employee number already exists: EMP001"))
         );
         
         webTestClient.post()
@@ -199,7 +199,7 @@ public class GlobalExceptionHandlerTest {
     @Test
     public void testHandleConstraintViolationException() {
         // Simulate ConstraintViolationException
-        when(employeeService.getEmployeeById(any())).thenReturn(
+        when(employeeApplicationService.getEmployeeById(any())).thenReturn(
                 Mono.error(new jakarta.validation.ConstraintViolationException("Parameter validation failed", null))
         );
         
@@ -214,7 +214,7 @@ public class GlobalExceptionHandlerTest {
     @Test
     public void testHandleGenericException() {
         // Simulate generic exception
-        when(employeeService.getEmployeeById(any())).thenReturn(
+        when(employeeApplicationService.getEmployeeById(any())).thenReturn(
                 Mono.error(new RuntimeException("Database connection failed"))
         );
         
@@ -230,7 +230,7 @@ public class GlobalExceptionHandlerTest {
     @Test
     public void testHandleGenericException_WithValidationFailure() {
         // Simulate exception containing "Validation failure"
-        when(employeeService.getEmployeeById(any())).thenReturn(
+        when(employeeApplicationService.getEmployeeById(any())).thenReturn(
                 Mono.error(new RuntimeException("Validation failure: Invalid data"))
         );
         
@@ -250,7 +250,7 @@ public class GlobalExceptionHandlerTest {
                 new jakarta.validation.ConstraintViolationException("Parameter validation failed", null);
         RuntimeException exception = new RuntimeException("Outer exception", cve);
         
-        when(employeeService.getEmployeeById(any())).thenReturn(Mono.error(exception));
+        when(employeeApplicationService.getEmployeeById(any())).thenReturn(Mono.error(exception));
         
         webTestClient.get()
                 .uri("/api/v1/employee/1")
@@ -264,7 +264,7 @@ public class GlobalExceptionHandlerTest {
     @Test
     public void testHandleGenericException_WithNullMessage() {
         // Simulate exception without message
-        when(employeeService.getEmployeeById(any())).thenReturn(
+        when(employeeApplicationService.getEmployeeById(any())).thenReturn(
                 Mono.error(new RuntimeException())
         );
         
@@ -279,8 +279,8 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     public void testHandleUpdateEmployee_WithDuplicateNumber() {
-        when(employeeService.updateEmployee(any(), any())).thenReturn(
-                Mono.error(new DuplicateEmployeeNumberException("Employee number already exists: EMP002"))
+        when(employeeApplicationService.updateEmployee(any(), any())).thenReturn(
+                Mono.error(new DuplicateEmployeeNumberHandler("Employee number already exists: EMP002"))
         );
         
         String updateEmployee = "{\"employeeNumber\":\"EMP002\",\"name\":\"Test\",\"furigana\":\"test\"}";
@@ -298,8 +298,8 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     public void testHandleDeleteEmployee_WithNotFoundException() {
-        when(employeeService.deleteEmployeeById(any())).thenReturn(
-                Mono.error(new EmployeeNotFoundException("Employee does not exist, ID: 999"))
+        when(employeeApplicationService.deleteEmployee(any())).thenReturn(
+                Mono.error(new EmployeeNotFoundHandler("Employee does not exist, ID: 999"))
         );
         
         webTestClient.delete()
@@ -320,7 +320,7 @@ public class GlobalExceptionHandlerTest {
     @Test
     public void testHandleServerWebInputException() {
         // Simulate ServerWebInputException
-        when(employeeService.getEmployeeById(any())).thenReturn(
+        when(employeeApplicationService.getEmployeeById(any())).thenReturn(
                 Mono.error(new org.springframework.web.server.ServerWebInputException("Invalid input data"))
         );
         
@@ -336,7 +336,7 @@ public class GlobalExceptionHandlerTest {
     @Test
     public void testHandleServerWebInputException_WithNullMessage() {
         // Simulate ServerWebInputException with empty message to test null message handling
-        when(employeeService.getEmployeeById(any())).thenReturn(
+        when(employeeApplicationService.getEmployeeById(any())).thenReturn(
                 Mono.error(new org.springframework.web.server.ServerWebInputException(""))
         );
         
@@ -352,7 +352,7 @@ public class GlobalExceptionHandlerTest {
     @Test
     public void testHandleConstraintViolationException_WithNullMessage() {
         // Simulate ConstraintViolationException with empty message to test null message handling
-        when(employeeService.getEmployeeById(any())).thenReturn(
+        when(employeeApplicationService.getEmployeeById(any())).thenReturn(
                 Mono.error(new jakarta.validation.ConstraintViolationException("", null))
         );
         
@@ -367,7 +367,7 @@ public class GlobalExceptionHandlerTest {
     @Test
     public void testHandleGenericException_WithEmptyMessage() {
         // Simulate exception with empty message
-        when(employeeService.getEmployeeById(any())).thenReturn(
+        when(employeeApplicationService.getEmployeeById(any())).thenReturn(
                 Mono.error(new RuntimeException(""))
         );
         
@@ -383,7 +383,7 @@ public class GlobalExceptionHandlerTest {
     @Test
     public void testHandleGenericException_WithWhitespaceMessage() {
         // Simulate exception with whitespace-only message
-        when(employeeService.getEmployeeById(any())).thenReturn(
+        when(employeeApplicationService.getEmployeeById(any())).thenReturn(
                 Mono.error(new RuntimeException("   "))
         );
         
@@ -427,7 +427,7 @@ public class GlobalExceptionHandlerTest {
         RuntimeException middleCause = new RuntimeException("Middle cause", rootCause);
         RuntimeException topException = new RuntimeException("Top exception", middleCause);
         
-        when(employeeService.getEmployeeById(any())).thenReturn(Mono.error(topException));
+        when(employeeApplicationService.getEmployeeById(any())).thenReturn(Mono.error(topException));
         
         webTestClient.get()
                 .uri("/api/v1/employee/1")

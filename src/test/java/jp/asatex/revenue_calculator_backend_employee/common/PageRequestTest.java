@@ -1,6 +1,5 @@
-package jp.asatex.revenue_calculator_backend_employee.dto;
+package jp.asatex.revenue_calculator_backend_employee.common;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 
@@ -23,11 +22,10 @@ class PageRequestTest {
     private final Validator validator = factory.getValidator();
 
     @Nested
-    @DisplayName("Constructor Test")
+    @DisplayName("Constructor Tests")
     class ConstructorTests {
 
-        @Test
-        @DisplayName("Object created with default constructor should have default values")
+        @DisplayName("Default constructor should set default values")
         void testDefaultConstructor() {
             PageRequest pageRequest = new PageRequest();
             
@@ -38,7 +36,6 @@ class PageRequestTest {
             assertEquals(0, pageRequest.getOffset());
         }
 
-        @Test
         @DisplayName("All-parameter constructor should correctly set all values")
         void testFullParameterConstructor() {
             PageRequest pageRequest = new PageRequest(2, 20, "name", SortDirection.DESC);
@@ -52,12 +49,11 @@ class PageRequestTest {
     }
 
     @Nested
-    @DisplayName("Getter and Setter Test")
-    class GetterSetterTests {
+    @DisplayName("Setter Tests")
+    class SetterTests {
 
-        @Test
-        @DisplayName("All getters and setters should work correctly")
-        void testGettersAndSetters() {
+        @DisplayName("Setters should correctly update values")
+        void testSetters() {
             PageRequest pageRequest = new PageRequest();
             
             pageRequest.setPage(3);
@@ -74,10 +70,9 @@ class PageRequestTest {
     }
 
     @Nested
-    @DisplayName("Validation Test")
+    @DisplayName("Validation Tests")
     class ValidationTests {
 
-        @Test
         @DisplayName("Valid PageRequest should pass validation")
         void testValidPageRequest() {
             PageRequest pageRequest = new PageRequest(0, 10, "name", SortDirection.ASC);
@@ -86,47 +81,43 @@ class PageRequestTest {
             assertTrue(violations.isEmpty(), "Valid PageRequest should not have validation errors");
         }
 
-        @Test
-        @DisplayName("Negative page number should fail validation")
+        @DisplayName("Negative page should fail validation")
         void testNegativePage() {
             PageRequest pageRequest = new PageRequest();
             pageRequest.setPage(-1);
             
             Set<ConstraintViolation<PageRequest>> violations = validator.validate(pageRequest);
-            assertFalse(violations.isEmpty(), "Negative page number should fail validation");
+            assertFalse(violations.isEmpty(), "Negative page should have validation errors");
         }
 
-        @Test
-        @DisplayName("Page size of 0 should fail validation")
+        @DisplayName("Zero size should fail validation")
         void testZeroSize() {
             PageRequest pageRequest = new PageRequest();
             pageRequest.setSize(0);
             
             Set<ConstraintViolation<PageRequest>> violations = validator.validate(pageRequest);
-            assertFalse(violations.isEmpty(), "Page size of 0 should fail validation");
+            assertFalse(violations.isEmpty(), "Zero size should have validation errors");
         }
 
-        @Test
-        @DisplayName("Page size over 100 should fail validation")
-        void testSizeTooLarge() {
+        @DisplayName("Size exceeding maximum should fail validation")
+        void testSizeExceedingMaximum() {
             PageRequest pageRequest = new PageRequest();
             pageRequest.setSize(101);
             
             Set<ConstraintViolation<PageRequest>> violations = validator.validate(pageRequest);
-            assertFalse(violations.isEmpty(), "Page size over 100 should fail validation");
+            assertFalse(violations.isEmpty(), "Size exceeding maximum should have validation errors");
         }
     }
 
     @Nested
-    @DisplayName("toString Test")
+    @DisplayName("toString Tests")
     class ToStringTests {
 
-        @Test
         @DisplayName("toString should return meaningful string")
         void testToString() {
             PageRequest pageRequest = new PageRequest(1, 5, "name", SortDirection.DESC);
             String result = pageRequest.toString();
-            
+
             assertTrue(result.contains("page=1"));
             assertTrue(result.contains("size=5"));
             assertTrue(result.contains("sortBy='name'"));

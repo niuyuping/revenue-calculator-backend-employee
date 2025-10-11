@@ -1,7 +1,7 @@
 package jp.asatex.revenue_calculator_backend_employee.integration;
 
 import jp.asatex.revenue_calculator_backend_employee.dto.EmployeeDto;
-import jp.asatex.revenue_calculator_backend_employee.dto.PageResponse;
+import jp.asatex.revenue_calculator_backend_employee.common.PageResponse;
 import jp.asatex.revenue_calculator_backend_employee.entity.Employee;
 import jp.asatex.revenue_calculator_backend_employee.repository.EmployeeRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,7 +59,7 @@ class PaginationIntegrationTest {
     void testGetAllEmployeesWithPagination() {
         // Test first page
         PageResponse<EmployeeDto> firstPage = webTestClient.get()
-                .uri("/api/v1/employee/paged?page=0&size=10&sortBy=employeeNumber&sortDirection=ASC")
+                .uri("/api/v1/employee?page=0&size=10&sortBy=employeeNumber&sortDirection=ASC")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -83,7 +83,7 @@ class PaginationIntegrationTest {
 
         // Test second page
         PageResponse<EmployeeDto> secondPage = webTestClient.get()
-                .uri("/api/v1/employee/paged?page=1&size=10&sortBy=employeeNumber&sortDirection=ASC")
+                .uri("/api/v1/employee?page=1&size=10&sortBy=employeeNumber&sortDirection=ASC")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -101,7 +101,7 @@ class PaginationIntegrationTest {
 
         // Test last page
         PageResponse<EmployeeDto> lastPage = webTestClient.get()
-                .uri("/api/v1/employee/paged?page=2&size=10&sortBy=employeeNumber&sortDirection=ASC")
+                .uri("/api/v1/employee?page=2&size=10&sortBy=employeeNumber&sortDirection=ASC")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -122,7 +122,7 @@ class PaginationIntegrationTest {
     void testPaginationWithDifferentSorting() {
         // Test sorting by name in descending order
         PageResponse<EmployeeDto> response = webTestClient.get()
-                .uri("/api/v1/employee/paged?page=0&size=5&sortBy=name&sortDirection=DESC")
+                .uri("/api/v1/employee?page=0&size=5&sortBy=name&sortDirection=DESC")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -207,21 +207,21 @@ class PaginationIntegrationTest {
     void testPaginationWithInvalidParameters() {
         // Test invalid page number
         webTestClient.get()
-                .uri("/api/v1/employee/paged?page=-1&size=10")
+                .uri("/api/v1/employee?page=-1&size=10")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest();
 
         // Test invalid page size
         webTestClient.get()
-                .uri("/api/v1/employee/paged?page=0&size=0")
+                .uri("/api/v1/employee?page=0&size=0")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest();
 
         // Test oversized page size
         webTestClient.get()
-                .uri("/api/v1/employee/paged?page=0&size=101")
+                .uri("/api/v1/employee?page=0&size=101")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest();
@@ -231,7 +231,7 @@ class PaginationIntegrationTest {
     void testPaginationWithDefaultParameters() {
         // Test default parameters
         PageResponse<EmployeeDto> response = webTestClient.get()
-                .uri("/api/v1/employee/paged")
+                .uri("/api/v1/employee")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()

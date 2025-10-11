@@ -1,6 +1,6 @@
 package jp.asatex.revenue_calculator_backend_employee.controller;
 
-import jp.asatex.revenue_calculator_backend_employee.service.EmployeeService;
+import jp.asatex.revenue_calculator_backend_employee.application.EmployeeApplicationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -21,7 +21,7 @@ class EmployeeControllerParameterValidationTest {
     private WebTestClient webTestClient;
 
     @MockitoBean
-    private EmployeeService employeeService;
+    private EmployeeApplicationService employeeApplicationService;
 
 
     @Test
@@ -176,7 +176,7 @@ class EmployeeControllerParameterValidationTest {
     @Test
     void testValidEmployeeNumber_ShouldPassValidation() {
         // Mock service to return empty Mono (employee not found)
-        when(employeeService.getEmployeeByNumber(any())).thenReturn(Mono.empty());
+        when(employeeApplicationService.getEmployeeByNumber(any())).thenReturn(Mono.empty());
         
         webTestClient.get()
                 .uri("/api/v1/employee/number/EMP001")
@@ -196,7 +196,7 @@ class EmployeeControllerParameterValidationTest {
     @Test
     void testValidId_ShouldPassValidation() {
         // Mock service to return empty Mono (employee not found)
-        when(employeeService.getEmployeeById(any())).thenReturn(Mono.empty());
+        when(employeeApplicationService.getEmployeeById(any())).thenReturn(Mono.empty());
         
         webTestClient.get()
                 .uri("/api/v1/employee/1")

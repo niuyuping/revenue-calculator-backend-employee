@@ -1,4 +1,4 @@
-package jp.asatex.revenue_calculator_backend_employee.dto;
+package jp.asatex.revenue_calculator_backend_employee.common;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
