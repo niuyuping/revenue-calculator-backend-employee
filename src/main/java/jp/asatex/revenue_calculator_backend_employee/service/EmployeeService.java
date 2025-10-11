@@ -12,6 +12,9 @@ import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -72,6 +75,7 @@ public class EmployeeService {
      * @param id Employee ID
      * @return Mono<EmployeeDto>
      */
+    @Cacheable(value = "employees", key = "#id")
     public Mono<EmployeeDto> getEmployeeById(Long id) {
         logger.debug("Retrieving employee with ID: {}", id);
         employeeQueryCounter.increment();
@@ -92,6 +96,7 @@ public class EmployeeService {
      * @param employeeNumber Employee number
      * @return Mono<EmployeeDto>
      */
+    @Cacheable(value = "employees", key = "'number:' + #employeeNumber")
     public Mono<EmployeeDto> getEmployeeByNumber(String employeeNumber) {
         logger.debug("Retrieving employee with number: {}", employeeNumber);
         employeeQueryCounter.increment();
@@ -148,6 +153,7 @@ public class EmployeeService {
      * @return Mono<EmployeeDto>
      */
     @Transactional
+    @CachePut(value = "employees", key = "#id")
     public Mono<EmployeeDto> updateEmployee(Long id, EmployeeDto employeeDto) {
         logger.info("Updating employee with ID: {}", id);
         employeeOperationCounter.increment();
@@ -180,6 +186,7 @@ public class EmployeeService {
      * @return Mono<Void>
      */
     @Transactional
+    @CacheEvict(value = "employees", key = "#id")
     public Mono<Void> deleteEmployeeById(Long id) {
         logger.info("Deleting employee with ID: {}", id);
         employeeOperationCounter.increment();
@@ -206,6 +213,7 @@ public class EmployeeService {
      * @return Mono<Void>
      */
     @Transactional
+    @CacheEvict(value = "employees", key = "'number:' + #employeeNumber")
     public Mono<Void> deleteEmployeeByNumber(String employeeNumber) {
         logger.info("Deleting employee with number: {}", employeeNumber);
         employeeOperationCounter.increment();
