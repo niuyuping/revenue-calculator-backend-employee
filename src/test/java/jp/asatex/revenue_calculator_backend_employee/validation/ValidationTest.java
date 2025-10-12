@@ -123,5 +123,29 @@ public class ValidationTest {
         Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(employee);
         assertTrue(violations.isEmpty(), "Valid katakana should not have validation errors");
     }
+
+    @Test
+    public void testValidFuriganaWithFullWidthSpace() {
+        EmployeeDto employee = new EmployeeDto();
+        employee.setEmployeeNumber("EMP001");
+        employee.setName("牛宇平");
+        employee.setFurigana("ギュ　ウヘイ"); // Valid with full-width space
+        employee.setBirthday(LocalDate.of(1990, 1, 1));
+
+        Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(employee);
+        assertTrue(violations.isEmpty(), "Valid furigana with full-width space should not have validation errors");
+    }
+
+    @Test
+    public void testValidFuriganaWithHalfWidthSpace() {
+        EmployeeDto employee = new EmployeeDto();
+        employee.setEmployeeNumber("EMP001");
+        employee.setName("Tanaka Taro");
+        employee.setFurigana("ギュ ウヘイ"); // Valid with half-width space
+        employee.setBirthday(LocalDate.of(1990, 1, 1));
+
+        Set<ConstraintViolation<EmployeeDto>> violations = validator.validate(employee);
+        assertTrue(violations.isEmpty(), "Valid furigana with half-width space should not have validation errors");
+    }
 }
 
