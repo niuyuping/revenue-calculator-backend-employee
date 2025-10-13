@@ -186,7 +186,7 @@ class TransactionIntegrationTest {
 
     @Test
     @DisplayName("Transaction exceptions should be handled correctly")
-    void testTransactionExceptionHandling() {
+    void testTransactionHandlerHandling() {
         // Create invalid employee data to trigger exception
         EmployeeDto invalidEmployee = new EmployeeDto();
         // Do not set required fields, should trigger validation exception

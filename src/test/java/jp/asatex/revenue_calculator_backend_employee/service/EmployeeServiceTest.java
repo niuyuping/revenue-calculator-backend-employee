@@ -2,8 +2,8 @@ package jp.asatex.revenue_calculator_backend_employee.service;
 
 import jp.asatex.revenue_calculator_backend_employee.dto.EmployeeDto;
 import jp.asatex.revenue_calculator_backend_employee.entity.Employee;
-import jp.asatex.revenue_calculator_backend_employee.exception.DuplicateEmployeeNumberException;
-import jp.asatex.revenue_calculator_backend_employee.exception.EmployeeNotFoundException;
+import jp.asatex.revenue_calculator_backend_employee.exception.DuplicateEmployeeNumberHandler;
+import jp.asatex.revenue_calculator_backend_employee.exception.EmployeeNotFoundHandler;
 import jp.asatex.revenue_calculator_backend_employee.repository.EmployeeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,7 +65,7 @@ class EmployeeServiceTest {
     private io.micrometer.core.instrument.Timer databaseOperationTimer;
 
     @Mock
-    private TransactionMonitoringService transactionMonitoringService;
+    private SystemMonitoringService transactionMonitoringService;
 
 
     @InjectMocks
@@ -90,7 +90,7 @@ class EmployeeServiceTest {
         testEmployee.setFurigana("tanaka taro");
         testEmployee.setBirthday(createDate(1990, 5, 15));
 
-        // Configure TransactionMonitoringService Mock - using lenient() to avoid unnecessary stubbing errors
+        // Configure SystemMonitoringService Mock - using lenient() to avoid unnecessary stubbing errors
         org.mockito.Mockito.lenient().when(transactionMonitoringService.monitorTransaction(any(String.class), any(String.class), any()))
                 .thenAnswer(invocation -> {
                     @SuppressWarnings("unchecked")
@@ -100,17 +100,6 @@ class EmployeeServiceTest {
 
     }
 
-    @Test
-    void getAllEmployees_ShouldReturnAllEmployees() {
-        // Given
-        List<Employee> employees = Arrays.asList(testEmployee);
-        when(employeeRepository.findAll()).thenReturn(Flux.fromIterable(employees));
-
-        // When & Then
-        StepVerifier.create(employeeService.getAllEmployees())
-                .expectNextMatches(dto -> dto.getEmployeeNumber().equals("EMP001"))
-                .verifyComplete();
-    }
 
     @Test
     void getEmployeeById_WhenEmployeeExists_ShouldReturnEmployee() {
@@ -130,7 +119,7 @@ class EmployeeServiceTest {
 
         // When & Then
         StepVerifier.create(employeeService.getEmployeeById(999L))
-                .expectError(EmployeeNotFoundException.class)
+                .expectError(EmployeeNotFoundHandler.class)
                 .verify();
     }
 
@@ -152,7 +141,7 @@ class EmployeeServiceTest {
 
         // When & Then
         StepVerifier.create(employeeService.getEmployeeByNumber("NOTEXIST"))
-                .expectError(EmployeeNotFoundException.class)
+                .expectError(EmployeeNotFoundHandler.class)
                 .verify();
     }
 
@@ -188,7 +177,7 @@ class EmployeeServiceTest {
 
         // When & Then
         StepVerifier.create(employeeService.createEmployee(testEmployeeDto))
-                .expectError(DuplicateEmployeeNumberException.class)
+                .expectError(DuplicateEmployeeNumberHandler.class)
                 .verify();
     }
 
@@ -243,7 +232,7 @@ class EmployeeServiceTest {
 
         // When & Then
         StepVerifier.create(employeeService.updateEmployee(999L, testEmployeeDto))
-                .expectError(EmployeeNotFoundException.class)
+                .expectError(EmployeeNotFoundHandler.class)
                 .verify();
     }
 
@@ -291,7 +280,7 @@ class EmployeeServiceTest {
 
         // When & Then
         StepVerifier.create(employeeService.deleteEmployeeById(999L))
-                .expectError(EmployeeNotFoundException.class)
+                .expectError(EmployeeNotFoundHandler.class)
                 .verify();
     }
 
@@ -313,7 +302,7 @@ class EmployeeServiceTest {
 
         // When & Then
         StepVerifier.create(employeeService.deleteEmployeeByNumber("NOTEXIST"))
-                .expectError(EmployeeNotFoundException.class)
+                .expectError(EmployeeNotFoundHandler.class)
                 .verify();
     }
 

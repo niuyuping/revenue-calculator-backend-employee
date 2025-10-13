@@ -3,12 +3,14 @@ package jp.asatex.revenue_calculator_backend_employee.integration;
 import jp.asatex.revenue_calculator_backend_employee.dto.EmployeeDto;
 import jp.asatex.revenue_calculator_backend_employee.entity.Employee;
 import jp.asatex.revenue_calculator_backend_employee.repository.EmployeeRepository;
+import jp.asatex.revenue_calculator_backend_employee.common.PageResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -135,19 +137,20 @@ class EmployeeIntegrationTest {
         assertThat(nonNullResultEmployee.getFurigana()).isEqualTo("tanaka taro (updated)");
 
         // 5. Get all employees
-        List<EmployeeDto> allEmployees = webTestClient.get()
-                .uri("/api/v1/employee")
+        PageResponse<EmployeeDto> pageResponse = webTestClient.get()
+                .uri("/api/v1/employee?size=100")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBodyList(EmployeeDto.class)
+                .expectBody(new ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
                 .returnResult()
                 .getResponseBody();
 
-        assertThat(allEmployees).hasSize(1);
+        assertThat(pageResponse).isNotNull();
+        assertThat(Objects.requireNonNull(pageResponse).getContent()).hasSize(1);
         // Use Objects.requireNonNull to ensure object is not null and resolve compiler warnings
-        List<EmployeeDto> nonNullAllEmployees = Objects.requireNonNull(allEmployees);
+        List<EmployeeDto> nonNullAllEmployees = Objects.requireNonNull(pageResponse.getContent());
         assertThat(nonNullAllEmployees.get(0).getName()).isEqualTo("Tanaka Taro (Updated)");
 
         // 6. Search employees by name
@@ -239,17 +242,17 @@ class EmployeeIntegrationTest {
                 .exchange()
                 .expectStatus().isCreated();
 
-        // Get all employees
-        List<EmployeeDto> allEmployees = webTestClient.get()
-                .uri("/api/v1/employee")
+        // Get all employees with pagination
+        PageResponse<EmployeeDto> pageResponse = webTestClient.get()
+                .uri("/api/v1/employee?size=100") // Get a large page size to get all employees
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(EmployeeDto.class)
+                .expectBody(new ParameterizedTypeReference<PageResponse<EmployeeDto>>() {})
                 .returnResult()
                 .getResponseBody();
 
-        assertThat(allEmployees).hasSize(3);
+        assertThat(Objects.requireNonNull(pageResponse).getContent()).hasSize(3);
 
         // Search test
         List<EmployeeDto> tanakaResults = webTestClient.get()

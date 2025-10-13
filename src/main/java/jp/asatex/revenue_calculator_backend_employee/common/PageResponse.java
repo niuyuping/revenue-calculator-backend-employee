@@ -1,10 +1,11 @@
-package jp.asatex.revenue_calculator_backend_employee.dto;
+package jp.asatex.revenue_calculator_backend_employee.common;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 /**
  * Pagination response result
+ * Common utility for pagination operations across the application
  */
 @Schema(description = "Pagination response result")
 public class PageResponse<T> {

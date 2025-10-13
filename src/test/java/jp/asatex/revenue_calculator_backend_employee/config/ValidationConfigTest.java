@@ -124,7 +124,7 @@ class ValidationConfigTest {
         @Test
         @DisplayName("ValidationConfig methodValidationPostProcessor method should work correctly")
         void testMethodValidationPostProcessorMethod() {
-            MethodValidationPostProcessor processor = validationConfig.methodValidationPostProcessor();
+            MethodValidationPostProcessor processor = ValidationConfig.methodValidationPostProcessor();
             assertThat(processor).isNotNull();
             assertThat(processor).isInstanceOf(MethodValidationPostProcessor.class);
             // In Spring Boot 3.x, getValidator() method is not available, so only check type

@@ -1,17 +1,19 @@
 package jp.asatex.revenue_calculator_backend_employee.service;
 
 import jp.asatex.revenue_calculator_backend_employee.dto.EmployeeDto;
-import jp.asatex.revenue_calculator_backend_employee.dto.PageRequest;
-import jp.asatex.revenue_calculator_backend_employee.dto.PageResponse;
+import jp.asatex.revenue_calculator_backend_employee.common.PageRequest;
+import jp.asatex.revenue_calculator_backend_employee.common.PageResponse;
 import jp.asatex.revenue_calculator_backend_employee.entity.Employee;
-import jp.asatex.revenue_calculator_backend_employee.exception.DuplicateEmployeeNumberException;
-import jp.asatex.revenue_calculator_backend_employee.exception.EmployeeNotFoundException;
+import jp.asatex.revenue_calculator_backend_employee.exception.DuplicateEmployeeNumberHandler;
+import jp.asatex.revenue_calculator_backend_employee.exception.EmployeeNotFoundHandler;
 import jp.asatex.revenue_calculator_backend_employee.repository.EmployeeRepository;
 import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -30,7 +32,7 @@ public class EmployeeService {
     private EmployeeRepository employeeRepository;
 
     @Autowired
-    private TransactionMonitoringService transactionMonitoringService;
+    private SystemMonitoringService systemMonitoringService;
     
     @Autowired
     private Counter employeeOperationCounter;
@@ -47,31 +49,12 @@ public class EmployeeService {
     @Autowired
     private Counter employeeDeleteCounter;
     
-    @Autowired
-    private Timer employeeOperationTimer;
-    
-    /**
-     * Get all employees
-     * @return Flux<EmployeeDto>
-     */
-    public Flux<EmployeeDto> getAllEmployees() {
-        logger.debug("Retrieving all employees");
-        employeeQueryCounter.increment();
-        
-        return employeeRepository.findAll()
-                .map(this::convertToDto)
-                .doOnComplete(() -> logger.info("Successfully retrieved all employees"))
-                .doOnSubscribe(subscription -> {
-                    Timer.Sample sample = Timer.start();
-                    sample.stop(employeeOperationTimer);
-                });
-    }
-    
     /**
      * Get employee by ID
      * @param id Employee ID
      * @return Mono<EmployeeDto>
      */
+    @Cacheable(value = "employees", key = "#id")
     public Mono<EmployeeDto> getEmployeeById(Long id) {
         logger.debug("Retrieving employee with ID: {}", id);
         employeeQueryCounter.increment();
@@ -84,7 +67,7 @@ public class EmployeeService {
                     }
                 })
                 .doOnError(error -> logger.error("Failed to retrieve employee with ID: {}", id, error))
-                .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found with ID: " + id)));
+                .switchIfEmpty(Mono.error(new EmployeeNotFoundHandler("Employee not found with ID: " + id)));
     }
     
     /**
@@ -92,6 +75,7 @@ public class EmployeeService {
      * @param employeeNumber Employee number
      * @return Mono<EmployeeDto>
      */
+    @Cacheable(value = "employees", key = "'number:' + #employeeNumber")
     public Mono<EmployeeDto> getEmployeeByNumber(String employeeNumber) {
         logger.debug("Retrieving employee with number: {}", employeeNumber);
         employeeQueryCounter.increment();
@@ -104,7 +88,7 @@ public class EmployeeService {
                     }
                 })
                 .doOnError(error -> logger.error("Failed to retrieve employee with number: {}", employeeNumber, error))
-                .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found with number: " + employeeNumber)));
+                .switchIfEmpty(Mono.error(new EmployeeNotFoundHandler("Employee not found with number: " + employeeNumber)));
     }
     
     /**
@@ -118,14 +102,14 @@ public class EmployeeService {
         employeeOperationCounter.increment();
         employeeCreateCounter.increment();
         
-        return transactionMonitoringService.monitorTransaction(
+        return systemMonitoringService.monitorTransaction(
                 "CREATE_EMPLOYEE",
                 "Creating employee: " + employeeDto.getEmployeeNumber(),
                 employeeRepository.existsByEmployeeNumber(employeeDto.getEmployeeNumber())
                         .flatMap(exists -> {
                             if (exists) {
                                 logger.warn("Duplicate employee number detected: {}", employeeDto.getEmployeeNumber());
-                                return Mono.error(new DuplicateEmployeeNumberException("Employee number already exists: " + employeeDto.getEmployeeNumber()));
+                                return Mono.error(new DuplicateEmployeeNumberHandler("Employee number already exists: " + employeeDto.getEmployeeNumber()));
                             }
                             return Mono.just(convertToEntity(employeeDto));
                         })
@@ -148,16 +132,17 @@ public class EmployeeService {
      * @return Mono<EmployeeDto>
      */
     @Transactional
+    @CachePut(value = "employees", key = "#id")
     public Mono<EmployeeDto> updateEmployee(Long id, EmployeeDto employeeDto) {
         logger.info("Updating employee with ID: {}", id);
         employeeOperationCounter.increment();
         employeeUpdateCounter.increment();
         
-        return transactionMonitoringService.monitorTransaction(
+        return systemMonitoringService.monitorTransaction(
                 "UPDATE_EMPLOYEE",
                 "Updating employee ID: " + id,
                 employeeRepository.findById(id)
-                        .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found with ID: " + id)))
+                        .switchIfEmpty(Mono.error(new EmployeeNotFoundHandler("Employee not found with ID: " + id)))
                         .flatMap(existingEmployee -> {
                             Employee updatedEmployee = convertToEntity(employeeDto);
                             updatedEmployee.setEmployeeId(id);
@@ -180,16 +165,17 @@ public class EmployeeService {
      * @return Mono<Void>
      */
     @Transactional
+    @CacheEvict(value = "employees", key = "#id")
     public Mono<Void> deleteEmployeeById(Long id) {
         logger.info("Deleting employee with ID: {}", id);
         employeeOperationCounter.increment();
         employeeDeleteCounter.increment();
         
-        return transactionMonitoringService.monitorTransaction(
+        return systemMonitoringService.monitorTransaction(
                 "DELETE_EMPLOYEE_BY_ID",
                 "Deleting employee ID: " + id,
                 employeeRepository.findById(id)
-                        .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found with ID: " + id)))
+                        .switchIfEmpty(Mono.error(new EmployeeNotFoundHandler("Employee not found with ID: " + id)))
                         .flatMap(employeeRepository::delete)
                         .doOnSuccess(unused -> {
                             logger.info("Successfully deleted employee with ID: {}", id);
@@ -206,16 +192,17 @@ public class EmployeeService {
      * @return Mono<Void>
      */
     @Transactional
+    @CacheEvict(value = "employees", key = "'number:' + #employeeNumber")
     public Mono<Void> deleteEmployeeByNumber(String employeeNumber) {
         logger.info("Deleting employee with number: {}", employeeNumber);
         employeeOperationCounter.increment();
         employeeDeleteCounter.increment();
         
-        return transactionMonitoringService.monitorTransaction(
+        return systemMonitoringService.monitorTransaction(
                 "DELETE_EMPLOYEE_BY_NUMBER",
                 "Deleting employee number: " + employeeNumber,
                 employeeRepository.findByEmployeeNumber(employeeNumber)
-                        .switchIfEmpty(Mono.error(new EmployeeNotFoundException("Employee not found with number: " + employeeNumber)))
+                        .switchIfEmpty(Mono.error(new EmployeeNotFoundHandler("Employee not found with number: " + employeeNumber)))
                         .flatMap(employeeRepository::delete)
                         .doOnSuccess(unused -> {
                             logger.info("Successfully deleted employee with number: {}", employeeNumber);
@@ -269,6 +256,33 @@ public class EmployeeService {
                 .map(this::convertToDto)
                 .collectList()
                 .map(employees -> {
+                    // Apply sorting
+                    employees.sort((e1, e2) -> {
+                        String sortBy = pageRequest.getSortBy().toLowerCase();
+                        boolean isDesc = pageRequest.getSortDirection().toString().equals("DESC");
+                        
+                        int comparison = 0;
+                        switch (sortBy) {
+                            case "employeeid":
+                            case "employee_id":
+                            case "id":
+                                comparison = e1.getEmployeeId().compareTo(e2.getEmployeeId());
+                                break;
+                            case "name":
+                                comparison = e1.getName().compareTo(e2.getName());
+                                break;
+                            case "employeenumber":
+                            case "employee_number":
+                            case "number":
+                                comparison = e1.getEmployeeNumber().compareTo(e2.getEmployeeNumber());
+                                break;
+                            default:
+                                comparison = e1.getEmployeeId().compareTo(e2.getEmployeeId());
+                        }
+                        
+                        return isDesc ? -comparison : comparison;
+                    });
+                    
                     int totalElements = employees.size();
                     int startIndex = pageRequest.getPage() * pageRequest.getSize();
                     int endIndex = Math.min(startIndex + pageRequest.getSize(), totalElements);

@@ -3,6 +3,8 @@ package jp.asatex.revenue_calculator_backend_employee.config;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,7 +12,7 @@ import java.time.Duration;
 
 /**
  * Rate limiting configuration class
- * Configures rate limiting strategies for different API endpoints
+ * Configures rate limiting strategies for different API endpoints with monitoring
  */
 @Configuration
 public class RateLimitConfig {
@@ -25,18 +27,16 @@ public class RateLimitConfig {
     }
 
     /**
-     * Employee API rate limiter
-     * 100 requests per minute
+     * Rate limit triggered counter for monitoring
+     * Tracks when rate limits are exceeded
      */
-    @Bean("employee-api")
-    public RateLimiter employeeApiRateLimiter(RateLimiterRegistry registry) {
-        RateLimiterConfig config = RateLimiterConfig.custom()
-                .limitForPeriod(100) // Number of requests allowed per time window
-                .limitRefreshPeriod(Duration.ofMinutes(1)) // Time window size
-                .timeoutDuration(Duration.ofSeconds(1)) // Wait time
-                .build();
-
-        return registry.rateLimiter("employee-api", config);
+    @Bean
+    public Counter rateLimitTriggeredCounter(MeterRegistry meterRegistry) {
+        return Counter.builder("rate.limit.triggered.total")
+                .description("Total number of rate limit triggers by limiter name")
+                .tag("service", "revenue-calculator-employee")
+                .tag("component", "rate-limiter")
+                .register(meterRegistry);
     }
 
     /**
@@ -127,20 +127,5 @@ public class RateLimitConfig {
                 .build();
 
         return registry.rateLimiter("monitoring-api", config);
-    }
-
-    /**
-     * Global API rate limiter
-     * 1000 requests per minute
-     */
-    @Bean("global-api")
-    public RateLimiter globalApiRateLimiter(RateLimiterRegistry registry) {
-        RateLimiterConfig config = RateLimiterConfig.custom()
-                .limitForPeriod(1000)
-                .limitRefreshPeriod(Duration.ofMinutes(1))
-                .timeoutDuration(Duration.ofSeconds(1))
-                .build();
-
-        return registry.rateLimiter("global-api", config);
     }
 }

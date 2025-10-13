@@ -30,7 +30,7 @@ public class EmployeeDto {
     
     @Schema(description = "Furigana", example = "tanaka taro")
     @Size(max = 200, message = "Furigana length cannot exceed 200 characters")
-    @Pattern(regexp = "^[\\p{IsHiragana}\\p{IsKatakana}ー\\p{IsLatin}\\s（）()]*$", message = "Furigana can only contain hiragana, katakana, Latin characters, spaces, and parentheses")
+    @Pattern(regexp = "^[\\p{IsHiragana}\\p{IsKatakana}ー\\p{IsLatin}\\s\u3000（）()]*$", message = "Furigana can only contain hiragana, katakana, Latin characters, spaces, and parentheses")
     private String furigana;
     
     @Schema(description = "Birthday", example = "1990-01-01", type = "string", format = "date")

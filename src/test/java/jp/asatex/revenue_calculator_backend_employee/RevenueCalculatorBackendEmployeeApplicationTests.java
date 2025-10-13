@@ -113,11 +113,6 @@ class RevenueCalculatorBackendEmployeeApplicationTests {
             assertThat(applicationContext.containsBean("validationConfig")).isTrue();
         }
 
-        @Test
-        @DisplayName("LoggingConfig should exist")
-        void testLoggingConfigExists() {
-            assertThat(applicationContext.containsBean("loggingConfig")).isTrue();
-        }
 
         @Test
         @DisplayName("SwaggerConfig should exist")

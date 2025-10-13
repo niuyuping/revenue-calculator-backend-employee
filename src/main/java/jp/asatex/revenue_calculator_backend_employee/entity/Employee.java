@@ -31,7 +31,7 @@ public class Employee {
     private String name;
     
     @Size(max = 200, message = "Furigana length cannot exceed 200 characters")
-    @Pattern(regexp = "^[\\p{IsHiragana}\\p{IsKatakana}\\p{IsLatin}\\s（）]*$", message = "Furigana can only contain hiragana, katakana, Latin characters, spaces, and parentheses")
+    @Pattern(regexp = "^[\\p{IsHiragana}\\p{IsKatakana}ー\\p{IsLatin}\\s\u3000（）()]*$", message = "Furigana can only contain hiragana, katakana, Latin characters, spaces, and parentheses")
     @Column("furigana")
     private String furigana;
     

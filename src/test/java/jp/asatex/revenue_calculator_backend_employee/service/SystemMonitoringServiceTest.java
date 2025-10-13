@@ -7,6 +7,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -14,27 +15,32 @@ import java.time.Duration;
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
- * TransactionMonitoringService test class
+ * SystemMonitoringService test class
  */
-@DisplayName("TransactionMonitoringService Test")
-class TransactionMonitoringServiceTest {
+@DisplayName("SystemMonitoringService Test")
+class SystemMonitoringServiceTest {
 
-    private TransactionMonitoringService transactionMonitoringService;
+    private SystemMonitoringService systemMonitoringService;
     private MeterRegistry meterRegistry;
+    private DatabaseClient databaseClient;
 
     @BeforeEach
     void setUp() {
         meterRegistry = new SimpleMeterRegistry();
-        transactionMonitoringService = new TransactionMonitoringService(meterRegistry);
+        databaseClient = mock(DatabaseClient.class);
+        systemMonitoringService = new SystemMonitoringService(databaseClient, meterRegistry);
     }
+
+    // ==================== Transaction Monitoring Tests ====================
 
     @Test
     @DisplayName("Recording transaction start should work correctly")
     void testRecordTransactionStart() {
         // Record transaction start
-        Instant startTime = transactionMonitoringService.recordTransactionStart("TEST_OPERATION", "Test Operation");
+        Instant startTime = systemMonitoringService.recordTransactionStart("TEST_OPERATION", "Test Operation");
         
         assertThat(startTime).isNotNull();
         
@@ -50,7 +56,7 @@ class TransactionMonitoringServiceTest {
         Instant startTime = Instant.now().minus(Duration.ofMillis(100));
         
         // Record transaction commit
-        transactionMonitoringService.recordTransactionCommit("TEST_OPERATION", startTime, "Test Operation");
+        systemMonitoringService.recordTransactionCommit("TEST_OPERATION", startTime, "Test Operation");
         
         // Verify counter increment
         Counter counter = meterRegistry.find("transaction.commit").counter();
@@ -69,7 +75,7 @@ class TransactionMonitoringServiceTest {
         Instant startTime = Instant.now().minus(Duration.ofMillis(50));
         
         // Record transaction rollback
-        transactionMonitoringService.recordTransactionRollback("TEST_OPERATION", startTime, "Test Rollback");
+        systemMonitoringService.recordTransactionRollback("TEST_OPERATION", startTime, "Test Rollback");
         
         // Verify counter increment
         Counter counter = meterRegistry.find("transaction.rollback").counter();
@@ -89,7 +95,7 @@ class TransactionMonitoringServiceTest {
         RuntimeException error = new RuntimeException("Test error");
         
         // Record transaction error
-        transactionMonitoringService.recordTransactionError("TEST_OPERATION", startTime, error);
+        systemMonitoringService.recordTransactionError("TEST_OPERATION", startTime, error);
         
         // Verify counter increment
         Counter counter = meterRegistry.find("transaction.error").counter();
@@ -106,7 +112,7 @@ class TransactionMonitoringServiceTest {
     @DisplayName("Monitoring transaction operations should work correctly")
     void testMonitorTransaction() {
         // Test successful transaction
-        StepVerifier.create(transactionMonitoringService.monitorTransaction(
+        StepVerifier.create(systemMonitoringService.monitorTransaction(
                 "TEST_OPERATION", 
                 "Test Operation", 
                 Mono.just("Success Result")
@@ -128,7 +134,7 @@ class TransactionMonitoringServiceTest {
         RuntimeException error = new RuntimeException("Test error");
         
         // Test failed transaction
-        StepVerifier.create(transactionMonitoringService.monitorTransaction(
+        StepVerifier.create(systemMonitoringService.monitorTransaction(
                 "TEST_OPERATION", 
                 "Test Operation", 
                 Mono.error(error)
@@ -148,13 +154,13 @@ class TransactionMonitoringServiceTest {
     @DisplayName("Getting transaction statistics should work correctly")
     void testGetTransactionStats() {
         // Execute some operations
-        transactionMonitoringService.recordTransactionStart("OP1", "Operation 1");
-        transactionMonitoringService.recordTransactionStart("OP2", "Operation 2");
-        transactionMonitoringService.recordTransactionCommit("OP1", Instant.now(), "Operation 1");
-        transactionMonitoringService.recordTransactionRollback("OP2", Instant.now(), "Operation 2");
+        systemMonitoringService.recordTransactionStart("OP1", "Operation 1");
+        systemMonitoringService.recordTransactionStart("OP2", "Operation 2");
+        systemMonitoringService.recordTransactionCommit("OP1", Instant.now(), "Operation 1");
+        systemMonitoringService.recordTransactionRollback("OP2", Instant.now(), "Operation 2");
         
         // Get statistics
-        TransactionMonitoringService.TransactionStats stats = transactionMonitoringService.getTransactionStats();
+        SystemMonitoringService.TransactionStats stats = systemMonitoringService.getTransactionStats();
         
         assertThat(stats).isNotNull();
         assertThat(stats.getTotalStarts()).isEqualTo(2);
@@ -166,7 +172,7 @@ class TransactionMonitoringServiceTest {
     @Test
     @DisplayName("Transaction statistics toString should format correctly")
     void testTransactionStatsToString() {
-        TransactionMonitoringService.TransactionStats stats = new TransactionMonitoringService.TransactionStats(
+        SystemMonitoringService.TransactionStats stats = new SystemMonitoringService.TransactionStats(
                 10, 8, 1, 1, 150.5
         );
         
@@ -176,5 +182,95 @@ class TransactionMonitoringServiceTest {
         assertThat(statsString).contains("rollbacks=1");
         assertThat(statsString).contains("errors=1");
         assertThat(statsString).contains("avgDuration=150.50ms");
+    }
+
+    // ==================== Database Monitoring Tests ====================
+    // Note: Database monitoring tests are complex due to R2DBC mocking requirements
+    // These tests are covered in integration tests with real database connections
+
+    // ==================== Data Classes Tests ====================
+
+    @Test
+    @DisplayName("DatabaseStats should have correct getters")
+    void testDatabaseStatsGetters() {
+        SystemMonitoringService.DatabaseHealth health = new SystemMonitoringService.DatabaseHealth(
+                "UP", "v1.0", "test_db", "user", Instant.now(), "OK"
+        );
+        SystemMonitoringService.TableStats tableStats = new SystemMonitoringService.TableStats(
+                java.util.Map.of(), 0, 0, 0, 0
+        );
+        SystemMonitoringService.ConnectionStats connectionStats = new SystemMonitoringService.ConnectionStats(
+                10, 5, 5, 0, 100.0
+        );
+        
+        SystemMonitoringService.DatabaseStats stats = new SystemMonitoringService.DatabaseStats(
+                health, tableStats, connectionStats
+        );
+        
+        assertThat(stats.getHealth()).isEqualTo(health);
+        assertThat(stats.getTableStats()).isEqualTo(tableStats);
+        assertThat(stats.getConnectionStats()).isEqualTo(connectionStats);
+    }
+
+    @Test
+    @DisplayName("ConnectionStats should have correct getters")
+    void testConnectionStatsGetters() {
+        SystemMonitoringService.ConnectionStats stats = new SystemMonitoringService.ConnectionStats(
+                100, 50, 30, 5, 200.5
+        );
+        
+        assertThat(stats.getTotalConnections()).isEqualTo(100);
+        assertThat(stats.getActiveConnections()).isEqualTo(50);
+        assertThat(stats.getIdleConnections()).isEqualTo(30);
+        assertThat(stats.getConnectionErrors()).isEqualTo(5);
+        assertThat(stats.getAverageConnectionTime()).isEqualTo(200.5);
+    }
+
+    @Test
+    @DisplayName("DatabaseHealth should have correct getters")
+    void testDatabaseHealthGetters() {
+        Instant now = Instant.now();
+        SystemMonitoringService.DatabaseHealth health = new SystemMonitoringService.DatabaseHealth(
+                "UP", "v1.0", "test_db", "user", now, "OK"
+        );
+        
+        assertThat(health.getStatus()).isEqualTo("UP");
+        assertThat(health.getVersion()).isEqualTo("v1.0");
+        assertThat(health.getDatabase()).isEqualTo("test_db");
+        assertThat(health.getUser()).isEqualTo("user");
+        assertThat(health.getLastChecked()).isEqualTo(now);
+        assertThat(health.getMessage()).isEqualTo("OK");
+    }
+
+    @Test
+    @DisplayName("TableStats should have correct getters")
+    void testTableStatsGetters() {
+        java.util.Map<String, SystemMonitoringService.TableInfo> tables = java.util.Map.of(
+                "employees", new SystemMonitoringService.TableInfo("employees", 100, 50, 20, 5)
+        );
+        
+        SystemMonitoringService.TableStats stats = new SystemMonitoringService.TableStats(
+                tables, 100, 50, 20, 5
+        );
+        
+        assertThat(stats.getTables()).isEqualTo(tables);
+        assertThat(stats.getTotalRows()).isEqualTo(100);
+        assertThat(stats.getTotalInserts()).isEqualTo(50);
+        assertThat(stats.getTotalUpdates()).isEqualTo(20);
+        assertThat(stats.getTotalDeletes()).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("TableInfo should have correct getters")
+    void testTableInfoGetters() {
+        SystemMonitoringService.TableInfo info = new SystemMonitoringService.TableInfo(
+                "employees", 100, 50, 20, 5
+        );
+        
+        assertThat(info.getTableName()).isEqualTo("employees");
+        assertThat(info.getRowCount()).isEqualTo(100);
+        assertThat(info.getInserts()).isEqualTo(50);
+        assertThat(info.getUpdates()).isEqualTo(20);
+        assertThat(info.getDeletes()).isEqualTo(5);
     }
 }

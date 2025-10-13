@@ -1,10 +1,9 @@
 package jp.asatex.revenue_calculator_backend_employee.controller;
 
 import jp.asatex.revenue_calculator_backend_employee.dto.EmployeeDto;
-import jp.asatex.revenue_calculator_backend_employee.dto.PageRequest;
-import jp.asatex.revenue_calculator_backend_employee.dto.PageResponse;
-import jp.asatex.revenue_calculator_backend_employee.dto.SortDirection;
-import jp.asatex.revenue_calculator_backend_employee.service.EmployeeService;
+import jp.asatex.revenue_calculator_backend_employee.common.PageRequest;
+import jp.asatex.revenue_calculator_backend_employee.common.PageResponse;
+import jp.asatex.revenue_calculator_backend_employee.application.EmployeeApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +16,6 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Max;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,23 +36,31 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 public class EmployeeController {
     
     @Autowired
-    private EmployeeService employeeService;
+    private EmployeeApplicationService employeeApplicationService;
     
     /**
-     * Get all employees
-     * GET /api/v1/employee
-     * @return Flux<EmployeeDto>
+     * Get employees with pagination
+     * GET /api/v1/employee?page=0&size=10&sortBy=name&sortDirection=ASC
+     * @param page Page number (0-based)
+     * @param size Page size
+     * @param sortBy Sort field
+     * @param sortDirection Sort direction (ASC/DESC)
+     * @return Mono<PageResponse<EmployeeDto>>
      */
-    @Operation(summary = "Get all employees", description = "Retrieve all employee information registered in the system")
+    @Operation(summary = "Get employees with pagination", description = "Retrieve employee information with pagination support")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success", 
-                    content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
+                    content = @Content(schema = @Schema(implementation = PageResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid parameters"),
             @ApiResponse(responseCode = "500", description = "Server error")
     })
     @GetMapping
     @RateLimiter(name = "employee-pagination")
-    public Flux<EmployeeDto> getAllEmployees() {
-        return employeeService.getAllEmployees();
+    public Mono<PageResponse<EmployeeDto>> getEmployeesWithPagination(
+            @Parameter(description = "Pagination parameters") 
+            @Valid PageRequest pageRequest) {
+        
+        return employeeApplicationService.getEmployeesWithPagination(pageRequest);
     }
     
     /**
@@ -76,7 +81,7 @@ public class EmployeeController {
     public Mono<ResponseEntity<EmployeeDto>> getEmployeeById(
             @Parameter(description = "Employee ID", required = true, example = "1")
             @PathVariable @NotNull @Positive(message = "Employee ID must be positive") Long id) {
-        return employeeService.getEmployeeById(id)
+        return employeeApplicationService.getEmployeeById(id)
                 .map(employee -> ResponseEntity.ok(employee))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
@@ -99,7 +104,7 @@ public class EmployeeController {
     public Mono<ResponseEntity<EmployeeDto>> getEmployeeByNumber(
             @Parameter(description = "Employee number", required = true, example = "EMP001")
             @PathVariable @NotBlank(message = "Employee numbercannot be empty") @Size(min = 1, max = 20, message = "Employee numberlength must be between 1-20 characters") @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "Employee numbercan only contain letters, numbers, underscores, and hyphens") String employeeNumber) {
-        return employeeService.getEmployeeByNumber(employeeNumber)
+        return employeeApplicationService.getEmployeeByNumber(employeeNumber)
                 .map(employee -> ResponseEntity.ok(employee))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
@@ -122,7 +127,7 @@ public class EmployeeController {
     public Flux<EmployeeDto> searchEmployeesByName(
             @Parameter(description = "Search keyword", required = true, example = "Tanaka")
             @RequestParam @NotBlank(message = "Search keyword cannot be empty") @Size(min = 1, max = 100, message = "Search keyword length must be between 1-100 characters") String name) {
-        return employeeService.searchEmployeesByName(name);
+        return employeeApplicationService.searchEmployeesByName(name);
     }
     
     /**
@@ -143,41 +148,10 @@ public class EmployeeController {
     public Flux<EmployeeDto> searchEmployeesByFurigana(
             @Parameter(description = "Search keyword", required = true, example = "tanaka")
             @RequestParam @NotBlank(message = "Search keyword cannot be empty") @Size(min = 1, max = 100, message = "Search keyword length must be between 1-100 characters") String furigana) {
-        return employeeService.searchEmployeesByFurigana(furigana);
+        return employeeApplicationService.searchEmployeesByFurigana(furigana);
     }
     
     
-    /**
-     * Get all employees with pagination
-     * GET /api/v1/employee/paged
-     * @param page Page number (starts from 0)
-     * @param size Page size
-     * @param sortBy Sort field
-     * @param sortDirection Sort direction
-     * @return Mono<PageResponse<EmployeeDto>>
-     */
-    @Operation(summary = "Get all employees with pagination", description = "Query employee list with pagination and sorting support")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Success", 
-                    content = @Content(schema = @Schema(implementation = PageResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid pagination parameters"),
-            @ApiResponse(responseCode = "500", description = "Server error")
-    })
-    @GetMapping("/paged")
-    @RateLimiter(name = "employee-pagination")
-    public Mono<PageResponse<EmployeeDto>> getAllEmployeesWithPagination(
-            @Parameter(description = "Page number, starting from 0", example = "0")
-            @RequestParam(defaultValue = "0") @Min(0) int page,
-            @Parameter(description = "Page size", example = "10")
-            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
-            @Parameter(description = "Sort field", example = "name")
-            @RequestParam(defaultValue = "employeeId") String sortBy,
-            @Parameter(description = "Sort direction", example = "ASC")
-            @RequestParam(defaultValue = "ASC") String sortDirection) {
-        
-        PageRequest pageRequest = new PageRequest(page, size, sortBy, SortDirection.fromString(sortDirection));
-        return employeeService.getEmployeesWithPagination(pageRequest);
-    }
     
     
     
@@ -200,7 +174,7 @@ public class EmployeeController {
     public Mono<ResponseEntity<EmployeeDto>> createEmployee(
             @Parameter(description = "Employee information", required = true)
             @RequestBody @Valid EmployeeDto employeeDto) {
-        return employeeService.createEmployee(employeeDto)
+        return employeeApplicationService.createEmployee(employeeDto)
                 .map(createdEmployee -> ResponseEntity.status(HttpStatus.CREATED).body(createdEmployee));
     }
     
@@ -226,7 +200,7 @@ public class EmployeeController {
             @PathVariable @NotNull @Positive(message = "Employee ID must be positive") Long id, 
             @Parameter(description = "Employee information to update", required = true)
             @RequestBody @Valid EmployeeDto employeeDto) {
-        return employeeService.updateEmployee(id, employeeDto)
+        return employeeApplicationService.updateEmployee(id, employeeDto)
                 .map(updatedEmployee -> ResponseEntity.ok(updatedEmployee))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
@@ -249,7 +223,7 @@ public class EmployeeController {
     public Mono<ResponseEntity<Void>> deleteEmployeeById(
             @Parameter(description = "Employee ID", required = true, example = "1")
             @PathVariable @NotNull @Positive(message = "Employee ID must be positive") Long id) {
-        return employeeService.deleteEmployeeById(id)
+        return employeeApplicationService.deleteEmployee(id)
                 .then(Mono.just(ResponseEntity.noContent().<Void>build()));
     }
     
@@ -271,7 +245,7 @@ public class EmployeeController {
     public Mono<ResponseEntity<Void>> deleteEmployeeByNumber(
             @Parameter(description = "Employee number", required = true, example = "EMP001")
             @PathVariable @NotBlank(message = "Employee numbercannot be empty") @Size(min = 1, max = 20, message = "Employee numberlength must be between 1-20 characters") @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "Employee numbercan only contain letters, numbers, underscores, and hyphens") String employeeNumber) {
-        return employeeService.deleteEmployeeByNumber(employeeNumber)
+        return employeeApplicationService.deleteEmployeeByNumber(employeeNumber)
                 .then(Mono.just(ResponseEntity.noContent().<Void>build()));
     }
     
