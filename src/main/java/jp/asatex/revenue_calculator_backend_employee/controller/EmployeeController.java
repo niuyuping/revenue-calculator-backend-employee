@@ -31,6 +31,7 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
  */
 @RestController
 @CrossOrigin(origins = "*")
+@RequestMapping("/api/v1/employee")
 @Tag(name = "Employee Management", description = "Employee Management API")
 public class EmployeeController {
     
