@@ -30,7 +30,6 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
  * Provides REST API endpoints for employee management
  */
 @RestController
-@RequestMapping("/api/v1/employee")
 @CrossOrigin(origins = "*")
 @Tag(name = "Employee Management", description = "Employee Management API")
 public class EmployeeController {
