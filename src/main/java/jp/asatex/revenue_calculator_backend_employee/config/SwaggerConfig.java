@@ -54,6 +54,13 @@ public class SwaggerConfig {
                             .url("/")
                             .description("Production server")
             );
+        } else if ("test".equals(activeProfile)) {
+            // Testing environment
+            return List.of(
+                    new Server()
+                            .url("/test/")
+                            .description("Testing server")
+            );
         } else {
             // Development environment
             return List.of(
