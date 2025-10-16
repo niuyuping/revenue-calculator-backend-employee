@@ -35,8 +35,8 @@ public class SwaggerConfig {
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("ASATEX Development Team")
-                                .email("dev@asatex.jp")
-                                .url("https://asatex.jp"))
+                                .email("niuyuping@asatex.jp")
+                                .url("https://www.asatex.jp"))
                         .license(new License()
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")))
@@ -53,6 +53,13 @@ public class SwaggerConfig {
                     new Server()
                             .url("/")
                             .description("Production server")
+            );
+        } else if ("test".equals(activeProfile)) {
+            // Testing environment
+            return List.of(
+                    new Server()
+                            .url("/test/")
+                            .description("Testing server")
             );
         } else {
             // Development environment
