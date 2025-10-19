@@ -134,7 +134,6 @@ public class EmployeeService {
     @Transactional
     @CachePut(value = "employees", key = "#id")
     public Mono<EmployeeDto> updateEmployee(Long id, EmployeeDto employeeDto) {
-        logger.info("Updating employee with ID: {}", id);
         employeeOperationCounter.increment();
         employeeUpdateCounter.increment();
         
@@ -146,12 +145,13 @@ public class EmployeeService {
                         .flatMap(existingEmployee -> {
                             Employee updatedEmployee = convertToEntity(employeeDto);
                             updatedEmployee.setEmployeeId(id);
+                            logger.info("Updating employee with: {}", updatedEmployee.toString());
                             return employeeRepository.save(updatedEmployee);
                         })
                         .map(this::convertToDto)
                         .doOnSuccess(updatedEmployee -> {
-                            logger.info("Successfully updated employee: {} with ID: {}", 
-                                    updatedEmployee.getEmployeeNumber(), updatedEmployee.getEmployeeId());
+                            logger.info("Successfully updated employee ID: {} with: {}", 
+                                    updatedEmployee.getEmployeeId(), updatedEmployee.toString());
                         })
                         .doOnError(error -> {
                             logger.error("Failed to update employee with ID: {}", id, error);
@@ -337,6 +337,31 @@ public class EmployeeService {
         dto.setName(employee.getName());
         dto.setFurigana(employee.getFurigana());
         dto.setBirthday(employee.getBirthday());
+        dto.setEmail(employee.getEmail());
+        dto.setBasicSalary(employee.getBasicSalary());
+        dto.setDependentCount(employee.getDependentCount());
+        dto.setHealthInsuranceEnrolled(employee.getHealthInsuranceEnrolled());
+        dto.setWelfarePensionEnrolled(employee.getWelfarePensionEnrolled());
+        dto.setUnitPrice(employee.getUnitPrice());
+        dto.setIndividualBusinessAmount(employee.getIndividualBusinessAmount());
+        dto.setPositionAllowance(employee.getPositionAllowance());
+        dto.setHousingAllowance(employee.getHousingAllowance());
+        dto.setFamilyAllowance(employee.getFamilyAllowance());
+        dto.setCollectionFeeAmount(employee.getCollectionFeeAmount());
+        dto.setPaymentFeeAmount(employee.getPaymentFeeAmount());
+        dto.setThirdPartyManagementRate(employee.getThirdPartyManagementRate());
+        dto.setThirdPartyProfitDistributionRate(employee.getThirdPartyProfitDistributionRate());
+        dto.setPhoneNumber(employee.getPhoneNumber());
+        dto.setConsumptionTaxRate(employee.getConsumptionTaxRate());
+        dto.setNonWorkingDeduction(employee.getNonWorkingDeduction());
+        dto.setOvertimeAllowance(employee.getOvertimeAllowance());
+        dto.setCommutingAllowance(employee.getCommutingAllowance());
+        dto.setRemarks(employee.getRemarks());
+        dto.setIsDisabled(employee.getIsDisabled());
+        dto.setIsSingleParent(employee.getIsSingleParent());
+        dto.setIsWidow(employee.getIsWidow());
+        dto.setIsWorkingStudent(employee.getIsWorkingStudent());
+        dto.setDisabledDependentCount(employee.getDisabledDependentCount());
         
         return dto;
     }
@@ -357,6 +382,31 @@ public class EmployeeService {
         employee.setName(dto.getName());
         employee.setFurigana(dto.getFurigana());
         employee.setBirthday(dto.getBirthday());
+        employee.setEmail(dto.getEmail());
+        employee.setBasicSalary(dto.getBasicSalary());
+        employee.setDependentCount(dto.getDependentCount());
+        employee.setHealthInsuranceEnrolled(dto.getHealthInsuranceEnrolled());
+        employee.setWelfarePensionEnrolled(dto.getWelfarePensionEnrolled());
+        employee.setUnitPrice(dto.getUnitPrice());
+        employee.setIndividualBusinessAmount(dto.getIndividualBusinessAmount());
+        employee.setPositionAllowance(dto.getPositionAllowance());
+        employee.setHousingAllowance(dto.getHousingAllowance());
+        employee.setFamilyAllowance(dto.getFamilyAllowance());
+        employee.setCollectionFeeAmount(dto.getCollectionFeeAmount());
+        employee.setPaymentFeeAmount(dto.getPaymentFeeAmount());
+        employee.setThirdPartyManagementRate(dto.getThirdPartyManagementRate());
+        employee.setThirdPartyProfitDistributionRate(dto.getThirdPartyProfitDistributionRate());
+        employee.setPhoneNumber(dto.getPhoneNumber());
+        employee.setConsumptionTaxRate(dto.getConsumptionTaxRate());
+        employee.setNonWorkingDeduction(dto.getNonWorkingDeduction());
+        employee.setOvertimeAllowance(dto.getOvertimeAllowance());
+        employee.setCommutingAllowance(dto.getCommutingAllowance());
+        employee.setRemarks(dto.getRemarks());
+        employee.setIsDisabled(dto.getIsDisabled());
+        employee.setIsSingleParent(dto.getIsSingleParent());
+        employee.setIsWidow(dto.getIsWidow());
+        employee.setIsWorkingStudent(dto.getIsWorkingStudent());
+        employee.setDisabledDependentCount(dto.getDisabledDependentCount());
         
         return employee;
     }

@@ -32,7 +32,7 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("Revenue Calculator Employee API")
                         .description(buildDescription())
-                        .version("1.0.0")
+                        .version("1.4.0")
                         .contact(new Contact()
                                 .name("ASATEX Development Team")
                                 .email("niuyuping@asatex.jp")
@@ -78,10 +78,22 @@ public class SwaggerConfig {
     private String buildDescription() {
         return "Employee management API for Revenue Calculator system.\n\n" +
                 "## Features\n" +
-                "- Complete CRUD operations for employee data\n" +
+                "- Complete CRUD operations for employee data (including comprehensive allowance and fee tracking)\n" +
                 "- Advanced search functionality (by name and furigana)\n" +
+                "- Comprehensive data validation (email format, monetary constraints, rate validation)\n" +
                 "- Reactive programming with Spring WebFlux\n" +
                 "- Rate limiting for API protection\n\n" +
+                "## Employee Data Model\n" +
+                "- **Basic Info**: Employee number, name, furigana, birthday\n" +
+                "- **Contact**: Email address with format validation\n" +
+                "- **Compensation**: Basic salary in JPY with precision handling\n" +
+                "- **Insurance**: Health insurance and welfare pension enrollment status\n" +
+                "- **Dependents**: Dependent count for tax calculation\n" +
+                "- **Pricing**: Unit price per hour/day and individual business amounts\n" +
+                "- **Allowances**: Position, housing, and family allowance amounts\n" +
+                "- **Fees**: Collection and payment fee amounts\n" +
+                "- **Third Party**: Management and profit distribution rates\n" +
+                "- **System Fields**: Created/updated timestamps, soft delete support\n\n" +
                 "## Authentication\n" +
                 "Currently no authentication required. All endpoints are publicly accessible.\n\n" +
                 "## Rate Limiting\n" +
