@@ -5,12 +5,13 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import jakarta.validation.constraints.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
  * Employee entity class
- * Contains basic employee information: employee number, name, furigana, birthday
+ * Contains employee information: basic info, contact, salary, insurance, payment details, allowances and fees
  */
 @Table("employeeInfo")
 public class Employee {
@@ -39,6 +40,73 @@ public class Employee {
     @Column("birthday")
     private LocalDate birthday;
     
+    @Email(message = "Email format is invalid")
+    @Size(max = 255, message = "Email length cannot exceed 255 characters")
+    @Column("email")
+    private String email;
+    
+    @DecimalMin(value = "0.0", message = "Basic salary must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Basic salary must have at most 10 integer digits and 2 decimal places")
+    @Column("basic_salary")
+    private BigDecimal basicSalary;
+    
+    @Min(value = 0, message = "Dependent count must be non-negative")
+    @Column("dependent_count")
+    private Integer dependentCount;
+    
+    @Column("health_insurance_enrolled")
+    private Boolean healthInsuranceEnrolled;
+    
+    @Column("welfare_pension_enrolled")
+    private Boolean welfarePensionEnrolled;
+    
+    @DecimalMin(value = "0.01", message = "Unit price must be positive")
+    @Digits(integer = 10, fraction = 2, message = "Unit price must have at most 10 integer digits and 2 decimal places")
+    @Column("unit_price")
+    private BigDecimal unitPrice;
+    
+    @DecimalMin(value = "0.0", message = "Individual business amount must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Individual business amount must have at most 10 integer digits and 2 decimal places")
+    @Column("individual_business_amount")
+    private BigDecimal individualBusinessAmount;
+    
+    @DecimalMin(value = "0.0", message = "Position allowance must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Position allowance must have at most 10 integer digits and 2 decimal places")
+    @Column("position_allowance")
+    private BigDecimal positionAllowance;
+    
+    @DecimalMin(value = "0.0", message = "Housing allowance must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Housing allowance must have at most 10 integer digits and 2 decimal places")
+    @Column("housing_allowance")
+    private BigDecimal housingAllowance;
+    
+    @DecimalMin(value = "0.0", message = "Family allowance must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Family allowance must have at most 10 integer digits and 2 decimal places")
+    @Column("family_allowance")
+    private BigDecimal familyAllowance;
+    
+    @DecimalMin(value = "0.0", message = "Collection fee amount must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Collection fee amount must have at most 10 integer digits and 2 decimal places")
+    @Column("collection_fee_amount")
+    private BigDecimal collectionFeeAmount;
+    
+    @DecimalMin(value = "0.0", message = "Payment fee amount must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Payment fee amount must have at most 10 integer digits and 2 decimal places")
+    @Column("payment_fee_amount")
+    private BigDecimal paymentFeeAmount;
+    
+    @DecimalMin(value = "0.0", message = "Third party management rate must be non-negative")
+    @DecimalMax(value = "1.0", message = "Third party management rate must not exceed 100%")
+    @Digits(integer = 1, fraction = 4, message = "Third party management rate must have at most 1 integer digit and 4 decimal places")
+    @Column("third_party_management_rate")
+    private BigDecimal thirdPartyManagementRate;
+    
+    @DecimalMin(value = "0.0", message = "Third party profit distribution rate must be non-negative")
+    @DecimalMax(value = "1.0", message = "Third party profit distribution rate must not exceed 100%")
+    @Digits(integer = 1, fraction = 4, message = "Third party profit distribution rate must have at most 1 integer digit and 4 decimal places")
+    @Column("third_party_profit_distribution_rate")
+    private BigDecimal thirdPartyProfitDistributionRate;
+    
     @Column("created_at")
     private LocalDateTime createdAt;
     
@@ -58,12 +126,26 @@ public class Employee {
     public Employee() {}
     
     // All parameters constructor
-    public Employee(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday) {
+    public Employee(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday, String email, BigDecimal basicSalary, Integer dependentCount, Boolean healthInsuranceEnrolled, Boolean welfarePensionEnrolled, BigDecimal unitPrice, BigDecimal individualBusinessAmount, BigDecimal positionAllowance, BigDecimal housingAllowance, BigDecimal familyAllowance, BigDecimal collectionFeeAmount, BigDecimal paymentFeeAmount, BigDecimal thirdPartyManagementRate, BigDecimal thirdPartyProfitDistributionRate) {
         this.employeeId = employeeId;
         this.employeeNumber = employeeNumber;
         this.name = name;
         this.furigana = furigana;
         this.birthday = birthday;
+        this.email = email;
+        this.basicSalary = basicSalary;
+        this.dependentCount = dependentCount;
+        this.healthInsuranceEnrolled = healthInsuranceEnrolled;
+        this.welfarePensionEnrolled = welfarePensionEnrolled;
+        this.unitPrice = unitPrice;
+        this.individualBusinessAmount = individualBusinessAmount;
+        this.positionAllowance = positionAllowance;
+        this.housingAllowance = housingAllowance;
+        this.familyAllowance = familyAllowance;
+        this.collectionFeeAmount = collectionFeeAmount;
+        this.paymentFeeAmount = paymentFeeAmount;
+        this.thirdPartyManagementRate = thirdPartyManagementRate;
+        this.thirdPartyProfitDistributionRate = thirdPartyProfitDistributionRate;
     }
     
     // Getter and Setter methods
@@ -105,6 +187,118 @@ public class Employee {
     
     public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
+    }
+    
+    public String getEmail() {
+        return email;
+    }
+    
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    
+    public BigDecimal getBasicSalary() {
+        return basicSalary;
+    }
+    
+    public void setBasicSalary(BigDecimal basicSalary) {
+        this.basicSalary = basicSalary;
+    }
+    
+    public Integer getDependentCount() {
+        return dependentCount;
+    }
+    
+    public void setDependentCount(Integer dependentCount) {
+        this.dependentCount = dependentCount;
+    }
+    
+    public Boolean getHealthInsuranceEnrolled() {
+        return healthInsuranceEnrolled;
+    }
+    
+    public void setHealthInsuranceEnrolled(Boolean healthInsuranceEnrolled) {
+        this.healthInsuranceEnrolled = healthInsuranceEnrolled;
+    }
+    
+    public Boolean getWelfarePensionEnrolled() {
+        return welfarePensionEnrolled;
+    }
+    
+    public void setWelfarePensionEnrolled(Boolean welfarePensionEnrolled) {
+        this.welfarePensionEnrolled = welfarePensionEnrolled;
+    }
+    
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
+    }
+    
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+    
+    public BigDecimal getIndividualBusinessAmount() {
+        return individualBusinessAmount;
+    }
+    
+    public void setIndividualBusinessAmount(BigDecimal individualBusinessAmount) {
+        this.individualBusinessAmount = individualBusinessAmount;
+    }
+    
+    public BigDecimal getPositionAllowance() {
+        return positionAllowance;
+    }
+    
+    public void setPositionAllowance(BigDecimal positionAllowance) {
+        this.positionAllowance = positionAllowance;
+    }
+    
+    public BigDecimal getHousingAllowance() {
+        return housingAllowance;
+    }
+    
+    public void setHousingAllowance(BigDecimal housingAllowance) {
+        this.housingAllowance = housingAllowance;
+    }
+    
+    public BigDecimal getFamilyAllowance() {
+        return familyAllowance;
+    }
+    
+    public void setFamilyAllowance(BigDecimal familyAllowance) {
+        this.familyAllowance = familyAllowance;
+    }
+    
+    public BigDecimal getCollectionFeeAmount() {
+        return collectionFeeAmount;
+    }
+    
+    public void setCollectionFeeAmount(BigDecimal collectionFeeAmount) {
+        this.collectionFeeAmount = collectionFeeAmount;
+    }
+    
+    public BigDecimal getPaymentFeeAmount() {
+        return paymentFeeAmount;
+    }
+    
+    public void setPaymentFeeAmount(BigDecimal paymentFeeAmount) {
+        this.paymentFeeAmount = paymentFeeAmount;
+    }
+    
+    public BigDecimal getThirdPartyManagementRate() {
+        return thirdPartyManagementRate;
+    }
+    
+    public void setThirdPartyManagementRate(BigDecimal thirdPartyManagementRate) {
+        this.thirdPartyManagementRate = thirdPartyManagementRate;
+    }
+    
+    public BigDecimal getThirdPartyProfitDistributionRate() {
+        return thirdPartyProfitDistributionRate;
+    }
+    
+    public void setThirdPartyProfitDistributionRate(BigDecimal thirdPartyProfitDistributionRate) {
+        this.thirdPartyProfitDistributionRate = thirdPartyProfitDistributionRate;
     }
     
     public LocalDateTime getCreatedAt() {
@@ -159,6 +353,20 @@ public class Employee {
                 ", name='" + name + '\'' +
                 ", furigana='" + furigana + '\'' +
                 ", birthday=" + birthday +
+                ", email='" + email + '\'' +
+                ", basicSalary=" + basicSalary +
+                ", dependentCount=" + dependentCount +
+                ", healthInsuranceEnrolled=" + healthInsuranceEnrolled +
+                ", welfarePensionEnrolled=" + welfarePensionEnrolled +
+                ", unitPrice=" + unitPrice +
+                ", individualBusinessAmount=" + individualBusinessAmount +
+                ", positionAllowance=" + positionAllowance +
+                ", housingAllowance=" + housingAllowance +
+                ", familyAllowance=" + familyAllowance +
+                ", collectionFeeAmount=" + collectionFeeAmount +
+                ", paymentFeeAmount=" + paymentFeeAmount +
+                ", thirdPartyManagementRate=" + thirdPartyManagementRate +
+                ", thirdPartyProfitDistributionRate=" + thirdPartyProfitDistributionRate +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", deletedAt=" + deletedAt +

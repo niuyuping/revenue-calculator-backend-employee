@@ -32,7 +32,7 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/v1/employee")
-@Tag(name = "Employee Management", description = "Employee Management API")
+@Tag(name = "Employee Management", description = "Employee Management API with comprehensive allowance, fee, and rate tracking")
 public class EmployeeController {
     
     @Autowired
@@ -161,7 +161,7 @@ public class EmployeeController {
      * @param employeeDto Employee information
      * @return Mono<ResponseEntity<EmployeeDto>>
      */
-    @Operation(summary = "Create new employee", description = "Register a new employee in the system")
+    @Operation(summary = "Create new employee", description = "Register a new employee in the system with comprehensive allowance, fee, and rate information")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Employee created successfully", 
                     content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
@@ -185,7 +185,7 @@ public class EmployeeController {
      * @param employeeDto Employee information
      * @return Mono<ResponseEntity<EmployeeDto>>
      */
-    @Operation(summary = "Update employee information", description = "Update employee information for the specified ID")
+    @Operation(summary = "Update employee information", description = "Update employee information including allowance, fee, and rate details for the specified ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Employee information updated successfully", 
                     content = @Content(schema = @Schema(implementation = EmployeeDto.class))),

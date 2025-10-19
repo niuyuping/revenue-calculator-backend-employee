@@ -23,9 +23,9 @@ A reactive employee management system built with Spring Boot 3.x, R2DBC, and Web
 
 ## 📋 Features
 
-- ✅ **Employee CRUD Operations** - Complete employee management
+- ✅ **Employee CRUD Operations** - Complete employee management with email and salary
 - ✅ **Search & Pagination** - Search by name with paginated results
-- ✅ **Data Validation** - Comprehensive input validation
+- ✅ **Data Validation** - Comprehensive input validation including email format
 - ✅ **Rate Limiting** - API protection with Resilience4j
 - ✅ **Caching** - High-performance in-memory caching
 - ✅ **Monitoring** - Health checks and custom metrics
@@ -66,7 +66,33 @@ A reactive employee management system built with Spring Boot 3.x, R2DBC, and Web
 | `PUT` | `/api/v1/employee/{id}` | Update employee |
 | `DELETE` | `/api/v1/employee/{id}` | Delete employee |
 | `GET` | `/api/v1/employee/search/name` | Search by name |
+| `GET` | `/api/v1/employee/search/furigana` | Search by furigana |
 | `GET` | `/api/v1/employee/number/{number}` | Get by employee number |
+| `DELETE` | `/api/v1/employee/number/{number}` | Delete by employee number |
+
+## 📝 Employee Data Model
+
+| Field | Type | Description | Validation |
+|-------|------|-------------|------------|
+| `employeeId` | Long | Unique identifier | Auto-generated |
+| `employeeNumber` | String | Employee number | Required, 1-20 chars, alphanumeric |
+| `name` | String | Full name | Required, 1-100 chars |
+| `furigana` | String | Japanese pronunciation | Optional, 0-200 chars, hiragana/katakana |
+| `birthday` | LocalDate | Date of birth | Optional, past date |
+| `email` | String | Email address | Optional, valid email format, max 255 chars |
+| `basicSalary` | BigDecimal | Monthly salary in JPY | Optional, non-negative, max 10 digits |
+| `dependentCount` | Integer | Number of dependents | Optional, non-negative |
+| `healthInsuranceEnrolled` | Boolean | Health insurance enrollment | Optional, true/false |
+| `welfarePensionEnrolled` | Boolean | Welfare pension enrollment | Optional, true/false |
+| `unitPrice` | BigDecimal | Unit price per hour/day | Optional, positive, max 10 digits |
+| `individualBusinessAmount` | BigDecimal | Individual business request amount | Optional, non-negative, max 10 digits |
+| `positionAllowance` | BigDecimal | Position allowance amount | Optional, non-negative, max 10 digits |
+| `housingAllowance` | BigDecimal | Housing allowance amount | Optional, non-negative, max 10 digits |
+| `familyAllowance` | BigDecimal | Family allowance amount | Optional, non-negative, max 10 digits |
+| `collectionFeeAmount` | BigDecimal | Collection fee amount | Optional, non-negative, max 10 digits |
+| `paymentFeeAmount` | BigDecimal | Payment fee amount | Optional, non-negative, max 10 digits |
+| `thirdPartyManagementRate` | BigDecimal | Third party management rate | Optional, 0.0000-1.0000 |
+| `thirdPartyProfitDistributionRate` | BigDecimal | Third party profit distribution rate | Optional, 0.0000-1.0000 |
 
 ## 🧪 Testing
 
@@ -118,7 +144,37 @@ server.port=9001
 management.endpoints.web.exposure.include=health,info,metrics
 ```
 
-## 📝 Recent Updates (v1.1.0)
+## 📝 Recent Updates (v1.4.0)
+
+- ✅ Added comprehensive allowance and fee fields (position, housing, family allowances)
+- ✅ Added collection and payment fee amount fields
+- ✅ Added third party management and profit distribution rate fields
+- ✅ Enhanced data validation for all new monetary and rate fields
+- ✅ Updated database schema with comprehensive allowance and fee tracking
+- ✅ Improved API documentation with detailed field descriptions and examples
+- ✅ Added comprehensive test coverage for all new fields
+- ✅ Updated Swagger/OpenAPI documentation with new field examples
+
+## 📝 Previous Updates (v1.3.0)
+
+- ✅ Added insurance and payment fields (dependent count, health insurance, welfare pension)
+- ✅ Added unit price and individual business amount fields
+- ✅ Enhanced data validation for all new monetary fields
+- ✅ Updated database schema with comprehensive insurance and payment tracking
+- ✅ Improved API documentation with detailed field descriptions
+- ✅ Added comprehensive test coverage for all new fields
+- ✅ Updated Swagger/OpenAPI documentation with new field examples
+
+## 📝 Previous Updates (v1.2.0)
+
+- ✅ Added email and basic salary fields to employee model
+- ✅ Enhanced data validation with email format checking
+- ✅ Updated database schema with new fields
+- ✅ Improved API documentation with new field descriptions
+- ✅ Added comprehensive test coverage for new fields
+- ✅ Updated Swagger/OpenAPI documentation
+
+## 📝 Previous Updates (v1.1.0)
 
 - ✅ Added Application Layer for better architecture
 - ✅ Unified monitoring services and controllers
@@ -135,4 +191,4 @@ management.endpoints.web.exposure.include=health,info,metrics
 
 ---
 
-**Version**: v1.1.0 | **Last Updated**: October 2025 | **Java**: 21+ | **Spring Boot**: 3.5.6+
+**Version**: v1.4.0 | **Last Updated**: December 2024 | **Java**: 21+ | **Spring Boot**: 3.5.6+
