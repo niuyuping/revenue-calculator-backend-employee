@@ -54,7 +54,7 @@ class EmployeeDtoTest {
             LocalDate birthday = LocalDate.of(1990, 5, 15);
 
             // When
-            EmployeeDto dto = new EmployeeDto(employeeId, employeeNumber, name, furigana, birthday, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto = new EmployeeDto(employeeId, employeeNumber, name, furigana, birthday, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // Then
             assertNotNull(dto);
@@ -69,7 +69,7 @@ class EmployeeDtoTest {
         @DisplayName("Constructor works with null parameters")
         void testAllArgsConstructorWithNulls() {
             // When
-            EmployeeDto dto = new EmployeeDto(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto = new EmployeeDto(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // Then
             assertNotNull(dto);
@@ -159,7 +159,7 @@ class EmployeeDtoTest {
         @DisplayName("null value setter works correctly")
         void testNullValueSetters() {
             // Given
-            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.now(), null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.now(), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // When
             dto.setEmployeeId(null);
@@ -185,8 +185,8 @@ class EmployeeDtoTest {
         @DisplayName("Objects with same content are equal")
         void testEqualsWithSameContent() {
             // Given
-            EmployeeDto dto1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-            EmployeeDto dto2 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto2 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // When & Then
             assertEquals(dto1, dto2);
@@ -197,8 +197,8 @@ class EmployeeDtoTest {
         @DisplayName("Objects with different content are not equal")
         void testEqualsWithDifferentContent() {
             // Given
-            EmployeeDto dto1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-            EmployeeDto dto2 = new EmployeeDto(2L, "EMP002", "Sato Hanako", "sato hanako", LocalDate.of(1985, 12, 3), null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto2 = new EmployeeDto(2L, "EMP002", "Sato Hanako", "sato hanako", LocalDate.of(1985, 12, 3), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // When & Then
             assertNotEquals(dto1, dto2);
@@ -209,8 +209,8 @@ class EmployeeDtoTest {
         @DisplayName("Comparison of objects containing null values works correctly")
         void testEqualsWithNullValues() {
             // Given
-            EmployeeDto dto1 = new EmployeeDto(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-            EmployeeDto dto2 = new EmployeeDto(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto1 = new EmployeeDto(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto2 = new EmployeeDto(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // When & Then
             assertEquals(dto1, dto2);
@@ -221,7 +221,7 @@ class EmployeeDtoTest {
         @DisplayName("Comparison with self is equal")
         void testEqualsWithSelf() {
             // Given
-            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // When & Then
             assertEquals(dto, dto);
@@ -231,7 +231,7 @@ class EmployeeDtoTest {
         @DisplayName("Comparison with null is not equal")
         void testEqualsWithNull() {
             // Given
-            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // When & Then
             assertNotEquals(dto, null);
@@ -241,7 +241,7 @@ class EmployeeDtoTest {
         @DisplayName("Comparison with different class is not equal")
         void testEqualsWithDifferentClass() {
             // Given
-            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
             String otherObject = "not an EmployeeDto";
 
             // When & Then
@@ -252,8 +252,8 @@ class EmployeeDtoTest {
         @DisplayName("Comparison when some fields are different")
         void testEqualsWithPartialDifferences() {
             // Given
-            EmployeeDto dto1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-            EmployeeDto dto2 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 16), null, null, null, null, null, null, null, null, null, null, null, null, null, null); // birthday is different
+            EmployeeDto dto1 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto2 = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 16), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null); // birthday is different
 
             // When & Then
             assertNotEquals(dto1, dto2);
@@ -268,7 +268,7 @@ class EmployeeDtoTest {
         @DisplayName("toString outputs in correct format")
         void testToString() {
             // Given
-            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto = new EmployeeDto(1L, "EMP001", "Tanaka Taro", "tanaka taro", LocalDate.of(1990, 5, 15), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // When
             String result = dto.toString();
@@ -287,7 +287,7 @@ class EmployeeDtoTest {
         @DisplayName("toString with null values works correctly")
         void testToStringWithNullValues() {
             // Given
-            EmployeeDto dto = new EmployeeDto(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            EmployeeDto dto = new EmployeeDto(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // When
             String result = dto.toString();

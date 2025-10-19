@@ -91,8 +91,14 @@ A reactive employee management system built with Spring Boot 3.x, R2DBC, and Web
 | `familyAllowance` | BigDecimal | Family allowance amount | Optional, non-negative, max 10 digits |
 | `collectionFeeAmount` | BigDecimal | Collection fee amount | Optional, non-negative, max 10 digits |
 | `paymentFeeAmount` | BigDecimal | Payment fee amount | Optional, non-negative, max 10 digits |
-| `thirdPartyManagementRate` | BigDecimal | Third party management rate | Optional, 0.0000-1.0000 |
-| `thirdPartyProfitDistributionRate` | BigDecimal | Third party profit distribution rate | Optional, 0.0000-1.0000 |
+| `thirdPartyManagementRate` | BigDecimal | Third party management rate | Optional, 0.00-100.00 |
+| `thirdPartyProfitDistributionRate` | BigDecimal | Third party profit distribution rate | Optional, 0.00-100.00 |
+| `phoneNumber` | String | Phone number with country code | Optional, max 20 chars, alphanumeric with special chars |
+| `consumptionTaxRate` | BigDecimal | Consumption tax rate percentage | Optional, 0.00-100.00 |
+| `nonWorkingDeduction` | BigDecimal | Non-working deduction amount in JPY | Optional, non-negative, max 10 digits |
+| `overtimeAllowance` | BigDecimal | Overtime allowance amount in JPY | Optional, non-negative, max 10 digits |
+| `commutingAllowance` | BigDecimal | Commuting allowance amount in JPY | Optional, non-negative, max 10 digits |
+| `remarks` | String | Additional remarks or notes | Optional, max 1000 chars |
 
 ## 🧪 Testing
 
@@ -144,7 +150,21 @@ server.port=9001
 management.endpoints.web.exposure.include=health,info,metrics
 ```
 
-## 📝 Recent Updates (v1.4.0)
+## 📝 Recent Updates (v1.5.0)
+
+- ✅ Added phone number field with international format support
+- ✅ Added consumption tax rate field (0.00-100.00%)
+- ✅ Added non-working deduction amount field
+- ✅ Added overtime allowance amount field
+- ✅ Added commuting allowance amount field
+- ✅ Added remarks field for additional notes (max 1000 chars)
+- ✅ Enhanced data validation for all new fields
+- ✅ Updated database schema with new employee information fields
+- ✅ Improved API documentation with detailed field descriptions and examples
+- ✅ Added comprehensive test coverage for all new fields
+- ✅ Updated Swagger/OpenAPI documentation with new field examples
+
+## 📝 Previous Updates (v1.4.0)
 
 - ✅ Added comprehensive allowance and fee fields (position, housing, family allowances)
 - ✅ Added collection and payment fee amount fields
@@ -191,4 +211,4 @@ management.endpoints.web.exposure.include=health,info,metrics
 
 ---
 
-**Version**: v1.4.0 | **Last Updated**: December 2024 | **Java**: 21+ | **Spring Boot**: 3.5.6+
+**Version**: v1.5.0 | **Last Updated**: December 2024 | **Java**: 21+ | **Spring Boot**: 3.5.6+

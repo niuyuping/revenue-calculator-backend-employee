@@ -94,23 +94,53 @@ public class EmployeeDto {
     @Digits(integer = 10, fraction = 2, message = "Payment fee amount must have at most 10 integer digits and 2 decimal places")
     private BigDecimal paymentFeeAmount;
     
-    @Schema(description = "Third party management rate (0.0000-1.0000)", example = "0.0500")
+    @Schema(description = "Third party management rate (0.00-100.00)", example = "5.00")
     @DecimalMin(value = "0.0", message = "Third party management rate must be non-negative")
-    @DecimalMax(value = "1.0", message = "Third party management rate must not exceed 100%")
-    @Digits(integer = 1, fraction = 4, message = "Third party management rate must have at most 1 integer digit and 4 decimal places")
+    @DecimalMax(value = "100.0", message = "Third party management rate must not exceed 100%")
+    @Digits(integer = 3, fraction = 2, message = "Third party management rate must have at most 3 integer digits and 2 decimal places")
     private BigDecimal thirdPartyManagementRate;
     
-    @Schema(description = "Third party profit distribution rate (0.0000-1.0000)", example = "0.0300")
+    @Schema(description = "Third party profit distribution rate (0.00-100.00)", example = "3.00")
     @DecimalMin(value = "0.0", message = "Third party profit distribution rate must be non-negative")
-    @DecimalMax(value = "1.0", message = "Third party profit distribution rate must not exceed 100%")
-    @Digits(integer = 1, fraction = 4, message = "Third party profit distribution rate must have at most 1 integer digit and 4 decimal places")
+    @DecimalMax(value = "100.0", message = "Third party profit distribution rate must not exceed 100%")
+    @Digits(integer = 3, fraction = 2, message = "Third party profit distribution rate must have at most 3 integer digits and 2 decimal places")
     private BigDecimal thirdPartyProfitDistributionRate;
+    
+    @Schema(description = "Phone number with country code", example = "+81-3-1234-5678")
+    @Size(max = 20, message = "Phone number length cannot exceed 20 characters")
+    @Pattern(regexp = "^[+]?[0-9\\s\\-\\(\\)]*$", message = "Phone number can only contain numbers, spaces, hyphens, parentheses, and optional plus sign")
+    private String phoneNumber;
+    
+    @Schema(description = "Consumption tax rate percentage (0.00-100.00)", example = "10.00")
+    @DecimalMin(value = "0.0", message = "Consumption tax rate must be non-negative")
+    @DecimalMax(value = "100.0", message = "Consumption tax rate must not exceed 100%")
+    @Digits(integer = 3, fraction = 2, message = "Consumption tax rate must have at most 3 integer digits and 2 decimal places")
+    private BigDecimal consumptionTaxRate;
+    
+    @Schema(description = "Non-working deduction amount in JPY", example = "50000.00")
+    @DecimalMin(value = "0.0", message = "Non-working deduction must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Non-working deduction must have at most 10 integer digits and 2 decimal places")
+    private BigDecimal nonWorkingDeduction;
+    
+    @Schema(description = "Overtime allowance amount in JPY", example = "25000.00")
+    @DecimalMin(value = "0.0", message = "Overtime allowance must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Overtime allowance must have at most 10 integer digits and 2 decimal places")
+    private BigDecimal overtimeAllowance;
+    
+    @Schema(description = "Commuting allowance amount in JPY", example = "15000.00")
+    @DecimalMin(value = "0.0", message = "Commuting allowance must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Commuting allowance must have at most 10 integer digits and 2 decimal places")
+    private BigDecimal commutingAllowance;
+    
+    @Schema(description = "Additional remarks or notes about the employee", example = "Special skills: Java, Spring Boot")
+    @Size(max = 1000, message = "Remarks length cannot exceed 1000 characters")
+    private String remarks;
     
     // Default constructor
     public EmployeeDto() {}
     
     // All parameters constructor
-    public EmployeeDto(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday, String email, BigDecimal basicSalary, Integer dependentCount, Boolean healthInsuranceEnrolled, Boolean welfarePensionEnrolled, BigDecimal unitPrice, BigDecimal individualBusinessAmount, BigDecimal positionAllowance, BigDecimal housingAllowance, BigDecimal familyAllowance, BigDecimal collectionFeeAmount, BigDecimal paymentFeeAmount, BigDecimal thirdPartyManagementRate, BigDecimal thirdPartyProfitDistributionRate) {
+    public EmployeeDto(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday, String email, BigDecimal basicSalary, Integer dependentCount, Boolean healthInsuranceEnrolled, Boolean welfarePensionEnrolled, BigDecimal unitPrice, BigDecimal individualBusinessAmount, BigDecimal positionAllowance, BigDecimal housingAllowance, BigDecimal familyAllowance, BigDecimal collectionFeeAmount, BigDecimal paymentFeeAmount, BigDecimal thirdPartyManagementRate, BigDecimal thirdPartyProfitDistributionRate, String phoneNumber, BigDecimal consumptionTaxRate, BigDecimal nonWorkingDeduction, BigDecimal overtimeAllowance, BigDecimal commutingAllowance, String remarks) {
         this.employeeId = employeeId;
         this.employeeNumber = employeeNumber;
         this.name = name;
@@ -130,6 +160,12 @@ public class EmployeeDto {
         this.paymentFeeAmount = paymentFeeAmount;
         this.thirdPartyManagementRate = thirdPartyManagementRate;
         this.thirdPartyProfitDistributionRate = thirdPartyProfitDistributionRate;
+        this.phoneNumber = phoneNumber;
+        this.consumptionTaxRate = consumptionTaxRate;
+        this.nonWorkingDeduction = nonWorkingDeduction;
+        this.overtimeAllowance = overtimeAllowance;
+        this.commutingAllowance = commutingAllowance;
+        this.remarks = remarks;
     }
     
     // Getter and Setter methods
@@ -285,6 +321,54 @@ public class EmployeeDto {
         this.thirdPartyProfitDistributionRate = thirdPartyProfitDistributionRate;
     }
     
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+    
+    public BigDecimal getConsumptionTaxRate() {
+        return consumptionTaxRate;
+    }
+    
+    public void setConsumptionTaxRate(BigDecimal consumptionTaxRate) {
+        this.consumptionTaxRate = consumptionTaxRate;
+    }
+    
+    public BigDecimal getNonWorkingDeduction() {
+        return nonWorkingDeduction;
+    }
+    
+    public void setNonWorkingDeduction(BigDecimal nonWorkingDeduction) {
+        this.nonWorkingDeduction = nonWorkingDeduction;
+    }
+    
+    public BigDecimal getOvertimeAllowance() {
+        return overtimeAllowance;
+    }
+    
+    public void setOvertimeAllowance(BigDecimal overtimeAllowance) {
+        this.overtimeAllowance = overtimeAllowance;
+    }
+    
+    public BigDecimal getCommutingAllowance() {
+        return commutingAllowance;
+    }
+    
+    public void setCommutingAllowance(BigDecimal commutingAllowance) {
+        this.commutingAllowance = commutingAllowance;
+    }
+    
+    public String getRemarks() {
+        return remarks;
+    }
+    
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -308,12 +392,18 @@ public class EmployeeDto {
                 Objects.equals(collectionFeeAmount, that.collectionFeeAmount) &&
                 Objects.equals(paymentFeeAmount, that.paymentFeeAmount) &&
                 Objects.equals(thirdPartyManagementRate, that.thirdPartyManagementRate) &&
-                Objects.equals(thirdPartyProfitDistributionRate, that.thirdPartyProfitDistributionRate);
+                Objects.equals(thirdPartyProfitDistributionRate, that.thirdPartyProfitDistributionRate) &&
+                Objects.equals(phoneNumber, that.phoneNumber) &&
+                Objects.equals(consumptionTaxRate, that.consumptionTaxRate) &&
+                Objects.equals(nonWorkingDeduction, that.nonWorkingDeduction) &&
+                Objects.equals(overtimeAllowance, that.overtimeAllowance) &&
+                Objects.equals(commutingAllowance, that.commutingAllowance) &&
+                Objects.equals(remarks, that.remarks);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(employeeId, employeeNumber, name, furigana, birthday, email, basicSalary, dependentCount, healthInsuranceEnrolled, welfarePensionEnrolled, unitPrice, individualBusinessAmount, positionAllowance, housingAllowance, familyAllowance, collectionFeeAmount, paymentFeeAmount, thirdPartyManagementRate, thirdPartyProfitDistributionRate);
+        return Objects.hash(employeeId, employeeNumber, name, furigana, birthday, email, basicSalary, dependentCount, healthInsuranceEnrolled, welfarePensionEnrolled, unitPrice, individualBusinessAmount, positionAllowance, housingAllowance, familyAllowance, collectionFeeAmount, paymentFeeAmount, thirdPartyManagementRate, thirdPartyProfitDistributionRate, phoneNumber, consumptionTaxRate, nonWorkingDeduction, overtimeAllowance, commutingAllowance, remarks);
     }
 
     @Override
@@ -338,6 +428,12 @@ public class EmployeeDto {
                 ", paymentFeeAmount=" + paymentFeeAmount +
                 ", thirdPartyManagementRate=" + thirdPartyManagementRate +
                 ", thirdPartyProfitDistributionRate=" + thirdPartyProfitDistributionRate +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", consumptionTaxRate=" + consumptionTaxRate +
+                ", nonWorkingDeduction=" + nonWorkingDeduction +
+                ", overtimeAllowance=" + overtimeAllowance +
+                ", commutingAllowance=" + commutingAllowance +
+                ", remarks='" + remarks + '\'' +
                 '}';
     }
 }

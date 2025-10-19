@@ -21,8 +21,14 @@
   "familyAllowance": 18000.00,
   "collectionFeeAmount": 4500.00,
   "paymentFeeAmount": 2800.00,
-  "thirdPartyManagementRate": 0.0450,
-  "thirdPartyProfitDistributionRate": 0.0280
+  "thirdPartyManagementRate": 4.50,
+  "thirdPartyProfitDistributionRate": 2.80,
+  "phoneNumber": "+81-3-1234-5678",
+  "consumptionTaxRate": 10.00,
+  "nonWorkingDeduction": 50000.00,
+  "overtimeAllowance": 25000.00,
+  "commutingAllowance": 15000.00,
+  "remarks": "Special skills: Java, Spring Boot, React"
 }
 ```
 
@@ -46,8 +52,14 @@
   "familyAllowance": 18000.00,
   "collectionFeeAmount": 4500.00,
   "paymentFeeAmount": 2800.00,
-  "thirdPartyManagementRate": 0.0450,
-  "thirdPartyProfitDistributionRate": 0.0280
+  "thirdPartyManagementRate": 4.50,
+  "thirdPartyProfitDistributionRate": 2.80,
+  "phoneNumber": "+81-3-1234-5678",
+  "consumptionTaxRate": 10.00,
+  "nonWorkingDeduction": 50000.00,
+  "overtimeAllowance": 25000.00,
+  "commutingAllowance": 15000.00,
+  "remarks": "Special skills: Java, Spring Boot, React"
 }
 ```
 
@@ -64,7 +76,13 @@
   "healthInsuranceEnrolled": true,
   "welfarePensionEnrolled": true,
   "unitPrice": 5500.00,
-  "individualBusinessAmount": 165000.00
+  "individualBusinessAmount": 165000.00,
+  "phoneNumber": "+81-3-9876-5432",
+  "consumptionTaxRate": 10.00,
+  "nonWorkingDeduction": 30000.00,
+  "overtimeAllowance": 20000.00,
+  "commutingAllowance": 12000.00,
+  "remarks": "Updated employee information"
 }
 ```
 
@@ -150,6 +168,45 @@
 ### Invalid Dependent Count Values
 - `-1` (negative values not allowed)
 - `100` (exceeds reasonable limit)
+
+### Valid Phone Number Formats
+- `+81-3-1234-5678` (international format)
+- `03-1234-5678` (domestic format)
+- `090-1234-5678` (mobile format)
+- `+1-555-123-4567` (US format)
+
+### Invalid Phone Number Formats
+- `invalid-phone` (contains letters)
+- `123` (too short)
+- `123456789012345678901` (exceeds 20 characters)
+
+### Valid Consumption Tax Rate Values
+- `10.00` (10% consumption tax)
+- `0.00` (no tax)
+- `100.00` (maximum tax rate)
+
+### Invalid Consumption Tax Rate Values
+- `-5.00` (negative values not allowed)
+- `150.00` (exceeds 100% limit)
+- `10.123` (exceeds 2 decimal places)
+
+### Valid Allowance Values
+- `50000.00` (50,000 JPY allowance)
+- `0.00` (no allowance)
+- `9999999999.99` (maximum value)
+
+### Invalid Allowance Values
+- `-1000.00` (negative values not allowed)
+- `12345678901.00` (exceeds 10 integer digits)
+- `123.456` (exceeds 2 decimal places)
+
+### Valid Remarks
+- `"Special skills: Java, Spring Boot"` (descriptive text)
+- `"Team lead for backend development"` (role description)
+- `""` (empty string allowed)
+
+### Invalid Remarks
+- Text exceeding 1000 characters (exceeds length limit)
 
 ## Error Response Examples
 

@@ -96,16 +96,46 @@ public class Employee {
     private BigDecimal paymentFeeAmount;
     
     @DecimalMin(value = "0.0", message = "Third party management rate must be non-negative")
-    @DecimalMax(value = "1.0", message = "Third party management rate must not exceed 100%")
-    @Digits(integer = 1, fraction = 4, message = "Third party management rate must have at most 1 integer digit and 4 decimal places")
+    @DecimalMax(value = "100.0", message = "Third party management rate must not exceed 100%")
+    @Digits(integer = 3, fraction = 2, message = "Third party management rate must have at most 3 integer digits and 2 decimal places")
     @Column("third_party_management_rate")
     private BigDecimal thirdPartyManagementRate;
     
     @DecimalMin(value = "0.0", message = "Third party profit distribution rate must be non-negative")
-    @DecimalMax(value = "1.0", message = "Third party profit distribution rate must not exceed 100%")
-    @Digits(integer = 1, fraction = 4, message = "Third party profit distribution rate must have at most 1 integer digit and 4 decimal places")
+    @DecimalMax(value = "100.0", message = "Third party profit distribution rate must not exceed 100%")
+    @Digits(integer = 3, fraction = 2, message = "Third party profit distribution rate must have at most 3 integer digits and 2 decimal places")
     @Column("third_party_profit_distribution_rate")
     private BigDecimal thirdPartyProfitDistributionRate;
+    
+    @Size(max = 20, message = "Phone number length cannot exceed 20 characters")
+    @Pattern(regexp = "^[+]?[0-9\\s\\-\\(\\)]*$", message = "Phone number can only contain numbers, spaces, hyphens, parentheses, and optional plus sign")
+    @Column("phone_number")
+    private String phoneNumber;
+    
+    @DecimalMin(value = "0.0", message = "Consumption tax rate must be non-negative")
+    @DecimalMax(value = "100.0", message = "Consumption tax rate must not exceed 100%")
+    @Digits(integer = 3, fraction = 2, message = "Consumption tax rate must have at most 3 integer digits and 2 decimal places")
+    @Column("consumption_tax_rate")
+    private BigDecimal consumptionTaxRate;
+    
+    @DecimalMin(value = "0.0", message = "Non-working deduction must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Non-working deduction must have at most 10 integer digits and 2 decimal places")
+    @Column("non_working_deduction")
+    private BigDecimal nonWorkingDeduction;
+    
+    @DecimalMin(value = "0.0", message = "Overtime allowance must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Overtime allowance must have at most 10 integer digits and 2 decimal places")
+    @Column("overtime_allowance")
+    private BigDecimal overtimeAllowance;
+    
+    @DecimalMin(value = "0.0", message = "Commuting allowance must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Commuting allowance must have at most 10 integer digits and 2 decimal places")
+    @Column("commuting_allowance")
+    private BigDecimal commutingAllowance;
+    
+    @Size(max = 1000, message = "Remarks length cannot exceed 1000 characters")
+    @Column("remarks")
+    private String remarks;
     
     @Column("created_at")
     private LocalDateTime createdAt;
@@ -126,7 +156,7 @@ public class Employee {
     public Employee() {}
     
     // All parameters constructor
-    public Employee(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday, String email, BigDecimal basicSalary, Integer dependentCount, Boolean healthInsuranceEnrolled, Boolean welfarePensionEnrolled, BigDecimal unitPrice, BigDecimal individualBusinessAmount, BigDecimal positionAllowance, BigDecimal housingAllowance, BigDecimal familyAllowance, BigDecimal collectionFeeAmount, BigDecimal paymentFeeAmount, BigDecimal thirdPartyManagementRate, BigDecimal thirdPartyProfitDistributionRate) {
+    public Employee(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday, String email, BigDecimal basicSalary, Integer dependentCount, Boolean healthInsuranceEnrolled, Boolean welfarePensionEnrolled, BigDecimal unitPrice, BigDecimal individualBusinessAmount, BigDecimal positionAllowance, BigDecimal housingAllowance, BigDecimal familyAllowance, BigDecimal collectionFeeAmount, BigDecimal paymentFeeAmount, BigDecimal thirdPartyManagementRate, BigDecimal thirdPartyProfitDistributionRate, String phoneNumber, BigDecimal consumptionTaxRate, BigDecimal nonWorkingDeduction, BigDecimal overtimeAllowance, BigDecimal commutingAllowance, String remarks) {
         this.employeeId = employeeId;
         this.employeeNumber = employeeNumber;
         this.name = name;
@@ -146,6 +176,12 @@ public class Employee {
         this.paymentFeeAmount = paymentFeeAmount;
         this.thirdPartyManagementRate = thirdPartyManagementRate;
         this.thirdPartyProfitDistributionRate = thirdPartyProfitDistributionRate;
+        this.phoneNumber = phoneNumber;
+        this.consumptionTaxRate = consumptionTaxRate;
+        this.nonWorkingDeduction = nonWorkingDeduction;
+        this.overtimeAllowance = overtimeAllowance;
+        this.commutingAllowance = commutingAllowance;
+        this.remarks = remarks;
     }
     
     // Getter and Setter methods
@@ -301,6 +337,54 @@ public class Employee {
         this.thirdPartyProfitDistributionRate = thirdPartyProfitDistributionRate;
     }
     
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+    
+    public BigDecimal getConsumptionTaxRate() {
+        return consumptionTaxRate;
+    }
+    
+    public void setConsumptionTaxRate(BigDecimal consumptionTaxRate) {
+        this.consumptionTaxRate = consumptionTaxRate;
+    }
+    
+    public BigDecimal getNonWorkingDeduction() {
+        return nonWorkingDeduction;
+    }
+    
+    public void setNonWorkingDeduction(BigDecimal nonWorkingDeduction) {
+        this.nonWorkingDeduction = nonWorkingDeduction;
+    }
+    
+    public BigDecimal getOvertimeAllowance() {
+        return overtimeAllowance;
+    }
+    
+    public void setOvertimeAllowance(BigDecimal overtimeAllowance) {
+        this.overtimeAllowance = overtimeAllowance;
+    }
+    
+    public BigDecimal getCommutingAllowance() {
+        return commutingAllowance;
+    }
+    
+    public void setCommutingAllowance(BigDecimal commutingAllowance) {
+        this.commutingAllowance = commutingAllowance;
+    }
+    
+    public String getRemarks() {
+        return remarks;
+    }
+    
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+    
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -367,6 +451,12 @@ public class Employee {
                 ", paymentFeeAmount=" + paymentFeeAmount +
                 ", thirdPartyManagementRate=" + thirdPartyManagementRate +
                 ", thirdPartyProfitDistributionRate=" + thirdPartyProfitDistributionRate +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", consumptionTaxRate=" + consumptionTaxRate +
+                ", nonWorkingDeduction=" + nonWorkingDeduction +
+                ", overtimeAllowance=" + overtimeAllowance +
+                ", commutingAllowance=" + commutingAllowance +
+                ", remarks='" + remarks + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", deletedAt=" + deletedAt +
