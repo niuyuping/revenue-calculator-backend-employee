@@ -357,6 +357,11 @@ public class EmployeeService {
         dto.setOvertimeAllowance(employee.getOvertimeAllowance());
         dto.setCommutingAllowance(employee.getCommutingAllowance());
         dto.setRemarks(employee.getRemarks());
+        dto.setIsDisabled(employee.getIsDisabled());
+        dto.setIsSingleParent(employee.getIsSingleParent());
+        dto.setIsWidow(employee.getIsWidow());
+        dto.setIsWorkingStudent(employee.getIsWorkingStudent());
+        dto.setDisabledDependentCount(employee.getDisabledDependentCount());
         
         return dto;
     }
@@ -397,6 +402,11 @@ public class EmployeeService {
         employee.setOvertimeAllowance(dto.getOvertimeAllowance());
         employee.setCommutingAllowance(dto.getCommutingAllowance());
         employee.setRemarks(dto.getRemarks());
+        employee.setIsDisabled(dto.getIsDisabled());
+        employee.setIsSingleParent(dto.getIsSingleParent());
+        employee.setIsWidow(dto.getIsWidow());
+        employee.setIsWorkingStudent(dto.getIsWorkingStudent());
+        employee.setDisabledDependentCount(dto.getDisabledDependentCount());
         
         return employee;
     }

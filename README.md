@@ -99,6 +99,11 @@ A reactive employee management system built with Spring Boot 3.x, R2DBC, and Web
 | `overtimeAllowance` | BigDecimal | Overtime allowance amount in JPY | Optional, non-negative, max 10 digits |
 | `commutingAllowance` | BigDecimal | Commuting allowance amount in JPY | Optional, non-negative, max 10 digits |
 | `remarks` | String | Additional remarks or notes | Optional, max 1000 chars |
+| `isDisabled` | Boolean | Whether the employee is disabled (for tax deduction) | Optional, true/false |
+| `isSingleParent` | Boolean | Whether the employee is a single parent (for tax deduction) | Optional, true/false |
+| `isWidow` | Boolean | Whether the employee is a widow (for tax deduction) | Optional, true/false |
+| `isWorkingStudent` | Boolean | Whether the employee is a working student (for tax deduction) | Optional, true/false |
+| `disabledDependentCount` | Integer | Number of disabled dependents (for tax deduction) | Optional, non-negative |
 
 ## 🧪 Testing
 
@@ -185,6 +190,14 @@ management.endpoints.web.exposure.include=health,info,metrics
 - ✅ Added comprehensive test coverage for all new fields
 - ✅ Updated Swagger/OpenAPI documentation with new field examples
 
+## 📝 Recent Updates (v1.6.0)
+
+- ✅ Added 5 new deduction target fields: isDisabled, isSingleParent, isWidow, isWorkingStudent, disabledDependentCount
+- ✅ Enhanced tax deduction calculation support for Japanese tax system
+- ✅ Updated database schema with V15 migration
+- ✅ Improved API documentation with deduction field descriptions
+- ✅ Updated Swagger/OpenAPI documentation
+
 ## 📝 Previous Updates (v1.2.0)
 
 - ✅ Added email and basic salary fields to employee model
@@ -211,4 +224,4 @@ management.endpoints.web.exposure.include=health,info,metrics
 
 ---
 
-**Version**: v1.5.0 | **Last Updated**: December 2024 | **Java**: 21+ | **Spring Boot**: 3.5.6+
+**Version**: v1.6.0 | **Last Updated**: December 2024 | **Java**: 21+ | **Spring Boot**: 3.5.6+

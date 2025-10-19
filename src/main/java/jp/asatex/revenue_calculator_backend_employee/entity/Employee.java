@@ -137,6 +137,22 @@ public class Employee {
     @Column("remarks")
     private String remarks;
     
+    @Column("is_disabled")
+    private Boolean isDisabled;
+    
+    @Column("is_single_parent")
+    private Boolean isSingleParent;
+    
+    @Column("is_widow")
+    private Boolean isWidow;
+    
+    @Column("is_working_student")
+    private Boolean isWorkingStudent;
+    
+    @Min(value = 0, message = "Disabled dependent count must be non-negative")
+    @Column("disabled_dependent_count")
+    private Integer disabledDependentCount;
+    
     @Column("created_at")
     private LocalDateTime createdAt;
     
@@ -156,7 +172,7 @@ public class Employee {
     public Employee() {}
     
     // All parameters constructor
-    public Employee(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday, String email, BigDecimal basicSalary, Integer dependentCount, Boolean healthInsuranceEnrolled, Boolean welfarePensionEnrolled, BigDecimal unitPrice, BigDecimal individualBusinessAmount, BigDecimal positionAllowance, BigDecimal housingAllowance, BigDecimal familyAllowance, BigDecimal collectionFeeAmount, BigDecimal paymentFeeAmount, BigDecimal thirdPartyManagementRate, BigDecimal thirdPartyProfitDistributionRate, String phoneNumber, BigDecimal consumptionTaxRate, BigDecimal nonWorkingDeduction, BigDecimal overtimeAllowance, BigDecimal commutingAllowance, String remarks) {
+    public Employee(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday, String email, BigDecimal basicSalary, Integer dependentCount, Boolean healthInsuranceEnrolled, Boolean welfarePensionEnrolled, BigDecimal unitPrice, BigDecimal individualBusinessAmount, BigDecimal positionAllowance, BigDecimal housingAllowance, BigDecimal familyAllowance, BigDecimal collectionFeeAmount, BigDecimal paymentFeeAmount, BigDecimal thirdPartyManagementRate, BigDecimal thirdPartyProfitDistributionRate, String phoneNumber, BigDecimal consumptionTaxRate, BigDecimal nonWorkingDeduction, BigDecimal overtimeAllowance, BigDecimal commutingAllowance, String remarks, Boolean isDisabled, Boolean isSingleParent, Boolean isWidow, Boolean isWorkingStudent, Integer disabledDependentCount) {
         this.employeeId = employeeId;
         this.employeeNumber = employeeNumber;
         this.name = name;
@@ -182,6 +198,11 @@ public class Employee {
         this.overtimeAllowance = overtimeAllowance;
         this.commutingAllowance = commutingAllowance;
         this.remarks = remarks;
+        this.isDisabled = isDisabled;
+        this.isSingleParent = isSingleParent;
+        this.isWidow = isWidow;
+        this.isWorkingStudent = isWorkingStudent;
+        this.disabledDependentCount = disabledDependentCount;
     }
     
     // Getter and Setter methods
@@ -385,6 +406,46 @@ public class Employee {
         this.remarks = remarks;
     }
     
+    public Boolean getIsDisabled() {
+        return isDisabled;
+    }
+    
+    public void setIsDisabled(Boolean isDisabled) {
+        this.isDisabled = isDisabled;
+    }
+    
+    public Boolean getIsSingleParent() {
+        return isSingleParent;
+    }
+    
+    public void setIsSingleParent(Boolean isSingleParent) {
+        this.isSingleParent = isSingleParent;
+    }
+    
+    public Boolean getIsWidow() {
+        return isWidow;
+    }
+    
+    public void setIsWidow(Boolean isWidow) {
+        this.isWidow = isWidow;
+    }
+    
+    public Boolean getIsWorkingStudent() {
+        return isWorkingStudent;
+    }
+    
+    public void setIsWorkingStudent(Boolean isWorkingStudent) {
+        this.isWorkingStudent = isWorkingStudent;
+    }
+    
+    public Integer getDisabledDependentCount() {
+        return disabledDependentCount;
+    }
+    
+    public void setDisabledDependentCount(Integer disabledDependentCount) {
+        this.disabledDependentCount = disabledDependentCount;
+    }
+    
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -457,6 +518,11 @@ public class Employee {
                 ", overtimeAllowance=" + overtimeAllowance +
                 ", commutingAllowance=" + commutingAllowance +
                 ", remarks='" + remarks + '\'' +
+                ", isDisabled=" + isDisabled +
+                ", isSingleParent=" + isSingleParent +
+                ", isWidow=" + isWidow +
+                ", isWorkingStudent=" + isWorkingStudent +
+                ", disabledDependentCount=" + disabledDependentCount +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", deletedAt=" + deletedAt +

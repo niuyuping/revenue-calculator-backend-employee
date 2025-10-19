@@ -136,11 +136,27 @@ public class EmployeeDto {
     @Size(max = 1000, message = "Remarks length cannot exceed 1000 characters")
     private String remarks;
     
+    @Schema(description = "Whether the employee is disabled (for tax deduction)", example = "false")
+    private Boolean isDisabled;
+    
+    @Schema(description = "Whether the employee is a single parent (for tax deduction)", example = "false")
+    private Boolean isSingleParent;
+    
+    @Schema(description = "Whether the employee is a widow (for tax deduction)", example = "false")
+    private Boolean isWidow;
+    
+    @Schema(description = "Whether the employee is a working student (for tax deduction)", example = "false")
+    private Boolean isWorkingStudent;
+    
+    @Schema(description = "Number of disabled dependents (for tax deduction)", example = "0")
+    @Min(value = 0, message = "Disabled dependent count must be non-negative")
+    private Integer disabledDependentCount;
+    
     // Default constructor
     public EmployeeDto() {}
     
     // All parameters constructor
-    public EmployeeDto(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday, String email, BigDecimal basicSalary, Integer dependentCount, Boolean healthInsuranceEnrolled, Boolean welfarePensionEnrolled, BigDecimal unitPrice, BigDecimal individualBusinessAmount, BigDecimal positionAllowance, BigDecimal housingAllowance, BigDecimal familyAllowance, BigDecimal collectionFeeAmount, BigDecimal paymentFeeAmount, BigDecimal thirdPartyManagementRate, BigDecimal thirdPartyProfitDistributionRate, String phoneNumber, BigDecimal consumptionTaxRate, BigDecimal nonWorkingDeduction, BigDecimal overtimeAllowance, BigDecimal commutingAllowance, String remarks) {
+    public EmployeeDto(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday, String email, BigDecimal basicSalary, Integer dependentCount, Boolean healthInsuranceEnrolled, Boolean welfarePensionEnrolled, BigDecimal unitPrice, BigDecimal individualBusinessAmount, BigDecimal positionAllowance, BigDecimal housingAllowance, BigDecimal familyAllowance, BigDecimal collectionFeeAmount, BigDecimal paymentFeeAmount, BigDecimal thirdPartyManagementRate, BigDecimal thirdPartyProfitDistributionRate, String phoneNumber, BigDecimal consumptionTaxRate, BigDecimal nonWorkingDeduction, BigDecimal overtimeAllowance, BigDecimal commutingAllowance, String remarks, Boolean isDisabled, Boolean isSingleParent, Boolean isWidow, Boolean isWorkingStudent, Integer disabledDependentCount) {
         this.employeeId = employeeId;
         this.employeeNumber = employeeNumber;
         this.name = name;
@@ -166,6 +182,11 @@ public class EmployeeDto {
         this.overtimeAllowance = overtimeAllowance;
         this.commutingAllowance = commutingAllowance;
         this.remarks = remarks;
+        this.isDisabled = isDisabled;
+        this.isSingleParent = isSingleParent;
+        this.isWidow = isWidow;
+        this.isWorkingStudent = isWorkingStudent;
+        this.disabledDependentCount = disabledDependentCount;
     }
     
     // Getter and Setter methods
@@ -369,6 +390,46 @@ public class EmployeeDto {
         this.remarks = remarks;
     }
     
+    public Boolean getIsDisabled() {
+        return isDisabled;
+    }
+    
+    public void setIsDisabled(Boolean isDisabled) {
+        this.isDisabled = isDisabled;
+    }
+    
+    public Boolean getIsSingleParent() {
+        return isSingleParent;
+    }
+    
+    public void setIsSingleParent(Boolean isSingleParent) {
+        this.isSingleParent = isSingleParent;
+    }
+    
+    public Boolean getIsWidow() {
+        return isWidow;
+    }
+    
+    public void setIsWidow(Boolean isWidow) {
+        this.isWidow = isWidow;
+    }
+    
+    public Boolean getIsWorkingStudent() {
+        return isWorkingStudent;
+    }
+    
+    public void setIsWorkingStudent(Boolean isWorkingStudent) {
+        this.isWorkingStudent = isWorkingStudent;
+    }
+    
+    public Integer getDisabledDependentCount() {
+        return disabledDependentCount;
+    }
+    
+    public void setDisabledDependentCount(Integer disabledDependentCount) {
+        this.disabledDependentCount = disabledDependentCount;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -398,12 +459,17 @@ public class EmployeeDto {
                 Objects.equals(nonWorkingDeduction, that.nonWorkingDeduction) &&
                 Objects.equals(overtimeAllowance, that.overtimeAllowance) &&
                 Objects.equals(commutingAllowance, that.commutingAllowance) &&
-                Objects.equals(remarks, that.remarks);
+                Objects.equals(remarks, that.remarks) &&
+                Objects.equals(isDisabled, that.isDisabled) &&
+                Objects.equals(isSingleParent, that.isSingleParent) &&
+                Objects.equals(isWidow, that.isWidow) &&
+                Objects.equals(isWorkingStudent, that.isWorkingStudent) &&
+                Objects.equals(disabledDependentCount, that.disabledDependentCount);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(employeeId, employeeNumber, name, furigana, birthday, email, basicSalary, dependentCount, healthInsuranceEnrolled, welfarePensionEnrolled, unitPrice, individualBusinessAmount, positionAllowance, housingAllowance, familyAllowance, collectionFeeAmount, paymentFeeAmount, thirdPartyManagementRate, thirdPartyProfitDistributionRate, phoneNumber, consumptionTaxRate, nonWorkingDeduction, overtimeAllowance, commutingAllowance, remarks);
+        return Objects.hash(employeeId, employeeNumber, name, furigana, birthday, email, basicSalary, dependentCount, healthInsuranceEnrolled, welfarePensionEnrolled, unitPrice, individualBusinessAmount, positionAllowance, housingAllowance, familyAllowance, collectionFeeAmount, paymentFeeAmount, thirdPartyManagementRate, thirdPartyProfitDistributionRate, phoneNumber, consumptionTaxRate, nonWorkingDeduction, overtimeAllowance, commutingAllowance, remarks, isDisabled, isSingleParent, isWidow, isWorkingStudent, disabledDependentCount);
     }
 
     @Override
@@ -434,6 +500,11 @@ public class EmployeeDto {
                 ", overtimeAllowance=" + overtimeAllowance +
                 ", commutingAllowance=" + commutingAllowance +
                 ", remarks='" + remarks + '\'' +
+                ", isDisabled=" + isDisabled +
+                ", isSingleParent=" + isSingleParent +
+                ", isWidow=" + isWidow +
+                ", isWorkingStudent=" + isWorkingStudent +
+                ", disabledDependentCount=" + disabledDependentCount +
                 '}';
     }
 }

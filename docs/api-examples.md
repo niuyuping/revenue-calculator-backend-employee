@@ -28,7 +28,12 @@
   "nonWorkingDeduction": 50000.00,
   "overtimeAllowance": 25000.00,
   "commutingAllowance": 15000.00,
-  "remarks": "Special skills: Java, Spring Boot, React"
+  "remarks": "Special skills: Java, Spring Boot, React",
+  "isDisabled": false,
+  "isSingleParent": false,
+  "isWidow": false,
+  "isWorkingStudent": false,
+  "disabledDependentCount": 0
 }
 ```
 
@@ -59,7 +64,12 @@
   "nonWorkingDeduction": 50000.00,
   "overtimeAllowance": 25000.00,
   "commutingAllowance": 15000.00,
-  "remarks": "Special skills: Java, Spring Boot, React"
+  "remarks": "Special skills: Java, Spring Boot, React",
+  "isDisabled": false,
+  "isSingleParent": false,
+  "isWidow": false,
+  "isWorkingStudent": false,
+  "disabledDependentCount": 0
 }
 ```
 
@@ -236,6 +246,60 @@
       "message": "Dependent count must be non-negative"
     }
   ]
+}
+```
+
+## 🏷️ Deduction Target Field Examples
+
+### Valid Deduction Target Values
+```json
+{
+  "isDisabled": true,
+  "isSingleParent": false,
+  "isWidow": false,
+  "isWorkingStudent": true,
+  "disabledDependentCount": 2
+}
+```
+
+### Invalid Deduction Target Values
+```json
+{
+  "isDisabled": "yes",  // ❌ Should be boolean
+  "isSingleParent": null,  // ✅ null is allowed
+  "isWidow": "true",  // ❌ Should be boolean
+  "isWorkingStudent": false,  // ✅ Valid
+  "disabledDependentCount": -1  // ❌ Should be non-negative
+}
+```
+
+### Tax Deduction Scenarios
+```json
+// Scenario 1: Disabled employee with disabled dependents
+{
+  "isDisabled": true,
+  "disabledDependentCount": 1
+}
+
+// Scenario 2: Single parent
+{
+  "isSingleParent": true,
+  "disabledDependentCount": 0
+}
+
+// Scenario 3: Working student
+{
+  "isWorkingStudent": true,
+  "disabledDependentCount": 0
+}
+
+// Scenario 4: Regular employee
+{
+  "isDisabled": false,
+  "isSingleParent": false,
+  "isWidow": false,
+  "isWorkingStudent": false,
+  "disabledDependentCount": 0
 }
 ```
 
