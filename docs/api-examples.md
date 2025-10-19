@@ -12,8 +12,8 @@
   "email": "yamada.taro@example.com",
   "basicSalary": 320000.00,
   "dependentCount": 1,
-  "healthInsuranceEnrolled": true,
-  "welfarePensionEnrolled": false,
+  "noHealthInsurance": false,
+  "noPensionInsurance": true,
   "unitPrice": 4500.00,
   "individualBusinessAmount": 135000.00,
   "positionAllowance": 45000.00,
@@ -48,8 +48,8 @@
   "email": "yamada.taro@example.com",
   "basicSalary": 320000.00,
   "dependentCount": 1,
-  "healthInsuranceEnrolled": true,
-  "welfarePensionEnrolled": false,
+  "noHealthInsurance": false,
+  "noPensionInsurance": true,
   "unitPrice": 4500.00,
   "individualBusinessAmount": 135000.00,
   "positionAllowance": 45000.00,
@@ -300,6 +300,56 @@
   "isWidow": false,
   "isWorkingStudent": false,
   "disabledDependentCount": 0
+}
+```
+
+## 🏥 Insurance Field Examples
+
+### Insurance Field Logic
+The insurance fields use a "NOT enrolled" logic:
+- `false` = **Enrolled** in insurance (default)
+- `true` = **NOT enrolled** in insurance
+
+### Valid Insurance Values
+```json
+{
+  "noHealthInsurance": false,  // ✅ Enrolled in health insurance
+  "noPensionInsurance": false  // ✅ Enrolled in pension insurance
+}
+```
+
+### Invalid Insurance Values
+```json
+{
+  "noHealthInsurance": "yes",  // ❌ Should be boolean
+  "noPensionInsurance": null   // ✅ null is allowed
+}
+```
+
+### Insurance Scenarios
+```json
+// Scenario 1: Fully enrolled employee (default)
+{
+  "noHealthInsurance": false,
+  "noPensionInsurance": false
+}
+
+// Scenario 2: Not enrolled in pension insurance
+{
+  "noHealthInsurance": false,
+  "noPensionInsurance": true
+}
+
+// Scenario 3: Not enrolled in health insurance
+{
+  "noHealthInsurance": true,
+  "noPensionInsurance": false
+}
+
+// Scenario 4: Not enrolled in either insurance
+{
+  "noHealthInsurance": true,
+  "noPensionInsurance": true
 }
 ```
 

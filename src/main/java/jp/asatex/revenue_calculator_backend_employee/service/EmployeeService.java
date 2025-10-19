@@ -340,8 +340,8 @@ public class EmployeeService {
         dto.setEmail(employee.getEmail());
         dto.setBasicSalary(employee.getBasicSalary());
         dto.setDependentCount(employee.getDependentCount());
-        dto.setHealthInsuranceEnrolled(employee.getHealthInsuranceEnrolled());
-        dto.setWelfarePensionEnrolled(employee.getWelfarePensionEnrolled());
+        dto.setNoHealthInsurance(employee.getNoHealthInsurance());
+        dto.setNoPensionInsurance(employee.getNoPensionInsurance());
         dto.setUnitPrice(employee.getUnitPrice());
         dto.setIndividualBusinessAmount(employee.getIndividualBusinessAmount());
         dto.setPositionAllowance(employee.getPositionAllowance());
@@ -385,8 +385,8 @@ public class EmployeeService {
         employee.setEmail(dto.getEmail());
         employee.setBasicSalary(dto.getBasicSalary());
         employee.setDependentCount(dto.getDependentCount());
-        employee.setHealthInsuranceEnrolled(dto.getHealthInsuranceEnrolled());
-        employee.setWelfarePensionEnrolled(dto.getWelfarePensionEnrolled());
+        employee.setNoHealthInsurance(dto.getNoHealthInsurance());
+        employee.setNoPensionInsurance(dto.getNoPensionInsurance());
         employee.setUnitPrice(dto.getUnitPrice());
         employee.setIndividualBusinessAmount(dto.getIndividualBusinessAmount());
         employee.setPositionAllowance(dto.getPositionAllowance());
