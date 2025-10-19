@@ -159,8 +159,8 @@ class EmployeeControllerTest {
                     assertThat(response.getEmail()).isEqualTo("tanaka.updated@example.com");
                     assertThat(response.getBasicSalary()).isEqualTo(new BigDecimal("450000"));
                     assertThat(response.getDependentCount()).isEqualTo(4);
-                    assertThat(response.getHealthInsuranceEnrolled()).isFalse();
-                    assertThat(response.getWelfarePensionEnrolled()).isFalse();
+                    assertThat(response.getNoHealthInsurance()).isFalse();
+                    assertThat(response.getNoPensionInsurance()).isFalse();
                     assertThat(response.getUnitPrice()).isEqualTo(new BigDecimal("6000"));
                     assertThat(response.getIndividualBusinessAmount()).isEqualTo(new BigDecimal("180000"));
                     assertThat(response.getPositionAllowance()).isEqualTo(new BigDecimal("60000"));

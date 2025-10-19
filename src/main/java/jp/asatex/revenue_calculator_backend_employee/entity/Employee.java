@@ -54,11 +54,11 @@ public class Employee {
     @Column("dependent_count")
     private Integer dependentCount;
     
-    @Column("health_insurance_enrolled")
-    private Boolean healthInsuranceEnrolled;
+    @Column("no_health_insurance")
+    private Boolean noHealthInsurance;
     
-    @Column("welfare_pension_enrolled")
-    private Boolean welfarePensionEnrolled;
+    @Column("no_pension_insurance")
+    private Boolean noPensionInsurance;
     
     @DecimalMin(value = "0.01", message = "Unit price must be positive")
     @Digits(integer = 10, fraction = 2, message = "Unit price must have at most 10 integer digits and 2 decimal places")
@@ -172,7 +172,7 @@ public class Employee {
     public Employee() {}
     
     // All parameters constructor
-    public Employee(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday, String email, BigDecimal basicSalary, Integer dependentCount, Boolean healthInsuranceEnrolled, Boolean welfarePensionEnrolled, BigDecimal unitPrice, BigDecimal individualBusinessAmount, BigDecimal positionAllowance, BigDecimal housingAllowance, BigDecimal familyAllowance, BigDecimal collectionFeeAmount, BigDecimal paymentFeeAmount, BigDecimal thirdPartyManagementRate, BigDecimal thirdPartyProfitDistributionRate, String phoneNumber, BigDecimal consumptionTaxRate, BigDecimal nonWorkingDeduction, BigDecimal overtimeAllowance, BigDecimal commutingAllowance, String remarks, Boolean isDisabled, Boolean isSingleParent, Boolean isWidow, Boolean isWorkingStudent, Integer disabledDependentCount) {
+    public Employee(Long employeeId, String employeeNumber, String name, String furigana, LocalDate birthday, String email, BigDecimal basicSalary, Integer dependentCount, Boolean noHealthInsurance, Boolean noPensionInsurance, BigDecimal unitPrice, BigDecimal individualBusinessAmount, BigDecimal positionAllowance, BigDecimal housingAllowance, BigDecimal familyAllowance, BigDecimal collectionFeeAmount, BigDecimal paymentFeeAmount, BigDecimal thirdPartyManagementRate, BigDecimal thirdPartyProfitDistributionRate, String phoneNumber, BigDecimal consumptionTaxRate, BigDecimal nonWorkingDeduction, BigDecimal overtimeAllowance, BigDecimal commutingAllowance, String remarks, Boolean isDisabled, Boolean isSingleParent, Boolean isWidow, Boolean isWorkingStudent, Integer disabledDependentCount) {
         this.employeeId = employeeId;
         this.employeeNumber = employeeNumber;
         this.name = name;
@@ -181,8 +181,8 @@ public class Employee {
         this.email = email;
         this.basicSalary = basicSalary;
         this.dependentCount = dependentCount;
-        this.healthInsuranceEnrolled = healthInsuranceEnrolled;
-        this.welfarePensionEnrolled = welfarePensionEnrolled;
+        this.noHealthInsurance = noHealthInsurance;
+        this.noPensionInsurance = noPensionInsurance;
         this.unitPrice = unitPrice;
         this.individualBusinessAmount = individualBusinessAmount;
         this.positionAllowance = positionAllowance;
@@ -270,20 +270,20 @@ public class Employee {
         this.dependentCount = dependentCount;
     }
     
-    public Boolean getHealthInsuranceEnrolled() {
-        return healthInsuranceEnrolled;
+    public Boolean getNoHealthInsurance() {
+        return noHealthInsurance;
     }
     
-    public void setHealthInsuranceEnrolled(Boolean healthInsuranceEnrolled) {
-        this.healthInsuranceEnrolled = healthInsuranceEnrolled;
+    public void setNoHealthInsurance(Boolean noHealthInsurance) {
+        this.noHealthInsurance = noHealthInsurance;
     }
     
-    public Boolean getWelfarePensionEnrolled() {
-        return welfarePensionEnrolled;
+    public Boolean getNoPensionInsurance() {
+        return noPensionInsurance;
     }
     
-    public void setWelfarePensionEnrolled(Boolean welfarePensionEnrolled) {
-        this.welfarePensionEnrolled = welfarePensionEnrolled;
+    public void setNoPensionInsurance(Boolean noPensionInsurance) {
+        this.noPensionInsurance = noPensionInsurance;
     }
     
     public BigDecimal getUnitPrice() {
@@ -501,8 +501,8 @@ public class Employee {
                 ", email='" + email + '\'' +
                 ", basicSalary=" + basicSalary +
                 ", dependentCount=" + dependentCount +
-                ", healthInsuranceEnrolled=" + healthInsuranceEnrolled +
-                ", welfarePensionEnrolled=" + welfarePensionEnrolled +
+                ", noHealthInsurance=" + noHealthInsurance +
+                ", noPensionInsurance=" + noPensionInsurance +
                 ", unitPrice=" + unitPrice +
                 ", individualBusinessAmount=" + individualBusinessAmount +
                 ", positionAllowance=" + positionAllowance +

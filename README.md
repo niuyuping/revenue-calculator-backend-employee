@@ -82,8 +82,8 @@ A reactive employee management system built with Spring Boot 3.x, R2DBC, and Web
 | `email` | String | Email address | Optional, valid email format, max 255 chars |
 | `basicSalary` | BigDecimal | Monthly salary in JPY | Optional, non-negative, max 10 digits |
 | `dependentCount` | Integer | Number of dependents | Optional, non-negative |
-| `healthInsuranceEnrolled` | Boolean | Health insurance enrollment | Optional, true/false |
-| `welfarePensionEnrolled` | Boolean | Welfare pension enrollment | Optional, true/false |
+| `noHealthInsurance` | Boolean | Whether NOT enrolled in health insurance | Optional, false=enrolled, true=not enrolled |
+| `noPensionInsurance` | Boolean | Whether NOT enrolled in pension insurance | Optional, false=enrolled, true=not enrolled |
 | `unitPrice` | BigDecimal | Unit price per hour/day | Optional, positive, max 10 digits |
 | `individualBusinessAmount` | BigDecimal | Individual business request amount | Optional, non-negative, max 10 digits |
 | `positionAllowance` | BigDecimal | Position allowance amount | Optional, non-negative, max 10 digits |
@@ -190,7 +190,15 @@ management.endpoints.web.exposure.include=health,info,metrics
 - ✅ Added comprehensive test coverage for all new fields
 - ✅ Updated Swagger/OpenAPI documentation with new field examples
 
-## 📝 Recent Updates (v1.6.0)
+## 📝 Recent Updates (v1.7.0)
+
+- ✅ Renamed insurance fields: healthInsuranceEnrolled → noHealthInsurance, welfarePensionEnrolled → noPensionInsurance
+- ✅ Fixed insurance field logic: false = enrolled (default), true = not enrolled
+- ✅ Updated database schema with V16 migration
+- ✅ Improved field naming consistency and clarity
+- ✅ Updated API documentation and Swagger/OpenAPI documentation
+
+## 📝 Previous Updates (v1.6.0)
 
 - ✅ Added 5 new deduction target fields: isDisabled, isSingleParent, isWidow, isWorkingStudent, disabledDependentCount
 - ✅ Enhanced tax deduction calculation support for Japanese tax system
@@ -224,4 +232,4 @@ management.endpoints.web.exposure.include=health,info,metrics
 
 ---
 
-**Version**: v1.6.0 | **Last Updated**: December 2024 | **Java**: 21+ | **Spring Boot**: 3.5.6+
+**Version**: v1.7.0 | **Last Updated**: December 2024 | **Java**: 21+ | **Spring Boot**: 3.5.6+
