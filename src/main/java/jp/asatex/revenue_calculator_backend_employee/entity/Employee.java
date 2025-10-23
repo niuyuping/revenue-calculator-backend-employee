@@ -60,7 +60,7 @@ public class Employee {
     @Column("no_pension_insurance")
     private Boolean noPensionInsurance;
     
-    @DecimalMin(value = "0.01", message = "Unit price must be positive")
+    @DecimalMin(value = "0.0", message = "Unit price must be non-negative")
     @Digits(integer = 10, fraction = 2, message = "Unit price must have at most 10 integer digits and 2 decimal places")
     @Column("unit_price")
     private BigDecimal unitPrice;

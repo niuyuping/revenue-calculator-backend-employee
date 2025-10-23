@@ -60,7 +60,7 @@ public class EmployeeDto {
     private Boolean noPensionInsurance;
     
     @Schema(description = "Unit price per hour/day in JPY", example = "5000.00")
-    @DecimalMin(value = "0.01", message = "Unit price must be positive")
+    @DecimalMin(value = "0.0", message = "Unit price must be non-negative")
     @Digits(integer = 10, fraction = 2, message = "Unit price must have at most 10 integer digits and 2 decimal places")
     private BigDecimal unitPrice;
     
